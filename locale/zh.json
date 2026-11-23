@@ -1,6 +1,6 @@
 {
   "meta": {
-    "title": "FPL Core",
+    "title": "dsh-fpl-core",
     "description": "为 FPL 应用提供模型、编程智能体、本地模型、任务与资源等公共能力。安装与完整文档请查看 GitHub。",
     "detail": "docs/PLUGIN.zh.md"
   }
