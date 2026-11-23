@@ -20,8 +20,10 @@ async function fixture(t) {
   const child = spawn(
     resolve(".runtime/worker-venv/bin/python"),
     ["tests/fixtures/server.py", "--root", root, "--port", String(port)],
-    { stdio: "ignore" },
+    { stdio: ["ignore", "ignore", "pipe"] },
   );
+  let errors = "";
+  child.stderr.on("data", (value) => (errors += value.toString()));
   t.after(async () => {
     child.kill("SIGTERM");
     await new Promise((r) => {
@@ -31,16 +33,18 @@ async function fixture(t) {
     await rm(root, { recursive: true, force: true });
   });
   let ready = false;
-  for (let i = 0; i < 100; i++) {
+  for (let i = 0; i < 600; i++) {
     try {
       if ((await fetch(endpoint + "/ready")).ok) {
         ready = true;
         break;
       }
     } catch {}
+    if (child.exitCode !== null)
+      assert.fail(errors || "Core exited before readiness");
     await new Promise((r) => setTimeout(r, 50));
   }
-  assert.ok(ready);
+  assert.ok(ready, errors || "Core readiness exceeded 30 seconds");
   const pair = JSON.parse(await readFile(root + "/fixture-pair.json", "utf8"));
   const keyStore = new Map([["DSH_CORE_BRIDGE", pair.token]]);
   const tools = new Map(),

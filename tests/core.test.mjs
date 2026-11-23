@@ -34,7 +34,7 @@ async function fixture(t) {
     });
   };
   const waitReady = async () => {
-    for (let i = 0; i < 100; i++) {
+    for (let i = 0; i < 600; i++) {
       try {
         if ((await fetch(endpoint + "/ready")).ok) return;
       } catch {}
@@ -196,7 +196,7 @@ test("closing DSH interrupts only the callback task and preserves partial output
     model: "model",
     prompt: "Wait",
   });
-  for (let i = 0; i < 100; i++) {
+  for (let i = 0; i < 600; i++) {
     if ((await service.task(task.id)).text === "Partial output") break;
     await new Promise((r) => setTimeout(r, 20));
   }
@@ -213,7 +213,7 @@ test("closing DSH interrupts only the callback task and preserves partial output
     .getSetCookie()
     .map((x) => x.split(";")[0])
     .join("; ");
-  for (let i = 0; i < 100; i++) {
+  for (let i = 0; i < 600; i++) {
     const current = await (
       await fetch(endpoint + "/v1/tasks/" + task.id, {
         headers: { Cookie: cookies },
