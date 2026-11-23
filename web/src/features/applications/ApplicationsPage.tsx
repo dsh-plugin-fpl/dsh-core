@@ -20,11 +20,11 @@ export function ApplicationsPage({
   const [search, setSearch] = useState("");
   const [category, setCategory] = useState("all");
   const [guide, setGuide] = useState(false);
-  const applications = (query.data || []).filter(
-    (app, index, all) =>
-      !app.url || all.findIndex((other) => other.url === app.url) === index,
+  const applications = query.data || [];
+  const app = applications.find(
+    (app) =>
+      app.id === selected || app.registrationIds.includes(selected || ""),
   );
-  const app = applications.find((app) => app.id === selected);
   const filtered = applications.filter(
     (app) =>
       (category === "all" || app.category === category) &&

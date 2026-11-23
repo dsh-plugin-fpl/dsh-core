@@ -1,3 +1,4 @@
+import { registrationRows } from "./registrationRows";
 import { useQuery } from "@tanstack/react-query";
 import { fetchApiJson } from "@platform/api/client";
 import {
@@ -16,6 +17,7 @@ export type ApplicationEntry = components["schemas"]["ApplicationOut"];
 export type ApplicationCategory = ApplicationEntry["category"];
 export type ApplicationDefinition = ApplicationEntry & {
   path: string;
+  registrationIds: string[];
   brandImage?: string;
   iconComponent: LucideIcon;
 };
@@ -48,7 +50,7 @@ export function useApplications() {
       const data = await fetchApiJson<{ items: ApplicationEntry[] }>(
         "/v1/applications",
       );
-      return data.items.map((app) => ({
+      return registrationRows(data.items).map((app) => ({
         ...app,
         path: "/apps/" + encodeURIComponent(app.id),
         brandImage: app.icon_url || undefined,
