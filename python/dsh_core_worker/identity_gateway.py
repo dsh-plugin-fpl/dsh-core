@@ -18,6 +18,8 @@ from .identity_contracts import (
     AccountProfile,
     Application,
     ApplicationRegistrationResult,
+    ApplicationDirectory,
+    ApplicationDirectoryResult,
     CreateAccount,
     IdentityMe,
     Login,
@@ -357,9 +359,16 @@ def create_unified_app(root, factory, web_root=None, origin="http://127.0.0.1:93
         accounts.revoke(body["session"])
         return {"revoked": True}
 
-    @app.post("/v1/identity/directory")
-    async def directory(request: Request):
-        body, _, profile = await app_actor(request)
+    @app.post("/v1/identity/directory", response_model=ApplicationDirectoryResult)
+    async def directory(request: Request, _query: ApplicationDirectory):
+        body, _ = await client_request(request)
+        if body.get("owner_user_id") is not None and body.get("session") is None:
+            owner = body["owner_user_id"]
+            if not accounts.has_grant(owner, body["application_id"]):
+                raise CoreError("账号尚未授权此应用", "forbidden")
+            profile = accounts.account(owner)
+        else:
+            body, _, profile = await app_actor(request)
         ids, names = body.get("ids", []), body.get("usernames", [])
         if not isinstance(ids, list) or not isinstance(names, list) or len(ids) + len(names) > 4000:
             raise CoreError("账号查询范围无效")

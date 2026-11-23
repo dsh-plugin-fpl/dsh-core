@@ -184,3 +184,39 @@ def test_revoking_application_cancels_only_its_active_tasks(service):
         runtime.invoke.assert_awaited_once_with("task.cancel", {"id": "writing-job"})
     finally:
         tenant.state.runtime = original
+
+
+def test_backend_public_directory_requires_live_account_application_grant(service):
+    app, client = service
+    value = client.post(
+        "/v1/identity/applications",
+        json={
+            "id": "dsh-thought-workshop",
+            "origin": "http://127.0.0.1:19363",
+            "callback": "/apps/thought-workshop",
+        },
+    ).json()
+    owner = app.state.accounts.initial["id"]
+    body = {"application_id": value["id"], "owner_user_id": owner, "ids": [owner], "usernames": []}
+    backend = TestClient(app)
+    headers = {"Authorization": "Bearer " + value["token"]}
+    response = backend.post("/v1/identity/directory", json=body, headers=headers)
+    assert response.status_code == 200, response.text
+    assert response.json()["caller"]["id"] == owner
+    assert set(response.json()["profiles"][0]) == {"id", "username", "display_name", "active"}
+    other = client.post(
+        "/v1/identity/accounts",
+        json={
+            "username": "directory-other",
+            "display_name": "Other",
+            "password": "isolated-password-123",
+        },
+    ).json()["id"]
+    assert (
+        backend.post(
+            "/v1/identity/directory", json={**body, "owner_user_id": other}, headers=headers
+        ).status_code
+        == 403
+    )
+    assert client.delete("/v1/identity/authorizations/" + value["id"]).status_code == 200
+    assert backend.post("/v1/identity/directory", json=body, headers=headers).status_code == 403

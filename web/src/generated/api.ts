@@ -5061,6 +5061,25 @@ export interface components {
             /** Bridge Id */
             bridge_id?: string | null;
         };
+        /** ApplicationDirectory */
+        ApplicationDirectory: {
+            /** Application Id */
+            application_id: string;
+            /** Session */
+            session?: string | null;
+            /** Owner User Id */
+            owner_user_id?: string | null;
+            /** Ids */
+            ids?: string[];
+            /** Usernames */
+            usernames?: string[];
+        };
+        /** ApplicationDirectoryResult */
+        ApplicationDirectoryResult: {
+            caller: components["schemas"]["DirectoryCaller"];
+            /** Profiles */
+            profiles: components["schemas"]["DirectoryAccount"][];
+        };
         /** ApplicationRegistrationResult */
         ApplicationRegistrationResult: {
             /** Id */
@@ -5090,6 +5109,35 @@ export interface components {
              * @enum {string}
              */
             role: "admin" | "user";
+        };
+        /** DirectoryAccount */
+        DirectoryAccount: {
+            /** Id */
+            id: string;
+            /** Username */
+            username: string;
+            /** Display Name */
+            display_name: string;
+            /** Active */
+            active: boolean;
+        };
+        /** DirectoryCaller */
+        DirectoryCaller: {
+            /** Id */
+            id: string;
+            /** Username */
+            username: string;
+            /** Display Name */
+            display_name: string;
+            /** Active */
+            active: boolean;
+            /**
+             * Platform Role
+             * @enum {string}
+             */
+            platform_role: "admin" | "user";
+            /** Revision */
+            revision: number;
         };
         /** IdentityMe */
         IdentityMe: {
@@ -9522,7 +9570,11 @@ export interface operations {
             path?: never;
             cookie?: never;
         };
-        requestBody?: never;
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ApplicationDirectory"];
+            };
+        };
         responses: {
             /** @description Successful Response */
             200: {
@@ -9530,7 +9582,16 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": unknown;
+                    "application/json": components["schemas"]["ApplicationDirectoryResult"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
                 };
             };
         };

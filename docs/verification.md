@@ -86,3 +86,8 @@ uv run --no-project python scripts/verify-service.py <运行目录>
 Core 211 项 Python（含新账号、实时撤权与语音目录边界）和 8 项连接测试通过；公开调用方编译、OpenAPI 再生成、连接器及看板构建通过；原两个 Chrome 场景通过。新增六应用组合通过公开 CLI/HTTP/WS 启动七个真实进程，验证两账号隔离、旧 owner 保留、PPTX 导出、思绪写作/社区逐篇撤权/显式官方导入/飞书幂等写入、Galgame 剧情、WAV 导入与 ASR、跨应用授权、真实 FFmpeg 片段复制至视觉自己的画布原件。实际 Harness 安装七份当前 tarball，六应用登记正确，关闭 Harness 后服务仍就绪。
 
 联合证据 `.local/workshops-accounts/1795443042516017000/` 含 report、harness-registration、ui-result 与页面截图。模型与飞书使用协议夹具，未调用真实付费供应商或修改旧 FPL 数据。页面等待编辑器加载及账号管理的补充结果在总仓库联动记录维护。
+
+
+最终补测：212 项 Python、9 项连接/目录投影测试通过；思绪 89 项 Python，新增纯插件凭据的知识库读取和实时撤权。公开七进程组合加入六个无浏览器 cookie 的插件调用后全部通过，证据 `.local/workshops-accounts/1795446055115708000/`。OpenAPI 与 TypeScript 重新生成，Core 看板构建通过。
+
+同一包/入口由独立服务和 DSH 双重登记时，看板只显示一张可用卡片并保留旧详情链接；关闭 DSH 后直接服务仍 ready。桌面已按正常插件管理安装 Core 0.4 和六个工坊（视觉/剪辑 0.2，其余 0.1），六个工坊中文名称与对应头像、启用状态可见。连接配置经公开 ConfigEditor 写入；一次性配置助手执行后已卸载。

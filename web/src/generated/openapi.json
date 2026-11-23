@@ -5985,12 +5985,34 @@
       "post": {
         "summary": "Directory",
         "operationId": "directory_v1_identity_directory_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ApplicationDirectory"
+              }
+            }
+          },
+          "required": true
+        },
         "responses": {
           "200": {
             "description": "Successful Response",
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/ApplicationDirectoryResult"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
               }
             }
           }
@@ -13931,6 +13953,84 @@
         ],
         "title": "Application"
       },
+      "ApplicationDirectory": {
+        "properties": {
+          "application_id": {
+            "type": "string",
+            "maxLength": 80,
+            "minLength": 1,
+            "title": "Application Id"
+          },
+          "session": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 256,
+                "minLength": 1
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Session"
+          },
+          "owner_user_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 100,
+                "minLength": 1
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Owner User Id"
+          },
+          "ids": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "maxItems": 2000,
+            "title": "Ids"
+          },
+          "usernames": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "maxItems": 2000,
+            "title": "Usernames"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "application_id"
+        ],
+        "title": "ApplicationDirectory"
+      },
+      "ApplicationDirectoryResult": {
+        "properties": {
+          "caller": {
+            "$ref": "#/components/schemas/DirectoryCaller"
+          },
+          "profiles": {
+            "items": {
+              "$ref": "#/components/schemas/DirectoryAccount"
+            },
+            "type": "array",
+            "title": "Profiles"
+          }
+        },
+        "type": "object",
+        "required": [
+          "caller",
+          "profiles"
+        ],
+        "title": "ApplicationDirectoryResult"
+      },
       "ApplicationRegistrationResult": {
         "properties": {
           "id": {
@@ -14018,6 +14118,76 @@
           "display_name"
         ],
         "title": "CreateAccount"
+      },
+      "DirectoryAccount": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "username": {
+            "type": "string",
+            "title": "Username"
+          },
+          "display_name": {
+            "type": "string",
+            "title": "Display Name"
+          },
+          "active": {
+            "type": "boolean",
+            "title": "Active"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "username",
+          "display_name",
+          "active"
+        ],
+        "title": "DirectoryAccount"
+      },
+      "DirectoryCaller": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "username": {
+            "type": "string",
+            "title": "Username"
+          },
+          "display_name": {
+            "type": "string",
+            "title": "Display Name"
+          },
+          "active": {
+            "type": "boolean",
+            "title": "Active"
+          },
+          "platform_role": {
+            "type": "string",
+            "enum": [
+              "admin",
+              "user"
+            ],
+            "title": "Platform Role"
+          },
+          "revision": {
+            "type": "integer",
+            "title": "Revision"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "username",
+          "display_name",
+          "active",
+          "platform_role",
+          "revision"
+        ],
+        "title": "DirectoryCaller"
       },
       "IdentityMe": {
         "properties": {

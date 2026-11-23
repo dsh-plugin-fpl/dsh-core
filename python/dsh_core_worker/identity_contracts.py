@@ -62,3 +62,28 @@ class IdentityMe(BaseModel):
 class ApplicationRegistrationResult(Application):
     token: str = Field(repr=False)
     account_id: str
+
+
+class ApplicationDirectory(Input):
+    application_id: str = Field(min_length=1, max_length=80)
+    session: str | None = Field(default=None, min_length=1, max_length=256, repr=False)
+    owner_user_id: str | None = Field(default=None, min_length=1, max_length=100)
+    ids: list[str] = Field(default_factory=list, max_length=2000)
+    usernames: list[str] = Field(default_factory=list, max_length=2000)
+
+
+class DirectoryAccount(BaseModel):
+    id: str
+    username: str
+    display_name: str
+    active: bool
+
+
+class DirectoryCaller(DirectoryAccount):
+    platform_role: Literal["admin", "user"]
+    revision: int
+
+
+class ApplicationDirectoryResult(BaseModel):
+    caller: DirectoryCaller
+    profiles: list[DirectoryAccount]
