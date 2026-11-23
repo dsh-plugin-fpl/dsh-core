@@ -44,7 +44,7 @@ function Boot() {
     </QueryClientProvider>
   ) : (
     <main className="core-unlock">
-      <h1>FPL Core</h1>
+      <h1>未来道具研究所</h1>
       <p>{error || "正在连接本机服务…"}</p>
       {error && (
         <p>
