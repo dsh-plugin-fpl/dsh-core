@@ -74,3 +74,16 @@ DSH 配对入口已合并到「集成中心 → 外部连接」，与飞书连�
 ## 工坊模型参数目录（0.3.1）
 
 配对 WS 的 `capabilities` 响应新增只读 `generation_options` 与 `temporary_upload_configured`。目录包含 Core 模型 ID、供应商种类、slug、图片尺寸、参考数量、随机种子支持、提示词上限、视频能力与工作流参数；不包含密钥、凭据引用或供应商地址。看板的 `/v1/model-test/generation-options` 使用相同目录。应用按该目录构建请求，Core 在执行入队时再次校验。
+
+
+## Core 0.4：统一账号与独立工坊
+
+`/v1/identity/login|logout|me` 管理 Core 会话；`/account` 管理账号与应用授权。管理员创建、禁用、重置账号，私人模型配置、资源与任务仍隔离。初始本机账号保留原 Core 状态；其他账号有独立运行目录。密码重置和禁用立即撤销会话，禁用还取消该账号的在途 Core 任务。
+
+应用后端在管理员会话中登记本机 origin/callback，保存仅本机可读的 client secret。浏览器向 Core 发起授权，使用一次性、应用/回调/状态绑定的 code，由应用后端交换并持续 introspect；不向浏览器暴露应用 secret。应用撤权后停止其在途 Core 任务并拒绝后续调用。DSH 的初始配对仍兼容，账号管理与机器执行能力归管理员。
+
+公开 HTTP 定义见生成的 `/v1/openapi.json`。受绑定应用的 WebSocket RPC 增加 `model.options`、`model.transcription-parameters`、`task.find` 与 `external.*`；限定在应用的 bridge/application scope。模型目录脱敏，语音参数复用 Core 拥有的供应商语言别名、默认值与大小限制。未知提交结果通过 request_id 查询，不自动重放付费请求。
+
+Core 的 peer-grant/peer-verify 签发绑定当前账号、来源/目标应用、方法、路径、查询、请求字节摘要、组件断言与元数据的短期授权。目标自行签发其组件断言；读取原件的派生授权保留父授权和深度上限。应用不共享数据库或本地路径。
+
+飞书 `external.*` 通过 Core 自有凭据、同步意图、步骤回执和终结账本执行；思绪只持有自己的笔记和请求关联。真实远端结果未知时保留待核对状态，重试原请求查询回执，不能盲目重新写入。

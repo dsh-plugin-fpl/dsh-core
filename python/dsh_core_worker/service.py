@@ -35,10 +35,10 @@ class RpcIn(BaseModel):
     params: dict = Field(default_factory=dict)
 
 
-def create_app(root, web_root=None, origin="http://127.0.0.1:9310"):
+def create_tenant_app(root, web_root=None, origin="http://127.0.0.1:9310", *, account_access=None):
     root = Path(root).resolve()
     web_root = Path(web_root).resolve() if web_root else None
-    access = Access(root / "access")
+    access = account_access or Access(root / "access")
     bridges = Bridges(access)
 
     @asynccontextmanager
@@ -60,6 +60,11 @@ def create_app(root, web_root=None, origin="http://127.0.0.1:9310"):
         app.state.integrations = Integrations(root / "integrations", runtime, access)
         try:
             await app.state.integrations.database.migrate()
+            from .integrations.external_schema import migrate as migrate_external
+            await migrate_external(app.state.integrations.database)
+            from .integrations.external_core import ExternalSync
+            bridges.external_sync=ExternalSync(runtime,app.state.integrations,access)
+            await bridges.external_sync.steps.recover()
             from .integrations.transfers import Transfers
             app.state.integration_transfers=Transfers(app.state.integrations,bridges,access)
             app.state.integration_validation_recovery=app.state.integrations.jobs
@@ -73,7 +78,7 @@ def create_app(root, web_root=None, origin="http://127.0.0.1:9310"):
 
     app = FastAPI(
         title="FPL Core",
-        version="0.3.1",
+        version="0.4.0",
         lifespan=lifespan,
         docs_url=None,
         redoc_url=None,
@@ -147,7 +152,7 @@ def create_app(root, web_root=None, origin="http://127.0.0.1:9310"):
         return {
             "status": "ready",
             "service": "fpl-core",
-            "version": "0.3.1",
+            "version": "0.4.0",
             "instance": (root / "instance").read_text() if (root / "instance").exists() else "",
         }
 
@@ -155,7 +160,7 @@ def create_app(root, web_root=None, origin="http://127.0.0.1:9310"):
     async def session(body: LaunchIn):
         value, csrf = access.exchange(body.ticket)
         response = JSONResponse(
-            {"csrf": csrf, "owner": {"id": "local-owner", "name": "本机所有者"}}
+            {"csrf": csrf, "owner": access.profile() if hasattr(access, "profile") else {"id": "local-owner", "name": "本机所有者"}}
         )
         response.set_cookie("core_session", value, httponly=True, samesite="strict", max_age=86400)
         response.set_cookie("core_csrf", csrf, samesite="strict", max_age=86400)
@@ -163,7 +168,7 @@ def create_app(root, web_root=None, origin="http://127.0.0.1:9310"):
 
     @app.get("/v1/session")
     async def current_session():
-        return {"owner": {"id": "local-owner", "name": "本机所有者"}}
+        return {"owner": access.profile() if hasattr(access, "profile") else {"id": "local-owner", "name": "本机所有者"}}
 
     @app.get("/v1/state")
     async def state():
@@ -343,6 +348,7 @@ def create_app(root, web_root=None, origin="http://127.0.0.1:9310"):
                         "id": message["id"],
                         "error": {
                             "code": getattr(error, "code", "bridge_error"),
+                            "data": error.details if isinstance(error,CoreError) else {},
                             "message": str(error)
                             if isinstance(error, CoreError)
                             else "连接请求失败",
@@ -416,3 +422,8 @@ def create_app(root, web_root=None, origin="http://127.0.0.1:9310"):
 
     install_contract(app)
     return app
+
+
+def create_app(root, web_root=None, origin="http://127.0.0.1:9310"):
+    from .identity_gateway import create_unified_app
+    return create_unified_app(root, create_tenant_app, web_root, origin)

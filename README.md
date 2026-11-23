@@ -81,3 +81,10 @@ DSH 连接层单独使用 `pnpm build:connector` 和 `pnpm pack --pack-destinati
 ## 集成中心
 
 打开看板「集成」管理工具 API、MCP、Skill 和外部连接。DSH 配对已放入「外部连接」，每个连接独立显示状态与操作。「从 DSH 导入 / 导入到 DSH」复制选定配置及鉴权，默认停用，确认后可在目标端启用。此功能要求新版 0.3.0 DSH 连接器；仅更新独立服务不会替换桌面插件。接口、插件适配器和恢复规则见 [集成中心](docs/integrations.md)。
+
+
+## Core 0.4 统一账号
+
+看板名称为「未来道具研究所」，技术包与应用 ID 保持兼容。打开右上角账号进入 `/account`，管理员可创建/禁用账号、设置密码和撤销应用授权。初始本机账号沿用原 Core 状态；新账号拥有独立配置、资源和任务。首次可以用 `pnpm dashboard --no-open --output .runtime/core-launch.json` 生成仅本机可读的一次性入口，然后在账号页设置密码。不要发送该文件或提交到 Git。
+
+工坊在自己的仓库运行 `pnpm setup`，再用其文档的 `connect-core --launch-file` 入口登记统一身份；9360–9365 对应视觉、剪辑、演示、思绪、Galgame、录音标注。应用直接登录和独立桥接也会出现在 Core 目录中。DSH 插件开关只控制连接层，独立服务使用自身启动器。应用包要求 Core 0.4.0，老的 DSH Core 连接器与原任务、资源协议仍兼容。

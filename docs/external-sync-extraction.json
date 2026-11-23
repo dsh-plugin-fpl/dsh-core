@@ -1,0 +1,26 @@
+{
+  "apps/integrations/external_reads.py": {
+    "sha256": "ccafaaab7cc1725db9cfcf600c5d2db640c8bb9c04372fe0927a8786cca099d5",
+    "destination": "external_reads.py"
+  },
+  "apps/integrations/external_steps.py": {
+    "sha256": "895e02f796acaeb6bac2231167ea930ca7cfe7f0412958e37782db3b777818d8",
+    "destination": "external_steps.py"
+  },
+  "apps/integrations/clients/document_blocks.py": {
+    "sha256": "16bdf23eb8d98d84c0580d8a25d70b710cd97d2ee2f35414933f6807b65c84c9",
+    "destination": "clients/document_blocks.py"
+  },
+  "apps/integrations/clients/document_verification.py": {
+    "sha256": "29820ceba03232a30ce6bb090973b199ef013dc09fb1ee860ec07e68533db091",
+    "destination": "clients/document_verification.py"
+  },
+  "contracts/integrations/external_sync.py": {
+    "sha256": "fac5f3c7260ee789d0f5782cbf9a5cd16d245838e08d05fe6d22642b9a20355b",
+    "destination": "contracts/external_sync.py"
+  },
+  "contracts/integrations/integration_intents.py": {
+    "sha256": "15d20c8186dd9187f562618200a55b07168b62ca387fede29e9955200d9f8d73",
+    "destination": "contracts/integration_intents.py"
+  }
+}

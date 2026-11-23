@@ -423,7 +423,7 @@ test("FPL shell, catalog editing, test history, files, bridge pairing and narrow
   await page.setViewportSize({ width: 1440, height: 1000 });
   bridge.close();
   await page.goto(origin + "/apps");
-  await expect(page.getByText("DSH 未连接", { exact: true })).toBeVisible();
+  await expect(page.getByText("应用未连接", { exact: true })).toBeVisible();
   await page.goto(origin + "/settings");
   await page.getByRole("button", { name: "连接 DSH", exact: true }).click();
   await page.getByRole("button", { name: "创建配对凭据", exact: true }).click();

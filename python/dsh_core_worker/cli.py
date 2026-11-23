@@ -19,7 +19,7 @@ from .private_files import atomic_private
 
 def main():
     repository = Path(__file__).resolve().parents[2]
-    parser = argparse.ArgumentParser(description="FPL Core 本机独立服务")
+    parser = argparse.ArgumentParser(description="未来道具研究所本机独立服务")
     parser.add_argument(
         "command", choices=["start", "serve", "stop", "status", "dashboard", "start-with-dsh"]
     )
@@ -27,6 +27,7 @@ def main():
     parser.add_argument("--web-root", type=Path, default=repository / "web/dist")
     parser.add_argument("--port", type=int, default=9310)
     parser.add_argument("--no-open", action="store_true")
+    parser.add_argument("--output",type=Path,help="将一次性登录入口写入仅所有者可读的文件")
     args = parser.parse_args()
     if not 1024 <= args.port <= 65535:
         parser.error("端口必须介于 1024 和 65535")
@@ -147,16 +148,18 @@ def main():
             raise SystemExit("Core 就绪检查超时，已停止本次进程")
     if ready.get("instance") != current.get("instance"):
         raise SystemExit("此端口正在运行其他 Core 实例，请检查配置")
-    if not args.no_open:
-        access = Access(root / "access")
-        ticket = access.ticket()
-        webbrowser.open(origin + "/#ticket=" + ticket)
+    if not args.no_open or args.output:
+        access=Access(root/'access');ticket=access.ticket();url=origin+'/#ticket='+ticket
+        if args.output:
+            args.output.parent.mkdir(parents=True,exist_ok=True,mode=0o700)
+            atomic_private(args.output,json.dumps({'url':url}).encode())
+        if not args.no_open:webbrowser.open(url)
     if args.command == "start-with-dsh":
         if sys.platform != "darwin":
             print("Core 已启动；请在本平台手动打开 DeepSeek Harness")
         else:
             subprocess.run(["open", "-a", "DeepSeek Harness"], check=True)
-    print("FPL Core 已就绪：" + origin)
+    print("未来道具研究所已就绪：" + origin)
 
 
 if __name__ == "__main__":

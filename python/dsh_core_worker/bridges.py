@@ -99,13 +99,38 @@ class Bridges:
 
     async def invoke(self, bridge, method, params):
         runtime = self.runtime
+        if hasattr(self.access,"authorize_bridge"): self.access.authorize_bridge(bridge.id)
+        if hasattr(self.access,'profile') and self.access.profile()['role']!='admin':
+            if method in {'agent.detect','local.manage'} or (method=='task.submit' and params.get('kind')=='agent'):
+                raise CoreError('此操作需要本机管理员权限','forbidden')
+        if method=='model.options':
+            if params.get('application_id') not in bridge.applications:raise CoreError('请先登记应用','application_unregistered')
+            from .model_options import application_options
+            return application_options(self.model_catalog_view)
+        if method=='model.transcription-parameters':
+            if params.get('application_id') not in bridge.applications:raise CoreError('请先登记应用','application_unregistered')
+            from .model_options import transcription_parameters
+            return transcription_parameters(self.model_catalog_view,params)
+        if method=='task.find':
+            application=params.get('application_id')
+            if application not in bridge.applications:raise CoreError('请先登记应用','application_unregistered')
+            scope=self.scope(bridge.id,application)
+            for task in runtime.store.tasks():
+                request=task['request']
+                if request['application_id']==scope and request['session_id']==params['session_id'] and request['request_id']==params['request_id']:return task
+            return None
+        if method.startswith('external.'):
+            application=params.get('application_id')
+            if application not in bridge.applications:raise CoreError('请先登记应用','application_unregistered')
+            return await self.external_sync.invoke(method,params,application)
         if method == "hello":
             if params.get("protocol") != 1:
                 raise CoreError("连接协议版本不兼容", "protocol_version")
             return {
                 **await runtime.invoke("hello", {"protocol": 1}),
                 "bridge_id": bridge.id,
-                "features": ["application-catalog", "integration-transfers", "generation-catalog"],
+                "account": self.access.profile() if hasattr(self.access,'profile') else None,
+                "features": ["application-catalog", "integration-transfers", "generation-catalog", "account-identity", "application-model-options", "application-transcription-parameters", "article-sync"],
             }
         if method == "capabilities":
             connections = [

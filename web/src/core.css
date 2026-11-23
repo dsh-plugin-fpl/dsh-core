@@ -378,3 +378,54 @@
   white-space: nowrap;
   border: 0;
 }
+
+.account-page {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 24px;
+}
+.account-list {
+  display: grid;
+  gap: 16px;
+}
+.account-list article {
+  padding: 20px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+.account-list form,
+.account-form {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: end;
+  gap: 12px;
+}
+.account-page label {
+  display: grid;
+  gap: 8px;
+}
+.account-page input {
+  min-width: 0;
+  max-width: 100%;
+  font: inherit;
+  padding: 10px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--panel);
+  color: inherit;
+}
+.account-page button {
+  font: inherit;
+  padding: 10px 16px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: var(--panel);
+  color: inherit;
+  cursor: pointer;
+}
+.account-page button:disabled {
+  opacity: 0.5;
+  cursor: wait;
+}

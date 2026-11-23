@@ -1,7 +1,10 @@
 import { createRoot } from "react-dom/client";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
-import { CoreOwnerAccess } from "@platform/auth/AccountAccess";
+import {
+  CoreOwnerAccess,
+  type CoreProfile,
+} from "@platform/auth/AccountAccess";
 import { requestApi, fetchApiJson } from "@platform/api/client";
 import { App } from "./App";
 import "@shared/ui/theme.css";
@@ -12,6 +15,10 @@ const queryClient = new QueryClient({
   defaultOptions: { queries: { retry: 1, refetchOnWindowFocus: false } },
 });
 function Boot() {
+  const [identity, setIdentity] = useState<{
+    account: CoreProfile;
+    permissions: string[];
+  } | null>(null);
   const [ready, setReady] = useState(false),
     [error, setError] = useState("");
   useEffect(() => {
@@ -31,14 +38,18 @@ function Boot() {
         });
       }
       await fetchApiJson("/v1/session");
+      setIdentity(await fetchApiJson("/v1/identity/me"));
       setReady(true);
     };
     void start().catch((e) => setError(e.message));
     return () => window.removeEventListener("core:auth-required", fail);
   }, []);
-  return ready ? (
+  return ready && identity ? (
     <QueryClientProvider client={queryClient}>
-      <CoreOwnerAccess>
+      <CoreOwnerAccess
+        profile={identity.account}
+        permissions={identity.permissions}
+      >
         <App />
       </CoreOwnerAccess>
     </QueryClientProvider>
@@ -48,7 +59,9 @@ function Boot() {
       <p>{error || "正在连接本机服务…"}</p>
       {error && (
         <p>
-          运行 <code>pnpm dashboard</code> 获取新的启动入口。
+          <a className="btn primary" href="/login">
+            使用 Core 账号登录
+          </a>
         </p>
       )}
     </main>

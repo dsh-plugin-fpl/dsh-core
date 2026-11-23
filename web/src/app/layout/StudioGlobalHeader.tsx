@@ -1,9 +1,12 @@
+import { useCoreAccount } from "@platform/auth/AccountAccess";
+import { requestApi } from "@platform/api/client";
 import { ThemeToggle } from "@shared/ui/ThemeToggle";
 import { useQuery } from "@tanstack/react-query";
 import { fetchApiJson } from "@platform/api/client";
 import { Network, UserRound } from "lucide-react";
 import "./studio-global-header.css";
 export function StudioGlobalHeader(_: { assistant?: unknown }) {
+  const profile = useCoreAccount();
   const q = useQuery({
     queryKey: ["bridges"],
     queryFn: () =>
@@ -27,9 +30,20 @@ export function StudioGlobalHeader(_: { assistant?: unknown }) {
           <Network size={16} />
           <span>{connected ? "DSH 已连接" : "连接 DSH"}</span>
         </a>
-        <span className="studio-header-chip">
-          <UserRound size={16} /> 本机所有者
-        </span>
+        <a className="studio-header-chip" href="/account">
+          <UserRound size={16} />
+          {profile.display_name}
+        </a>
+        <button
+          className="studio-header-chip"
+          onClick={() =>
+            void requestApi("/v1/identity/logout", { method: "POST" }).then(
+              () => location.assign("/login"),
+            )
+          }
+        >
+          退出
+        </button>
       </div>
     </header>
   );

@@ -361,3 +361,10 @@
     transform: none;
   }
 }
+
+.application-detail-avatar {
+  width: 72px;
+  height: 72px;
+  object-fit: contain;
+  border-radius: 16px;
+}

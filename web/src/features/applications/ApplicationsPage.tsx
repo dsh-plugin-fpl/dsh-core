@@ -20,7 +20,10 @@ export function ApplicationsPage({
   const [search, setSearch] = useState("");
   const [category, setCategory] = useState("all");
   const [guide, setGuide] = useState(false);
-  const applications = query.data || [];
+  const applications = (query.data || []).filter(
+    (app, index, all) =>
+      !app.url || all.findIndex((other) => other.url === app.url) === index,
+  );
   const app = applications.find((app) => app.id === selected);
   const filtered = applications.filter(
     (app) =>
@@ -58,7 +61,15 @@ export function ApplicationsPage({
           </button>
           {app ? (
             <article className="home-panel core-application-detail">
-              <app.iconComponent size={40} aria-hidden />
+              {app.brandImage ? (
+                <img
+                  className="application-detail-avatar"
+                  src={app.brandImage}
+                  alt=""
+                />
+              ) : (
+                <app.iconComponent size={40} aria-hidden />
+              )}
               <h2>{app.name}</h2>
               <p>{app.description || "由已启用的 DSH 插件提供。"}</p>
               <dl>
@@ -85,7 +96,7 @@ export function ApplicationsPage({
               ) : (
                 <p>
                   {app.status === "offline"
-                    ? "连接 DeepSeek Harness 后即可打开此应用。"
+                    ? "启动应用服务或连接 DeepSeek Harness 后即可打开此应用。"
                     : "应用已登记，正在等待插件提供页面入口。"}
                 </p>
               )}

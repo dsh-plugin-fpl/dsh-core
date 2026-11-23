@@ -1,6 +1,6 @@
 {
   "name": "@dsh-plugin-fpl/dsh-core",
-  "version": "0.3.1",
+  "version": "0.4.0",
   "description": "Independent FPL Core service, dashboard and optional DeepSeek Harness connection",
   "type": "module",
   "exports": {

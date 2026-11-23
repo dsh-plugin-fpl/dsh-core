@@ -1,3 +1,5 @@
+import { AccountsPage } from "@features/accounts/AccountsPage";
+import { useCoreAccount } from "@platform/auth/AccountAccess";
 import {
   useEffect,
   useState,
@@ -56,6 +58,7 @@ const paths: Record<StudioPage, string> = {
   "model-call-logs": "/model-call-logs",
 };
 export function App() {
+  const account = useCoreAccount();
   const [path, setPath] = useState(location.pathname + location.search);
   useEffect(() => {
     const sync = () => setPath(location.pathname + location.search);
@@ -100,7 +103,9 @@ export function App() {
       assistant={null}
     >
       <Suspense fallback={<p className="page-loading">正在打开页面…</p>}>
-        {page === "home" ? (
+        {path.split("?")[0] === "/account" ? (
+          <AccountsPage />
+        ) : page === "home" ? (
           <Home navigate={navigate} />
         ) : page === "model-service" ? (
           <ModelServicePage
@@ -112,7 +117,11 @@ export function App() {
             }
           />
         ) : page === "code-agents" ? (
-          <CodeAgentsPage canManage scope="local-owner" renderHeader={header} />
+          <CodeAgentsPage
+            canManage={account.role === "admin"}
+            scope={account.id}
+            renderHeader={header}
+          />
         ) : page === "model-test" ? (
           <ModelTestPage
             key={path}
@@ -131,7 +140,7 @@ export function App() {
           />
         ) : page === "model-call-logs" ? (
           <ModelCallLogsPage
-            currentAccount={{ id: "local-owner", name: "本机所有者" }}
+            currentAccount={{ id: account.id, name: account.display_name }}
           />
         ) : page === "applications" ? (
           <ApplicationsPage

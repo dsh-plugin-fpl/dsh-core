@@ -62,6 +62,6 @@ export function statusLabel(app: ApplicationEntry) {
   return app.status === "ready"
     ? "可打开"
     : app.status === "offline"
-      ? "DSH 未连接"
+      ? "应用未连接"
       : "等待应用入口";
 }

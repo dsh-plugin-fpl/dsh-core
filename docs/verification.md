@@ -79,3 +79,10 @@ uv run --no-project python scripts/verify-service.py <运行目录>
 真实桌面 0.2.2-rc.1 暴露旧宿主包覆盖问题：原 Core 普通依赖使 pluginInventory/list 返回 404。移为宿主可选 peer、保留固定开发依赖后，连接器构建及 8 项连接测试通过。首次热更新仍持有已删除模块的位置，完整重启 DSH 后库存接口恢复；桌面插件页实测显示两个正确头像且三个开关均启用。
 
 通过正式登录与公开 RPC 完成 Core 配对；既有业务数据、会话和其他插件保留。两套工坊使用各自正常启动器初始化空状态并监听 9360/9361；Core 目录中两应用均 ready，服务就绪与头像读取通过。无真实付费生成。回退所需 profile 清单/锁/覆盖配置和原安装包位置记录在 `.runtime/desktop-install/`，不备份无关业务数据库。不含凭据的最终结果为该目录 installed.json。
+
+
+## 2026-11-23：Core 0.4 与六工坊统一账号
+
+Core 211 项 Python（含新账号、实时撤权与语音目录边界）和 8 项连接测试通过；公开调用方编译、OpenAPI 再生成、连接器及看板构建通过；原两个 Chrome 场景通过。新增六应用组合通过公开 CLI/HTTP/WS 启动七个真实进程，验证两账号隔离、旧 owner 保留、PPTX 导出、思绪写作/社区逐篇撤权/显式官方导入/飞书幂等写入、Galgame 剧情、WAV 导入与 ASR、跨应用授权、真实 FFmpeg 片段复制至视觉自己的画布原件。实际 Harness 安装七份当前 tarball，六应用登记正确，关闭 Harness 后服务仍就绪。
+
+联合证据 `.local/workshops-accounts/1795443042516017000/` 含 report、harness-registration、ui-result 与页面截图。模型与飞书使用协议夹具，未调用真实付费供应商或修改旧 FPL 数据。页面等待编辑器加载及账号管理的补充结果在总仓库联动记录维护。

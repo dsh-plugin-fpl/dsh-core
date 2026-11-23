@@ -1,0 +1,5 @@
+{
+  "source": "backend/studio/apps/model_service/transcription/support.py",
+  "sha256": "91655177a2073d7a3f4a7f3c041aec6970fbc8d601c919a8f5aff3140e4438ef",
+  "adaptation": "Owned import namespace only; provider parameter normalization and byte limits remain Core-owned."
+}

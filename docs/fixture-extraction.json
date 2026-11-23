@@ -1,0 +1,5 @@
+{
+  "description": "Synthetic Feishu HTTP transport vector extracted from the original FPL test fixture; no credentials or production data.",
+  "destination": "tests/fixtures/fake_feishu.py",
+  "destination_sha256": "e92c6522250a75e338d66f62a146ddeed25bf509b91a5e3ca9493a6b4edb477a"
+}
