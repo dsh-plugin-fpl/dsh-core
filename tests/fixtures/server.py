@@ -16,6 +16,7 @@ parser.add_argument("--root", type=Path, required=True)
 parser.add_argument("--port", type=int, required=True)
 parser.add_argument("--web-root", type=Path)
 parser.add_argument("--mock-models", action="store_true")
+parser.add_argument("--mock-model-delay", type=float, default=0.05)
 parser.add_argument("--mock-external", action="store_true")
 args = parser.parse_args()
 app = create_app(args.root, args.web_root, origin=f"http://127.0.0.1:{args.port}")
@@ -78,7 +79,7 @@ if args.mock_models or args.mock_external:
                 if request.capability in ("chat", "vision", "tools"):
                     for text in ["独立 Core ", "测试回复，已保留会话历史。"]:
                         await emit("assistant_delta", {"text": text})
-                        await asyncio.sleep(0.05)
+                        await asyncio.sleep(args.mock_model_delay)
                     return {
                         "usage": {
                             "input_tokens": 11,
