@@ -68,15 +68,15 @@
     "@deepseek-ai/dsh-typert-protocol": "0.2.1-rc.2",
     "@deepseek-ai/schemastery": "~3.18.5",
     "react": "^18.2.0",
-    "@deepseek-ai/dsh-tools": "0.2.1-rc.2"
+    "@deepseek-ai/dsh-tools": "0.2.1-rc.2",
+    "@deepseek-ai/dsh-mcp-client": "^0.2.1-rc.2 || ^0.2.2-rc.1",
+    "@deepseek-ai/dsh-host-plugin-inventory": "^0.2.1-rc.2 || ^0.2.2-rc.1"
   },
   "dependencies": {
     "zod": "^4.4.3",
     "ws": "^8.18.3",
     "fflate": "^0.8.2",
-    "ajv": "^8.17.1",
-    "@deepseek-ai/dsh-mcp-client": "0.2.1-rc.2",
-    "@deepseek-ai/dsh-host-plugin-inventory": "0.2.1-rc.2"
+    "ajv": "^8.17.1"
   },
   "devDependencies": {
     "@deepseek-ai/cordis": "~4.0.5",
@@ -93,7 +93,17 @@
     "react": "^18.2.0",
     "typescript": "^5.9.0",
     "@types/ws": "^8.18.1",
-    "@deepseek-ai/dsh-tools": "0.2.1-rc.2"
+    "@deepseek-ai/dsh-tools": "0.2.1-rc.2",
+    "@deepseek-ai/dsh-mcp-client": "0.2.1-rc.2",
+    "@deepseek-ai/dsh-host-plugin-inventory": "0.2.1-rc.2"
   },
-  "icon": "./lib/icon.webp"
+  "icon": "./lib/icon.webp",
+  "peerDependenciesMeta": {
+    "@deepseek-ai/dsh-mcp-client": {
+      "optional": true
+    },
+    "@deepseek-ai/dsh-host-plugin-inventory": {
+      "optional": true
+    }
+  }
 }
