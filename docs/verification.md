@@ -65,3 +65,9 @@ uv run --no-project python scripts/verify-service.py <运行目录>
 独立服务运行包完成自身环境安装与隔离验证：包内模块、空配置、并发/重复启动、端口冲突、停止/重启及状态保留均通过，报告 `.local/release-acceptance/latest.json`。集成模块通过 Ruff 与格式检查。正式 9310 服务更新前通过认证 API 确认无在途任务；更新后 /ready 返回 0.3.0，四类目录和旧地址跳转通过，既有配对保留。源代码恢复点位于 `.runtime/core-integrations-transition/`，不改原业务 schema。
 
 飞书真实凭据、付费工具及真实第三方插件的私有配置未调用；它们需通过公开适配器接入。未提交、推送或更新总仓库 gitlink。保留并合入同期的插件图标、manifest 导出和文档打包修改，FPL 主仓库保持干净。
+
+## 2026-11-23：独立工坊的公共生成参数（0.3.1）
+
+`capabilities` 增加不含凭据的供应商生成参数目录；看板 generation-options 复用相同的尺寸和工作流来源，修正先前固定 1024 尺寸与供应商不符的问题。连接层公开 CapabilityCatalog 类型，旧服务缺少新增字段时仍兼容。
+
+205 项 Python、8 项连接层测试通过，连接器构建、公开调用方编译与 OpenAPI 再生成通过。使用真实 Core WebSocket、任务和分块资源，配合隔离确定性供应商执行，将生成结果发布到独立视觉画布；未调用真实付费供应商。两个工坊另在联合工作区维护真实 FFmpeg 媒体交接和 tarball 安装验收。本次无业务 schema 变化，不迁移旧 FPL 数据。

@@ -391,6 +391,11 @@ class TaskViews:
                 "page": page,
                 "page_size": size,
             }
+        if path == '/v1/model-test/generation-options':
+            from .generation_catalog import generation_options
+            configured = bool(self.runtime.store.config('settings', {})['value'].get('temporary_upload_url'))
+            options = generation_options(self.catalog.view()['providers'],upload_configured=configured)
+            return {'items':[row for row in options['models'] if row['kind'] in {'image','video'}]}
         if path.endswith(("/options", "-options")):
             capability = "speech_recognition" if "transcription" in path else None
             rows = []

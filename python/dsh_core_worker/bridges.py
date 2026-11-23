@@ -50,6 +50,7 @@ class Bridges:
         self.runtime = None
         self.credentials = None
         self.catalog = None
+        self.model_catalog_view = None
 
     def application(self, identity):
         for bridge in self.online.values():
@@ -104,7 +105,7 @@ class Bridges:
             return {
                 **await runtime.invoke("hello", {"protocol": 1}),
                 "bridge_id": bridge.id,
-                "features": ["application-catalog", "integration-transfers"],
+                "features": ["application-catalog", "integration-transfers", "generation-catalog"],
             }
         if method == "capabilities":
             connections = [
@@ -114,7 +115,12 @@ class Bridges:
             connections.extend(
                 {**row, "kind": "harness", "enabled": True} for row in self.model_catalog()
             )
-            return {"connections": connections, "defaults": runtime.store.config("defaults", {})}
+            from .generation_catalog import generation_options
+            configured = bool(runtime.store.config('settings', {})['value'].get('temporary_upload_url'))
+            providers = self.model_catalog_view.view()['providers']
+            return {"connections": connections, "defaults": runtime.store.config("defaults", {}),
+                    'generation_options': generation_options(providers,upload_configured=configured),
+                    'temporary_upload_configured':configured}
         if method == "integrations.publish":
             from .integrations.host_contract import AdapterDescriptor
             rows=[AdapterDescriptor.model_validate(row).model_dump() for row in params.get("adapters",[])]

@@ -177,7 +177,33 @@ export interface TaskEvent {
   value: Json;
   created_at: number;
 }
+/** Credential-free generation constraints advertised by Core 0.3.1+. */
+export interface GenerationModelOption {
+  id: string;
+  provider_id: string;
+  provider_name: string;
+  provider_kind: string;
+  kind: "image" | "video" | "audio";
+  slug: string;
+  label: string;
+  description: string;
+  sizes: string[];
+  max_reference_images: number;
+  supports_seed: boolean;
+  max_prompt_length: number;
+  reference_mime_types: string[];
+  video_capabilities: Record<string, Json> | null;
+  workflow_capabilities: Record<string, Json> | null;
+}
+export interface CapabilityCatalog {
+  connections: Omit<Connection, "base_url" | "credential_ref">[];
+  defaults: State["defaults"];
+  /** Absent when paired with an older Core service. */
+  generation_options?: { models: GenerationModelOption[] };
+  temporary_upload_configured?: boolean;
+}
 export interface CoreApi {
+  capabilities(): Promise<CapabilityCatalog>;
   registerIntegrationAdapter(adapter: IntegrationAdapter): () => void;
   events(id: string, after?: number): Promise<TaskEvent[]>;
   registerApplication(application: Application): () => void;

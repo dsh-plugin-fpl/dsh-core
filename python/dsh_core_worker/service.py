@@ -54,6 +54,7 @@ def create_app(root, web_root=None, origin="http://127.0.0.1:9310"):
         app.state.credentials = credentials
         app.state.runtime = runtime
         app.state.catalog = Catalog(runtime, credentials, bridges)
+        bridges.model_catalog_view = app.state.catalog
         app.state.conversations = Conversations(runtime, app.state.catalog)
         from .integrations.assembly import Integrations
         app.state.integrations = Integrations(root / "integrations", runtime, access)
@@ -72,7 +73,7 @@ def create_app(root, web_root=None, origin="http://127.0.0.1:9310"):
 
     app = FastAPI(
         title="FPL Core",
-        version="0.3.0",
+        version="0.3.1",
         lifespan=lifespan,
         docs_url=None,
         redoc_url=None,
@@ -146,7 +147,7 @@ def create_app(root, web_root=None, origin="http://127.0.0.1:9310"):
         return {
             "status": "ready",
             "service": "fpl-core",
-            "version": "0.3.0",
+            "version": "0.3.1",
             "instance": (root / "instance").read_text() if (root / "instance").exists() else "",
         }
 

@@ -70,3 +70,7 @@ ctx.effect(() => ctx.dshCore.registerApplication({
 四类配置由 `/v1/integrations/{tool-apis|mcp|skills|external-connections}` 管理，明确调用返回 Core 任务回执。`ctx.dshCore.registerIntegrationAdapter` 发布应用拥有的集成适配器；看板通过 dsh-adapters、transfer-candidates、transfers/preview、transfers/{id}/apply 和 transfers/{id} 完成两端独立配置复制。正式 HTTP schema 由 OpenAPI 生成；插件类型、导入回执与安全/恢复边界见 [集成中心](integrations.md)。
 
 DSH 配对入口已合并到「集成中心 → 外部连接」，与飞书连接逐项展示；旧 `/settings` 保留重定向。导入副本停用，不执行命令、HTTP 调用或 Skill 注册。只有所有者明确启用后，DSH 连接层才将所选副本加入宿主工具/Skill 注册表；这部分 profile 配置与密钥由 DSH 自有存储管理，不承载独立 Core 的业务库。
+
+## 工坊模型参数目录（0.3.1）
+
+配对 WS 的 `capabilities` 响应新增只读 `generation_options` 与 `temporary_upload_configured`。目录包含 Core 模型 ID、供应商种类、slug、图片尺寸、参考数量、随机种子支持、提示词上限、视频能力与工作流参数；不包含密钥、凭据引用或供应商地址。看板的 `/v1/model-test/generation-options` 使用相同目录。应用按该目录构建请求，Core 在执行入队时再次校验。

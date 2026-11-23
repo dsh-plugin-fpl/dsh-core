@@ -17,6 +17,7 @@ import { dashboardSchema } from "./applications.js";
 import { remoteInfo } from "./remote.js";
 import type {
   Application,
+  CapabilityCatalog,
   CoreApi,
   CoreResult,
   Execution,
@@ -333,13 +334,7 @@ export class DshCore extends TypertRemoteService implements CoreApi {
     };
   }
   capabilities() {
-    return this.call<{
-      connections: Omit<
-        import("./contracts.js").Connection,
-        "base_url" | "credential_ref"
-      >[];
-      defaults: import("./contracts.js").State["defaults"];
-    }>("capabilities");
+    return this.call<CapabilityCatalog>("capabilities");
   }
   async submit(request: Execution, signal?: AbortSignal): Promise<Task> {
     if (!this.applications.has(request.application_id))
