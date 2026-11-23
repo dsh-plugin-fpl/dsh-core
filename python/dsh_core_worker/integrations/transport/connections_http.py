@@ -1,0 +1,100 @@
+from fastapi import APIRouter, HTTPException, Query, Request
+
+from dsh_core_worker.integrations.contracts.external_connections import (
+    ExternalConnectionInput,
+    ExternalConnectionList,
+    ExternalConnectionOut,
+    ExternalConnectionUpdate,
+    ExternalTargetInput,
+    ExternalTargetOut,
+)
+from dsh_core_worker.integrations.contracts.external_documents import ExternalError
+from dsh_core_worker.integrations.dependencies import OwnerDep, SessionDep, StudioAuth
+from dsh_core_worker.integrations.transport.bindings import external_catalog
+
+router = APIRouter(prefix="/integrations/external-connections", tags=["integrations"])
+
+
+async def call(principal, operation):
+    if not principal.allows("configuration.manage"):
+        operation.close()
+        raise HTTPException(403, "需要账号管理员或拥有者权限")
+    try:
+        return await operation
+    except ExternalError as exc:
+        raise HTTPException(exc.status, {"code": exc.code, "message": str(exc)}) from None
+
+
+@router.get("", response_model=ExternalConnectionList)
+async def list_connections(
+    request: Request, principal: StudioAuth, session: SessionDep, owner_user_id: OwnerDep
+):
+    return await call(principal, external_catalog(request, session, owner_user_id).list())
+
+
+@router.post("", response_model=ExternalConnectionOut, status_code=201)
+async def create_connection(
+    request: Request,
+    body: ExternalConnectionInput,
+    principal: StudioAuth,
+    session: SessionDep,
+    owner_user_id: OwnerDep,
+):
+    return await call(principal, external_catalog(request, session, owner_user_id).save(body))
+
+
+@router.patch("/{connection_id}", response_model=ExternalConnectionOut)
+async def update_connection(
+    request: Request,
+    connection_id: str,
+    body: ExternalConnectionUpdate,
+    principal: StudioAuth,
+    session: SessionDep,
+    owner_user_id: OwnerDep,
+):
+    return await call(
+        principal, external_catalog(request, session, owner_user_id).save(body, connection_id)
+    )
+
+
+@router.post("/{connection_id}/check", response_model=ExternalConnectionOut)
+async def check_connection(
+    request: Request,
+    connection_id: str,
+    principal: StudioAuth,
+    session: SessionDep,
+    owner_user_id: OwnerDep,
+):
+    return await call(
+        principal, external_catalog(request, session, owner_user_id).check(connection_id)
+    )
+
+
+@router.post("/{connection_id}/target-check", response_model=ExternalTargetOut)
+async def check_target(
+    request: Request,
+    connection_id: str,
+    body: ExternalTargetInput,
+    principal: StudioAuth,
+    session: SessionDep,
+    owner_user_id: OwnerDep,
+):
+    return await call(
+        principal, external_catalog(request, session, owner_user_id).target(connection_id, body.url)
+    )
+
+
+@router.delete("/{connection_id}")
+async def delete_connection(
+    request: Request,
+    connection_id: str,
+    principal: StudioAuth,
+    session: SessionDep,
+    owner_user_id: OwnerDep,
+    expected_revision: int = Query(ge=0),
+):
+    await call(
+        principal,
+        external_catalog(request, session, owner_user_id).delete(connection_id, expected_revision),
+    )
+    return {"deleted": True}

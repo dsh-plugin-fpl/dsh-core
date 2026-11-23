@@ -1,0 +1,22 @@
+.code-agent-logo {
+  display: inline-block;
+  flex: 0 0 auto;
+  vertical-align: middle;
+  mask: var(--agent-mark) center / contain no-repeat;
+}
+img.code-agent-logo {
+  object-fit: contain;
+  mask: none;
+}
+.code-agent-logo.is-codex {
+  background: #7b6cf6;
+}
+.code-agent-logo.is-claude-code {
+  background: #d97757;
+}
+.code-agent-logo.is-opencode {
+  background: var(--text-strong);
+}
+.code-agent-logo.is-dsh {
+  background: #4d6bfe;
+}

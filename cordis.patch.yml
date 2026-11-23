@@ -1,0 +1,3 @@
+- insert:
+    - id: dsh-core
+      name: '@dsh-plugin-fpl/dsh-core'

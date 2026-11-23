@@ -1,0 +1,3 @@
+- insert:
+    - id: fpl-dashboard-app-example
+      name: '@dsh-plugin-fpl/dashboard-app-example'

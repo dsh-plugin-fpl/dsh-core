@@ -15,3 +15,11 @@ node_modules/
 dist/
 coverage/
 .DS_Store
+
+/lib/
+.ruff_cache/
+.pytest_cache/
+
+# Local brand pack and generated browser VAD assets
+web/public/brand/
+web/public/voice-vad/

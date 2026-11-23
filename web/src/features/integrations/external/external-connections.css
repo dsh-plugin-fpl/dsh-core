@@ -1,0 +1,402 @@
+.external-connections {
+  display: grid;
+  gap: 14px;
+  padding-top: 10px;
+}
+.external-connections-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+.external-connections-heading h2 {
+  font-size: 18px;
+  margin: 0 0 6px;
+  letter-spacing: -0.02em;
+}
+.external-connections-heading p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.6;
+}
+.external-connections .btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  min-height: 38px;
+  padding: 8px 14px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--surface);
+  color: var(--text);
+  font-weight: 600;
+  white-space: nowrap;
+}
+.external-connections .btn.primary {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: white;
+}
+.external-connections .btn:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+}
+.external-connections-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+.external-connections-toolbar label {
+  flex: 1;
+  min-width: 0;
+  max-width: 340px;
+}
+.external-connections-toolbar > span {
+  color: var(--muted);
+  font-size: 12px;
+}
+.external-connections-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 56px 24px 48px;
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  background: var(--surface);
+}
+.external-connections-empty-icon {
+  display: grid;
+  place-items: center;
+  width: 64px;
+  height: 64px;
+  border: 1px solid var(--accent-line);
+  border-radius: 18px;
+  background: var(--accent-soft);
+  color: var(--accent);
+}
+.external-connections-empty h3 {
+  margin: 22px 0 10px;
+  font-size: 20px;
+  letter-spacing: -0.025em;
+}
+.external-connections-empty p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 14px;
+  line-height: 1.85;
+}
+.external-connections-empty small {
+  margin-top: 24px;
+  font-size: 12px;
+  color: var(--muted);
+}
+.external-connection-flow {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-top: 28px;
+  color: var(--muted);
+}
+.external-connection-flow span {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--text);
+  font-size: 13px;
+}
+.external-connection-flow b {
+  display: grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  background: var(--surface-soft);
+  border-radius: 50%;
+  font-size: 11px;
+  color: var(--muted);
+}
+.external-connections-list {
+  display: grid;
+  gap: 8px;
+}
+.external-connection-card {
+  min-width: 0;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 10px 12px;
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--surface);
+}
+.external-connection-card-copy {
+  min-width: 0;
+  display: grid;
+  gap: 3px;
+}
+.external-connection-card-heading {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 8px;
+  min-width: 0;
+}
+.external-connection-card strong {
+  font-size: 14px;
+  line-height: 1.35;
+  overflow-wrap: anywhere;
+}
+.external-connection-card-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  margin: 0;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.45;
+}
+.external-connection-card-meta > span {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.external-connection-card-meta > span + span::before {
+  content: "·";
+  margin: 0 7px;
+  color: var(--faint);
+}
+.external-connection-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 2px 7px;
+  border-radius: 6px;
+  font-size: 11px;
+  white-space: nowrap;
+  background: var(--surface-soft);
+  color: var(--muted);
+}
+.external-connection-status i {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: currentColor;
+}
+.external-connection-status.healthy {
+  color: var(--ok);
+  background: var(--ok-soft);
+}
+.external-connection-status.failed {
+  color: var(--danger);
+  background: var(--danger-soft);
+}
+.external-connection-status-detail svg {
+  flex-shrink: 0;
+}
+.external-connection-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.external-connection-actions .btn {
+  min-height: 30px;
+  padding: 4px 10px;
+  border-radius: 8px;
+  font-size: 12px;
+}
+.integration-modal.external-connection-modal {
+  width: min(600px, 100%);
+  border-radius: 18px;
+}
+.external-connection-modal > header {
+  padding: 18px 24px;
+}
+.external-connection-form.integration-form {
+  padding: 20px 24px 0;
+  gap: 16px;
+}
+.external-connection-intro {
+  grid-column: 1 / -1;
+  font-size: 13px;
+  color: var(--muted);
+  margin: 0 0 2px;
+  line-height: 1.6;
+}
+.external-connection-guide {
+  grid-column: 1 / -1;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 14px 16px;
+  background: var(--surface-soft);
+  margin-top: 2px;
+}
+.external-connection-guide > div {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  font-size: 12px;
+}
+.external-connection-guide a {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  color: var(--accent);
+  text-decoration: none;
+  white-space: nowrap;
+}
+.external-connection-guide a:hover {
+  text-decoration: underline;
+}
+.external-connection-guide ol {
+  margin: 10px 0 0;
+  padding-left: 18px;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.9;
+}
+.external-connection-security {
+  grid-column: 1 / -1;
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+  margin: 0;
+  color: var(--muted);
+  font-size: 11px;
+  line-height: 1.6;
+}
+.external-connection-security svg {
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+.external-connection-toggle {
+  grid-column: 1 / -1;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+}
+.external-connection-toggle strong {
+  font-size: 13px;
+}
+.external-connection-toggle small {
+  display: block;
+  color: var(--muted);
+  font-size: 11px;
+  margin-top: 5px;
+}
+.external-connection-toggle .integration-switch {
+  font-size: 0;
+  gap: 0;
+  padding: 8px 0 8px 8px;
+}
+.external-connection-form-footer.integration-form-actions {
+  position: sticky;
+  bottom: 0;
+  margin: 0 -24px;
+  padding: 16px 24px;
+  background: var(--surface);
+  border-top: 1px solid var(--border);
+  gap: 8px;
+}
+.external-connection-error {
+  margin: 0;
+  padding: 12px 16px;
+  border-radius: 10px;
+  background: var(--danger-soft);
+  color: var(--danger);
+  font-size: 13px;
+}
+.external-connection-modal > fieldset > .external-connection-error {
+  margin: 16px 24px 0;
+}
+@media (max-width: 600px) {
+  .external-connections-heading {
+    align-items: flex-start;
+  }
+  .external-connections-heading h2 {
+    font-size: 16px;
+  }
+  .external-connections-heading p {
+    font-size: 12px;
+  }
+  .external-connections-heading .btn {
+    padding: 8px 10px;
+    font-size: 12px;
+  }
+  .external-connections-toolbar {
+    flex-wrap: wrap;
+  }
+  .external-connections-empty {
+    padding: 36px 16px;
+  }
+  .external-connections-empty h3 {
+    font-size: 17px;
+  }
+  .external-connections-empty p {
+    font-size: 12px;
+  }
+  .external-connection-flow {
+    width: 100%;
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 8px;
+  }
+  .external-connection-flow > svg {
+    display: none;
+  }
+  .external-connection-flow span {
+    flex-direction: column;
+    gap: 7px;
+    font-size: 11px;
+    white-space: nowrap;
+  }
+  .external-connection-card {
+    grid-template-columns: auto minmax(0, 1fr);
+    align-items: start;
+    padding: 10px;
+  }
+  .external-connection-actions {
+    grid-column: 1 / -1;
+    justify-content: flex-end;
+  }
+  .external-connection-modal > header {
+    padding: 16px 18px;
+  }
+  .external-connection-form.integration-form {
+    padding: 16px 18px 0;
+  }
+  .external-connection-form-footer.integration-form-actions {
+    margin: 0 -18px;
+    padding: 14px 18px;
+  }
+}
+
+.external-connections-add {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+}
+.external-connections-add .btn {
+  display: inline-flex;
+  gap: 7px;
+  align-items: center;
+  min-height: 38px;
+}
+.external-connection-service-icon {
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  flex-shrink: 0;
+  border-radius: 10px;
+  background: var(--surface-soft);
+  color: var(--accent);
+}

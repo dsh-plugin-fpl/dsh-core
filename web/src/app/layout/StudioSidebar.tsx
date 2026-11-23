@@ -1,0 +1,423 @@
+import "./studio-shell.css";
+import { useEffect, useState, type ReactNode } from "react";
+import { Bot, MonitorCog, Link2 } from "lucide-react";
+import {
+  StudioCollapsedRail,
+  type StudioRailEntry,
+} from "@shared/ui/StudioCollapsedRail";
+import { useAccountPermission } from "@platform/auth/AccountAccess";
+import { BrandMark } from "@shared/ui/BrandMark";
+
+import type { StudioPage } from "@app/routes";
+import { StudioGlobalHeader } from "@app/layout/StudioGlobalHeader";
+
+const SECONDARY_STORAGE_KEY = "future-props-sidebar-studio-secondary-collapsed";
+const NARROW_QUERY = "(max-width: 1200px)";
+
+function loadSecondaryCollapsed(): boolean {
+  try {
+    return localStorage.getItem(SECONDARY_STORAGE_KEY) === "true";
+  } catch {
+    return false;
+  }
+}
+
+function HomeIcon() {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden>
+      <path d="m3 10 9-7 9 7v10a1 1 0 0 1-1 1h-5v-7H9v7H4a1 1 0 0 1-1-1V10Z" />
+    </svg>
+  );
+}
+
+function AppsIcon() {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden>
+      <rect x="3" y="3" width="7" height="7" rx="2" />
+      <rect x="14" y="3" width="7" height="7" rx="2" />
+      <rect x="3" y="14" width="7" height="7" rx="2" />
+      <path d="M17.5 14v7M14 17.5h7" />
+    </svg>
+  );
+}
+
+function CreativeIcon() {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden>
+      <path d="m12 2 1.8 6.2L20 10l-6.2 1.8L12 18l-1.8-6.2L4 10l6.2-1.8L12 2Z" />
+      <path d="m19 16 .7 2.3L22 19l-2.3.7L19 22l-.7-2.3L16 19l2.3-.7L19 16Z" />
+    </svg>
+  );
+}
+
+function CompassIcon() {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden>
+      <circle cx="12" cy="12" r="9" />
+      <path d="m15.5 8.5-2.2 4.8-4.8 2.2 2.2-4.8 4.8-2.2Z" />
+    </svg>
+  );
+}
+
+function FilesIcon() {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden>
+      <path d="M3 6.5h7l2 2h9v9.5a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6.5Z" />
+      <path d="M3 9h18" />
+    </svg>
+  );
+}
+
+function CubeIcon() {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden>
+      <path d="m12 2 9 5-9 5-9-5 9-5Z" />
+      <path d="m3 7 9 5 9-5v10l-9 5-9-5V7Z" />
+      <path d="M12 12v10" />
+    </svg>
+  );
+}
+
+function TestIcon() {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden>
+      <path d="M9 3h6M10 3v5l-5 9a2 2 0 0 0 1.8 3h10.4a2 2 0 0 0 1.8-3l-5-9V3" />
+      <path d="M8 15h8" />
+    </svg>
+  );
+}
+
+function LogsIcon() {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden>
+      <path d="M4 4v6h6" />
+      <path d="M5.5 16a8 8 0 1 0 .5-9" />
+      <path d="M12 7v5l3 2" />
+    </svg>
+  );
+}
+
+type SecondaryItem = {
+  id: string;
+  label: string;
+  icon: ReactNode;
+  active: boolean;
+  onSelect: () => void;
+};
+
+type PrimarySection = {
+  id: string;
+  label: string;
+  shortLabel: string;
+  icon: ReactNode;
+  active: boolean;
+  page?: StudioPage;
+  children?: SecondaryItem[];
+};
+
+function useNarrowViewport() {
+  const [narrow, setNarrow] = useState(() =>
+    typeof window !== "undefined"
+      ? window.matchMedia(NARROW_QUERY).matches
+      : false,
+  );
+  useEffect(() => {
+    const media = window.matchMedia(NARROW_QUERY);
+    const sync = () => setNarrow(media.matches);
+    sync();
+    media.addEventListener("change", sync);
+    return () => media.removeEventListener("change", sync);
+  }, []);
+  return narrow;
+}
+
+function StudioSecondaryPanel({
+  title,
+  items,
+}: {
+  title: string;
+  items: SecondaryItem[];
+}) {
+  return (
+    <div className="studio-secondary" aria-label={`${title}导航`}>
+      <div className="studio-secondary__header">
+        <strong>{title}</strong>
+      </div>
+      <nav className="studio-secondary__nav" aria-label={`${title}子菜单`}>
+        {items.map((item) => (
+          <button
+            key={item.id}
+            type="button"
+            className={`studio-secondary__item${item.active ? " is-active" : ""}`}
+            aria-current={item.active ? "page" : undefined}
+            onClick={item.onSelect}
+          >
+            <span className="studio-secondary__item-icon" aria-hidden>
+              {item.icon}
+            </span>
+            <span>{item.label}</span>
+          </button>
+        ))}
+      </nav>
+    </div>
+  );
+}
+
+function StudioChrome({
+  page,
+  navigate,
+  children,
+  assistant,
+}: {
+  page: StudioPage;
+  navigate: (page: StudioPage) => void;
+  children?: ReactNode;
+  assistant?: (() => void) | null;
+}) {
+  const canReadLogs = useAccountPermission("logs.read");
+  const canRead = useAccountPermission("content.read");
+  const canAccessCloud = useAccountPermission("cloud-control.access");
+  const narrow = useNarrowViewport();
+  const [secondaryCollapsed, setSecondaryCollapsed] = useState(
+    loadSecondaryCollapsed,
+  );
+
+  const infrastructurePages: StudioPage[] = [
+    "code-agents",
+    "model-test",
+    "model-service",
+    "model-call-logs",
+    "tasks",
+  ];
+  const infrastructureActive = infrastructurePages.includes(page);
+
+  const modelItems: SecondaryItem[] = [
+    {
+      id: "model-service",
+      label: "模型与智能体",
+      icon: <Bot aria-hidden />,
+      active: page === "code-agents" || page === "model-service",
+      onSelect: () => navigate("model-service"),
+    },
+    {
+      id: "model-test",
+      label: "模型测试",
+      icon: <TestIcon />,
+      active: page === "model-test",
+      onSelect: () => navigate("model-test"),
+    },
+    ...(canReadLogs
+      ? [
+          {
+            id: "model-call-logs",
+            label: "模型调用日志",
+            icon: <LogsIcon />,
+            active: page === "model-call-logs",
+            onSelect: () => navigate("model-call-logs"),
+          } satisfies SecondaryItem,
+        ]
+      : []),
+    {
+      id: "tasks",
+      label: "运行记录",
+      icon: <LogsIcon />,
+      active: page === "tasks",
+      onSelect: () => navigate("tasks"),
+    },
+  ];
+
+  const sections: PrimarySection[] = [
+    {
+      id: "home",
+      label: "首页",
+      shortLabel: "首页",
+      icon: <HomeIcon />,
+      active: page === "home",
+      page: "home",
+    },
+    {
+      id: "applications",
+      label: "应用",
+      shortLabel: "应用",
+      icon: <AppsIcon />,
+      active: page === "applications",
+      page: "applications",
+    },
+    {
+      id: "files",
+      label: "文件管理",
+      shortLabel: "文件",
+      icon: <FilesIcon />,
+      active: page === "files",
+      page: "files",
+    },
+    {
+      id: "integrations",
+      label: "集成中心",
+      shortLabel: "集成",
+      icon: <Link2 />,
+      active: page === "integrations",
+      page: "integrations",
+    },
+    {
+      id: "base-models",
+      label: "AI 能力",
+      shortLabel: "AI 能力",
+      icon: <CubeIcon />,
+      active: infrastructureActive,
+      children: modelItems,
+    },
+  ];
+
+  const activeSection =
+    sections.find((section) => section.active) ??
+    sections.find((section) => section.id === "home")!;
+  const secondaryItems = activeSection.children ?? [];
+  const hasSecondary = secondaryItems.length > 0;
+  const showSecondary = !narrow && hasSecondary && !secondaryCollapsed;
+  const preferFlyout = !showSecondary;
+
+  const openSecondary = () => {
+    if (narrow) return;
+    setSecondaryCollapsed(false);
+    try {
+      localStorage.setItem(SECONDARY_STORAGE_KEY, "false");
+    } catch {
+      // Storage can be unavailable in privacy modes.
+    }
+  };
+
+  const toggleSecondary = () => {
+    if (!hasSecondary || narrow) return;
+    setSecondaryCollapsed((current) => {
+      const next = !current;
+      try {
+        localStorage.setItem(SECONDARY_STORAGE_KEY, String(next));
+      } catch {
+        // Storage can be unavailable in privacy modes.
+      }
+      return next;
+    });
+  };
+
+  const railEntries: StudioRailEntry[] = sections.map((section) => {
+    if (section.children?.length) {
+      return {
+        kind: "group",
+        id: section.id,
+        label: section.label,
+        shortLabel: section.shortLabel,
+        icon: section.icon,
+        active: section.active,
+        onSelect: () => {
+          openSecondary();
+          const current = section.children?.find((item) => item.active);
+          (current ?? section.children?.[0])?.onSelect();
+        },
+        items: section.children.map((item) => ({
+          id: item.id,
+          label: item.label,
+          icon: item.icon,
+          active: item.active,
+          onSelect: item.onSelect,
+        })),
+      };
+    }
+    return {
+      kind: "leaf",
+      id: section.id,
+      label: section.label,
+      shortLabel: section.shortLabel,
+      icon: section.icon,
+      active: section.active,
+      onSelect: () => {
+        if (!section.page) return;
+
+        navigate(section.page);
+      },
+    };
+  });
+
+  const canToggleSecondary = hasSecondary && !narrow;
+
+  const leftPanel = (
+    <aside
+      className={`studio-panel studio-sidebar${showSecondary ? " has-secondary" : ""}`}
+    >
+      <div className="studio-sidebar__rail">
+        <StudioCollapsedRail
+          labeled
+          preferFlyout={preferFlyout}
+          brand={<BrandMark size={32} />}
+          entries={railEntries}
+          routeKey={page}
+          secondaryToggle={
+            canToggleSecondary
+              ? {
+                  collapsed: secondaryCollapsed,
+                  label: secondaryCollapsed ? "展开二级导航" : "收起二级导航",
+                  onToggle: toggleSecondary,
+                }
+              : undefined
+          }
+          footer={null}
+        />
+      </div>
+      {showSecondary ? (
+        <StudioSecondaryPanel
+          title={activeSection.label}
+          items={secondaryItems}
+        />
+      ) : null}
+    </aside>
+  );
+
+  if (children === undefined) {
+    return (
+      <div
+        className={`studio-shell${showSecondary ? " has-secondary" : ""}`}
+        data-studio-chrome="sidebar-only"
+      >
+        {leftPanel}
+      </div>
+    );
+  }
+
+  return (
+    <div className={`studio-shell${showSecondary ? " has-secondary" : ""}`}>
+      {leftPanel}
+      <div className="studio-stage">
+        <StudioGlobalHeader assistant={canRead ? assistant : null} />
+        <main className="studio-panel studio-main">{children}</main>
+      </div>
+    </div>
+  );
+}
+
+export function StudioShell({
+  page,
+  navigate,
+  children,
+  assistant,
+}: {
+  page: StudioPage;
+  navigate: (page: StudioPage) => void;
+  children: ReactNode;
+  assistant?: (() => void) | null;
+}) {
+  return (
+    <StudioChrome page={page} navigate={navigate} assistant={assistant}>
+      {children}
+    </StudioChrome>
+  );
+}
+
+export function StudioSidebar({
+  page,
+  navigate,
+}: {
+  page: StudioPage;
+  navigate: (page: StudioPage) => void;
+}) {
+  return <StudioChrome page={page} navigate={navigate} />;
+}

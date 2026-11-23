@@ -1,0 +1,15 @@
+{
+  "name": "dsh-core-verification",
+  "version": "0.0.1",
+  "type": "module",
+  "main": "index.mjs",
+  "files": [
+    "index.mjs",
+    "cordis.patch.yml"
+  ],
+  "dsh": {
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    }
+  }
+}

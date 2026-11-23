@@ -1,0 +1,29 @@
+{
+  "source": "Future-Props-Lab/backend/studio",
+  "files": {
+    "apps/integrations/storage/models.py": "0f694869d888a6a9dbb9f41554888d7a5114b1659710a16ffd7469c7e8c79ce2",
+    "apps/integrations/storage/external_models.py": "4fe375a68549ca71d3864b004b0f3d95051d18d9f4fdce5a96b418cf49568de2",
+    "apps/integrations/storage/check_history.py": "372d3254e392bfd34ae2d51c9fde39fe61937d7baa756904e91c7993db3263b0",
+    "apps/integrations/tool_apis/catalog.py": "22228cc69701b362b648ce3901b452095f8601998e3c8229242030d7e97332bb",
+    "apps/integrations/mcp/catalog.py": "cfd425fc753f3298a175bd68c8c6299f000357c1971fb7aa4150da523d2c4b95",
+    "apps/integrations/skills/catalog.py": "e7449fe4e391bdfa7c62843c6896cd2e4cc2ca634329dda475f5017111802f26",
+    "apps/integrations/skills/archive.py": "7c76b8e409ec7285cd906700f5a9a049eaa58f88d1ae8f3c346ea2aafdab0560",
+    "apps/integrations/skills/preview.py": "c94adda2cd13d5cbf677780e9fe25b40cbd3535c6eb7c03a65fbcf5c8b446514",
+    "apps/integrations/clients/skill_archive.py": "c133a98a2167e63ff72dddf79e7d541a2e2e2c8d54db6e56111387713d9f7386",
+    "apps/integrations/external/catalog.py": "9444e079e89a134b3bc53eb2ba83104a523358e9c06d11e68f2aa55efd3f7d05",
+    "apps/integrations/external/feishu.py": "ffcbf37af10e098c7fa781c0e1e8d09fdd769fa50421f3b44215b53890cecceb",
+    "apps/integrations/transport/catalog_http.py": "bde969305e02f1364815d03fe3b1b0eccf0dbd8c9fe3da807b95cacb00af0af8",
+    "apps/integrations/transport/connections_http.py": "e1f743920cc06e8dbcbd2aa55d90f4fae98f054e9fa321dc40fa5884bb5351c8",
+    "apps/integrations/transport/projections.py": "07aa132a7e39664e5a8ad13d0374763021e6350f0e50837065b1ac3b044a724b",
+    "contracts/integrations/catalog.py": "b13a3fc1731ad2e07ecd4f48340f37d5f591b0f9a90532d4078db20c0929870a",
+    "contracts/integrations/errors.py": "563c6b8cc360dfb29779d32ba8e3960215c5d2bb1605b48eb1f5bb2e5b458100",
+    "contracts/integrations/mcp.py": "a81d71e4902098c738b66d3323ce9804ade8f89f9087ed7eda29fb329da4e9c3",
+    "contracts/integrations/external_connections.py": "c6e0aa5ee84a8ca70c3bab36146f0c56d229d1e8484dbfde82100e9e7032e39f",
+    "contracts/integrations/external_documents.py": "b9930cdadb4022bb817181cf6365c6494fd45b3740d229dde0aae1ad67bce5e2",
+    "runtime/time.py": "1c8ae9aafab7e107ec602b9d6df1c2e7603f60914dc1da4c5730ffd9290e6af3",
+    "runtime/ids.py": "a79428ffe7ca5662cc53cd5da670eed235d657fb18763f93193fd954f74959cf",
+    "runtime/revisions.py": "292f2806546bc351460caf76a2be66a4e48c0ef5378b8993ff79f97ae6718e06",
+    "runtime/secrets.py": "cb75d4b2d3bf05db9846aea145b7ddba276989be2d9df88c16c860b5def1759e"
+  },
+  "adaptation": "Core-owned assembly, storage, identity, credentials and transports; no runtime FPL imports"
+}

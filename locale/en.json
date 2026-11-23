@@ -1,0 +1,7 @@
+{
+  "meta": {
+    "title": "FPL Core",
+    "description": "Shared models, coding agents, local models, tasks and resources for FPL apps. See GitHub for installation and full documentation.",
+    "detail": "docs/PLUGIN.md"
+  }
+}

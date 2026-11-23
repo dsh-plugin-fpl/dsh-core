@@ -1,0 +1,99 @@
+{
+  "name": "@dsh-plugin-fpl/dsh-core",
+  "version": "0.3.0",
+  "description": "Independent FPL Core service, dashboard and optional DeepSeek Harness connection",
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./lib/index.d.ts",
+      "import": "./lib/index.js"
+    },
+    "./client": "./lib/client.js",
+    "./contracts": {
+      "types": "./lib/contracts.d.ts",
+      "import": "./lib/contracts.js"
+    },
+    "./remote": "./lib/remote.js",
+    "./icon": "./lib/icon.webp",
+    "./locale/*.json": "./locale/*.json"
+  },
+  "files": [
+    "lib",
+    "cordis.patch.yml",
+    "README.md",
+    "docs/api.md",
+    "docs/integrations.md",
+    "locale",
+    "docs/PLUGIN.md",
+    "docs/PLUGIN.zh.md"
+  ],
+  "dsh": {
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    },
+    "client": {
+      "platform": "web",
+      "inject": [
+        "@deepseek-ai/dsh-client-ui-settings"
+      ]
+    }
+  },
+  "engines": {
+    "node": ">=22",
+    "dsh": ">=0.2.1-rc.2"
+  },
+  "scripts": {
+    "build": "pnpm build:connector && pnpm build:dashboard",
+    "typecheck": "tsc --noEmit",
+    "test": "pnpm test:connector && pnpm test:python",
+    "pack:plugin": "pnpm build && pnpm pack --pack-destination .runtime/packages",
+    "test:consumer": "tsc --noEmit --strict --skipLibCheck --target es2023 --module nodenext --moduleResolution nodenext examples/consumer.ts",
+    "build:connector": "node scripts/build.mjs",
+    "build:dashboard": "pnpm --dir web build",
+    "setup:service": "node scripts/core.mjs setup",
+    "start": "node scripts/core.mjs start",
+    "start:with-dsh": "node scripts/core.mjs start-with-dsh",
+    "dashboard": "node scripts/core.mjs dashboard",
+    "stop": "node scripts/core.mjs stop",
+    "status": "node scripts/core.mjs status",
+    "test:python": "node scripts/core.mjs test",
+    "contracts:generate": "node scripts/core.mjs contracts",
+    "test:connector": "node --test tests/*.test.mjs",
+    "release:service": "pnpm build:dashboard && node scripts/release-service.mjs",
+    "test:harness": "node scripts/verify-harness.mjs"
+  },
+  "peerDependencies": {
+    "@deepseek-ai/cordis": "~4.0.5",
+    "@deepseek-ai/dsh-credentials": "0.2.1-rc.2",
+    "@deepseek-ai/dsh-typert-protocol": "0.2.1-rc.2",
+    "@deepseek-ai/schemastery": "~3.18.5",
+    "react": "^18.2.0",
+    "@deepseek-ai/dsh-tools": "0.2.1-rc.2"
+  },
+  "dependencies": {
+    "zod": "^4.4.3",
+    "ws": "^8.18.3",
+    "fflate": "^0.8.2",
+    "ajv": "^8.17.1",
+    "@deepseek-ai/dsh-mcp-client": "0.2.1-rc.2",
+    "@deepseek-ai/dsh-host-plugin-inventory": "0.2.1-rc.2"
+  },
+  "devDependencies": {
+    "@deepseek-ai/cordis": "~4.0.5",
+    "@deepseek-ai/dsh-app-boot": "0.2.1-rc.2",
+    "@deepseek-ai/dsh-credentials": "0.2.1-rc.2",
+    "@deepseek-ai/dsh-llm": "0.2.1-rc.2",
+    "@deepseek-ai/dsh-typert-protocol": "0.2.1-rc.2",
+    "@deepseek-ai/dsh-typert-registry": "0.2.1-rc.2",
+    "@deepseek-ai/schemastery": "~3.18.5",
+    "@types/node": "^24.0.0",
+    "@types/react": "^18.3.0",
+    "esbuild": "^0.27.0",
+    "prettier": "^3.10.1",
+    "react": "^18.2.0",
+    "typescript": "^5.9.0",
+    "@types/ws": "^8.18.1",
+    "@deepseek-ai/dsh-tools": "0.2.1-rc.2"
+  },
+  "icon": "./lib/icon.webp"
+}
