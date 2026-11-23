@@ -51,7 +51,11 @@ class Runtime:
         self.store.recover()
         for task in self.store.tasks(active=True):
             if task["request"]["kind"] == "integration":
-                self.store.update(task["id"],status="interrupted",error={"code":"unknown_result","message":"集成调用已中断，不会自动重提"})
+                self.store.update(
+                    task["id"],
+                    status="interrupted",
+                    error={"code": "unknown_result", "message": "集成调用已中断，不会自动重提"},
+                )
             elif task["status"] in ("queued", "recoverable"):
                 self.schedule(task["id"])
 
@@ -90,6 +94,24 @@ class Runtime:
                 "capabilities": CAPABILITIES,
                 "agents": AGENTS,
             }
+        from .storage_admission import paused
+
+        if paused(self.store.root) and method in {
+            "config.save",
+            "task.submit",
+            "task.retry",
+            "local.install",
+            "local.remove",
+            "local.enable",
+            "local.manage",
+            "task.resume",
+            "resource.put",
+            "resource.upload.begin",
+            "resource.upload.chunk",
+            "resource.upload.finish",
+            "resource.delete",
+        }:
+            raise CoreError("存储迁移中，请稍后重试", "storage_migrating")
         if method == "state":
             return {
                 "connections": self.store.config("connections", []),
@@ -167,7 +189,8 @@ class Runtime:
             return self.store.events(p["id"], int(p.get("after", 0)))
         if method == "task.submit":
             request = Execution.model_validate(p)
-            if request.kind == "integration":raise CoreError("请通过集成调用接口提交", "forbidden")
+            if request.kind == "integration":
+                raise CoreError("请通过集成调用接口提交", "forbidden")
             replay = self.store.replay(request)
             if replay:
                 return replay
@@ -219,7 +242,10 @@ class Runtime:
             return task
         if method == "task.resume":
             task = self.store.task(p["id"])
-            local = task["request"]["kind"] == "local" and task["connection"].get("kind") != "local_management"
+            local = (
+                task["request"]["kind"] == "local"
+                and task["connection"].get("kind") != "local_management"
+            )
             if not task["provider_task_id"] and not task["result_url"] and not local:
                 raise CoreError("该任务没有可恢复的供应商回执", "not_recoverable")
             if p["id"] not in self.running:
@@ -455,7 +481,11 @@ class Runtime:
             )
             if isinstance(error, TimeoutError):
                 code, message = "timeout", "任务已达到执行时限"
-            self.store.update(identity, status="interrupted" if code == "bridge_disconnected" else "failed", error={"code": code, "message": message})
+            self.store.update(
+                identity,
+                status="interrupted" if code == "bridge_disconnected" else "failed",
+                error={"code": code, "message": message},
+            )
         finally:
             if scratch.exists():
                 await asyncio.to_thread(shutil.rmtree, scratch)

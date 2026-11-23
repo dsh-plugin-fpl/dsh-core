@@ -49,6 +49,16 @@ function Panel({ api }: { api: Invoke }) {
         打开独立看板
       </a>
       <p>首次打开看板请在 Core 安装目录运行 pnpm dashboard。</p>
+      <p>
+        <a
+          href={(state?.endpoint || "http://127.0.0.1:9310") + "/storage"}
+          target="_blank"
+          rel="noreferrer"
+        >
+          存储与迁移
+        </a>{" "}
+        · 在独立看板统一设置 Core 和各工坊的数据位置。
+      </p>
       <form
         onSubmit={(e) => {
           e.preventDefault();

@@ -107,6 +107,57 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/file-library": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Page */
+        get: operations["page_v1_file_library_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/import-history": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Inventory */
+        get: operations["inventory_v1_import_history_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/import-history/{dataset}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Records */
+        get: operations["records_v1_import_history__dataset__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/tasks": {
         parameters: {
             query?: never;
@@ -1971,6 +2022,108 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/storage": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Status */
+        get: operations["status_v1_storage_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/storage/plans": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Plan */
+        post: operations["plan_v1_storage_plans_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/storage/migrations": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Migrate */
+        post: operations["migrate_v1_storage_migrations_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/storage/migrations/{identity}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Job */
+        get: operations["job_v1_storage_migrations__identity__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/storage/migrations/{identity}/resume": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Resume */
+        post: operations["resume_v1_storage_migrations__identity__resume_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/storage/migrations/{identity}/cancel": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Cancel */
+        post: operations["cancel_v1_storage_migrations__identity__cancel_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/identity/peer-grant": {
         parameters: {
             query?: never;
@@ -2431,6 +2584,20 @@ export interface components {
             /** Detail */
             detail?: components["schemas"]["ValidationError"][];
         };
+        /** HistoryDataset */
+        HistoryDataset: {
+            /** Dataset */
+            dataset: string;
+            /** Count */
+            count: number;
+            /** Readable */
+            readable: boolean;
+        };
+        /** HistoryInventory */
+        HistoryInventory: {
+            /** Items */
+            items: components["schemas"]["HistoryDataset"][];
+        };
         /** HistoryMessage */
         HistoryMessage: {
             /**
@@ -2531,6 +2698,49 @@ export interface components {
         LaunchIn: {
             /** Ticket */
             ticket: string;
+        };
+        /** LibraryEntry */
+        LibraryEntry: {
+            /** Id */
+            id: string;
+            /** Name */
+            name: string;
+            /** Mime Type */
+            mime_type: string;
+            /** Byte Size */
+            byte_size: number;
+            /** Sha256 */
+            sha256: string;
+            /** Application Id */
+            application_id: string;
+            /** Folder Id */
+            folder_id?: string | null;
+            /** Source */
+            source?: string | null;
+            /** Metadata */
+            metadata?: {
+                [key: string]: unknown;
+            };
+        };
+        /** LibraryFolder */
+        LibraryFolder: {
+            /** Id */
+            id: string;
+            /** Parent Id */
+            parent_id: string | null;
+            /** Name */
+            name: string;
+        };
+        /** LibraryPage */
+        LibraryPage: {
+            /** Items */
+            items: components["schemas"]["LibraryEntry"][];
+            /** Folders */
+            folders: components["schemas"]["LibraryFolder"][];
+            /** Breadcrumbs */
+            breadcrumbs: components["schemas"]["LibraryFolder"][];
+            /** Next Cursor */
+            next_cursor: string | null;
         };
         /** McpCallIn */
         McpCallIn: {
@@ -5168,6 +5378,86 @@ export interface components {
             /** Invitation */
             invitation: string;
         };
+        /** StorageJob */
+        StorageJob: {
+            /** Id */
+            id: string;
+            /** Status */
+            status: string;
+            /** Phase */
+            phase: string;
+            /** Message */
+            message: string;
+            /** Created At */
+            created_at: number;
+        };
+        /** StorageMigrationInput */
+        StorageMigrationInput: {
+            /**
+             * Plan Id
+             * Format: uuid
+             */
+            plan_id: string;
+        };
+        /** StorageParticipant */
+        StorageParticipant: {
+            /** Id */
+            id: string;
+            /** Root */
+            root: string;
+            /** Files */
+            files: number;
+            /** Bytes */
+            bytes: number;
+        };
+        /** StoragePlan */
+        StoragePlan: {
+            /** Id */
+            id: string;
+            /** Root */
+            root: string;
+            /** Required Bytes */
+            required_bytes: number;
+            /** Available Bytes */
+            available_bytes: number;
+            /** Entries */
+            entries: components["schemas"]["StorageParticipant"][];
+            /** Legacy */
+            legacy: {
+                [key: string]: unknown;
+            } | null;
+        };
+        /** StoragePlanInput */
+        StoragePlanInput: {
+            /** Target Root */
+            target_root: string;
+            /** Expected Revision */
+            expected_revision: number;
+            /**
+             * Include Legacy
+             * @default false
+             */
+            include_legacy: boolean;
+        };
+        /** StorageStatus */
+        StorageStatus: {
+            /** Configured */
+            configured: boolean;
+            /** Revision */
+            revision: number;
+            /** Root */
+            root: string;
+            /** Core Root */
+            core_root: string;
+            /** Participants */
+            participants: components["schemas"]["StorageParticipant"][];
+            /** Jobs */
+            jobs: components["schemas"]["StorageJob"][];
+            /** Legacy Source Configured */
+            legacy_source_configured: boolean;
+            /** Legacy Imported */
+            legacy_imported: boolean;
+        };
         /** UpdateAccount */
         UpdateAccount: {
             /** Active */
@@ -5329,6 +5619,94 @@ export interface operations {
                 "application/json": components["schemas"]["RpcIn"];
             };
         };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    page_v1_file_library_get: {
+        parameters: {
+            query?: {
+                folder_id?: string | null;
+                after?: string | null;
+                search?: string;
+                limit?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["LibraryPage"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    inventory_v1_import_history_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HistoryInventory"];
+                };
+            };
+        };
+    };
+    records_v1_import_history__dataset__get: {
+        parameters: {
+            query?: {
+                offset?: number;
+                limit?: number;
+            };
+            header?: never;
+            path: {
+                dataset: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
         responses: {
             /** @description Successful Response */
             200: {
@@ -9450,6 +9828,185 @@ export interface operations {
                 };
                 content: {
                     "application/json": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    status_v1_storage_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StorageStatus"];
+                };
+            };
+        };
+    };
+    plan_v1_storage_plans_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["StoragePlanInput"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StoragePlan"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    migrate_v1_storage_migrations_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["StorageMigrationInput"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            202: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StorageJob"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    job_v1_storage_migrations__identity__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                identity: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StorageJob"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    resume_v1_storage_migrations__identity__resume_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                identity: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            202: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StorageJob"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    cancel_v1_storage_migrations__identity__cancel_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                identity: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            202: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StorageJob"];
                 };
             };
             /** @description Validation Error */

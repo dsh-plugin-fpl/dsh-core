@@ -1,0 +1,65 @@
+.storage-page {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+.storage-panel {
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.storage-panel h2 {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+}
+.storage-panel label {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.storage-panel input {
+  width: 100%;
+  box-sizing: border-box;
+  background: var(--surface);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 12px;
+  font: inherit;
+}
+.storage-hint {
+  color: var(--muted);
+  line-height: 1.7;
+}
+.storage-panel code {
+  overflow-wrap: anywhere;
+  white-space: normal;
+}
+.storage-entries {
+  display: grid;
+  gap: 12px;
+}
+.storage-entries > div {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 12px;
+}
+.storage-panel .btn {
+  align-self: flex-start;
+}
+@media (max-width: 600px) {
+  .storage-panel {
+    padding: 16px;
+  }
+  .storage-panel .btn {
+    align-self: stretch;
+  }
+}
+
+
+.storage-panel input[type="checkbox"] { width: auto; align-self: flex-start; }

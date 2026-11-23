@@ -3,7 +3,7 @@ import { requestApi } from "@platform/api/client";
 import { ThemeToggle } from "@shared/ui/ThemeToggle";
 import { useQuery } from "@tanstack/react-query";
 import { fetchApiJson } from "@platform/api/client";
-import { Network, UserRound } from "lucide-react";
+import { HardDrive, Network, UserRound } from "lucide-react";
 import "./studio-global-header.css";
 export function StudioGlobalHeader(_: { assistant?: unknown }) {
   const profile = useCoreAccount();
@@ -23,6 +23,12 @@ export function StudioGlobalHeader(_: { assistant?: unknown }) {
         </div>
       </div>
       <div className="studio-header-actions">
+        {profile.legacy && profile.role === "admin" && (
+          <a className="studio-header-chip" href="/storage">
+            <HardDrive size={16} />
+            存储
+          </a>
+        )}
         <a
           href="/integrations?kind=external-connections"
           className="studio-header-chip"

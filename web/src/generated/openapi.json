@@ -157,6 +157,165 @@
         }
       }
     },
+    "/v1/file-library": {
+      "get": {
+        "summary": "Page",
+        "operationId": "page_v1_file_library_get",
+        "parameters": [
+          {
+            "name": "folder_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Folder Id"
+            }
+          },
+          {
+            "name": "after",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "After"
+            }
+          },
+          {
+            "name": "search",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "default": "",
+              "title": "Search"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 200,
+              "minimum": 1,
+              "default": 100,
+              "title": "Limit"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LibraryPage"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/import-history": {
+      "get": {
+        "summary": "Inventory",
+        "operationId": "inventory_v1_import_history_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HistoryInventory"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/import-history/{dataset}": {
+      "get": {
+        "summary": "Records",
+        "operationId": "records_v1_import_history__dataset__get",
+        "parameters": [
+          {
+            "name": "dataset",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Dataset"
+            }
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 0,
+              "title": "Offset"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 50,
+              "title": "Limit"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/v1/tasks": {
       "get": {
         "summary": "Tasks",
@@ -5901,6 +6060,220 @@
         }
       }
     },
+    "/v1/storage": {
+      "get": {
+        "summary": "Status",
+        "operationId": "status_v1_storage_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StorageStatus"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/storage/plans": {
+      "post": {
+        "summary": "Plan",
+        "operationId": "plan_v1_storage_plans_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/StoragePlanInput"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StoragePlan"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/storage/migrations": {
+      "post": {
+        "summary": "Migrate",
+        "operationId": "migrate_v1_storage_migrations_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/StorageMigrationInput"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "202": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StorageJob"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/storage/migrations/{identity}": {
+      "get": {
+        "summary": "Job",
+        "operationId": "job_v1_storage_migrations__identity__get",
+        "parameters": [
+          {
+            "name": "identity",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Identity"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StorageJob"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/storage/migrations/{identity}/resume": {
+      "post": {
+        "summary": "Resume",
+        "operationId": "resume_v1_storage_migrations__identity__resume_post",
+        "parameters": [
+          {
+            "name": "identity",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Identity"
+            }
+          }
+        ],
+        "responses": {
+          "202": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StorageJob"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/storage/migrations/{identity}/cancel": {
+      "post": {
+        "summary": "Cancel",
+        "operationId": "cancel_v1_storage_migrations__identity__cancel_post",
+        "parameters": [
+          {
+            "name": "identity",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Identity"
+            }
+          }
+        ],
+        "responses": {
+          "202": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StorageJob"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/v1/identity/peer-grant": {
       "post": {
         "summary": "Grant",
@@ -6804,6 +7177,45 @@
         "type": "object",
         "title": "HTTPValidationError"
       },
+      "HistoryDataset": {
+        "properties": {
+          "dataset": {
+            "type": "string",
+            "title": "Dataset"
+          },
+          "count": {
+            "type": "integer",
+            "title": "Count"
+          },
+          "readable": {
+            "type": "boolean",
+            "title": "Readable"
+          }
+        },
+        "type": "object",
+        "required": [
+          "dataset",
+          "count",
+          "readable"
+        ],
+        "title": "HistoryDataset"
+      },
+      "HistoryInventory": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/HistoryDataset"
+            },
+            "type": "array",
+            "title": "Items"
+          }
+        },
+        "type": "object",
+        "required": [
+          "items"
+        ],
+        "title": "HistoryInventory"
+      },
       "HistoryMessage": {
         "properties": {
           "role": {
@@ -7050,6 +7462,145 @@
           "ticket"
         ],
         "title": "LaunchIn"
+      },
+      "LibraryEntry": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "mime_type": {
+            "type": "string",
+            "title": "Mime Type"
+          },
+          "byte_size": {
+            "type": "integer",
+            "title": "Byte Size"
+          },
+          "sha256": {
+            "type": "string",
+            "title": "Sha256"
+          },
+          "application_id": {
+            "type": "string",
+            "title": "Application Id"
+          },
+          "folder_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Folder Id"
+          },
+          "source": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Source"
+          },
+          "metadata": {
+            "additionalProperties": true,
+            "type": "object",
+            "title": "Metadata"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "name",
+          "mime_type",
+          "byte_size",
+          "sha256",
+          "application_id"
+        ],
+        "title": "LibraryEntry"
+      },
+      "LibraryFolder": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "parent_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Parent Id"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "parent_id",
+          "name"
+        ],
+        "title": "LibraryFolder"
+      },
+      "LibraryPage": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/LibraryEntry"
+            },
+            "type": "array",
+            "title": "Items"
+          },
+          "folders": {
+            "items": {
+              "$ref": "#/components/schemas/LibraryFolder"
+            },
+            "type": "array",
+            "title": "Folders"
+          },
+          "breadcrumbs": {
+            "items": {
+              "$ref": "#/components/schemas/LibraryFolder"
+            },
+            "type": "array",
+            "title": "Breadcrumbs"
+          },
+          "next_cursor": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Next Cursor"
+          }
+        },
+        "type": "object",
+        "required": [
+          "items",
+          "folders",
+          "breadcrumbs",
+          "next_cursor"
+        ],
+        "title": "LibraryPage"
       },
       "McpCallIn": {
         "properties": {
@@ -14220,7 +14771,7 @@
           "password": {
             "type": "string",
             "maxLength": 256,
-            "minLength": 12,
+            "minLength": 10,
             "title": "Password"
           }
         },
@@ -14284,6 +14835,210 @@
           "invitation"
         ],
         "title": "RegisterAccount"
+      },
+      "StorageJob": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "status": {
+            "type": "string",
+            "title": "Status"
+          },
+          "phase": {
+            "type": "string",
+            "title": "Phase"
+          },
+          "message": {
+            "type": "string",
+            "title": "Message"
+          },
+          "created_at": {
+            "type": "number",
+            "title": "Created At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "status",
+          "phase",
+          "message",
+          "created_at"
+        ],
+        "title": "StorageJob"
+      },
+      "StorageMigrationInput": {
+        "properties": {
+          "plan_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Plan Id"
+          }
+        },
+        "type": "object",
+        "required": [
+          "plan_id"
+        ],
+        "title": "StorageMigrationInput"
+      },
+      "StorageParticipant": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "root": {
+            "type": "string",
+            "title": "Root"
+          },
+          "files": {
+            "type": "integer",
+            "title": "Files"
+          },
+          "bytes": {
+            "type": "integer",
+            "title": "Bytes"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "root",
+          "files",
+          "bytes"
+        ],
+        "title": "StorageParticipant"
+      },
+      "StoragePlan": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "root": {
+            "type": "string",
+            "title": "Root"
+          },
+          "required_bytes": {
+            "type": "integer",
+            "title": "Required Bytes"
+          },
+          "available_bytes": {
+            "type": "integer",
+            "title": "Available Bytes"
+          },
+          "entries": {
+            "items": {
+              "$ref": "#/components/schemas/StorageParticipant"
+            },
+            "type": "array",
+            "title": "Entries"
+          },
+          "legacy": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Legacy"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "root",
+          "required_bytes",
+          "available_bytes",
+          "entries",
+          "legacy"
+        ],
+        "title": "StoragePlan"
+      },
+      "StoragePlanInput": {
+        "properties": {
+          "target_root": {
+            "type": "string",
+            "maxLength": 4096,
+            "minLength": 1,
+            "title": "Target Root"
+          },
+          "expected_revision": {
+            "type": "integer",
+            "minimum": 0.0,
+            "title": "Expected Revision"
+          },
+          "include_legacy": {
+            "type": "boolean",
+            "title": "Include Legacy",
+            "default": false
+          }
+        },
+        "type": "object",
+        "required": [
+          "target_root",
+          "expected_revision"
+        ],
+        "title": "StoragePlanInput"
+      },
+      "StorageStatus": {
+        "properties": {
+          "configured": {
+            "type": "boolean",
+            "title": "Configured"
+          },
+          "revision": {
+            "type": "integer",
+            "title": "Revision"
+          },
+          "root": {
+            "type": "string",
+            "title": "Root"
+          },
+          "core_root": {
+            "type": "string",
+            "title": "Core Root"
+          },
+          "participants": {
+            "items": {
+              "$ref": "#/components/schemas/StorageParticipant"
+            },
+            "type": "array",
+            "title": "Participants"
+          },
+          "jobs": {
+            "items": {
+              "$ref": "#/components/schemas/StorageJob"
+            },
+            "type": "array",
+            "title": "Jobs"
+          },
+          "legacy_source_configured": {
+            "type": "boolean",
+            "title": "Legacy Source Configured"
+          },
+          "legacy_imported": {
+            "type": "boolean",
+            "title": "Legacy Imported"
+          }
+        },
+        "type": "object",
+        "required": [
+          "configured",
+          "revision",
+          "root",
+          "core_root",
+          "participants",
+          "jobs",
+          "legacy_source_configured",
+          "legacy_imported"
+        ],
+        "title": "StorageStatus"
       },
       "UpdateAccount": {
         "properties": {

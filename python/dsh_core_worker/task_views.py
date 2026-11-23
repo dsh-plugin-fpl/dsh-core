@@ -336,11 +336,14 @@ class TaskViews:
             if request.method == "DELETE" or path.endswith("/batch-delete"):
                 identities = [identity] if identity else body["ids"]
                 for item in identities:
-                    runtime.store.task(item)
+                    if self.app.state.imported_history.get("llm_call_logs", item) is None:
+                        runtime.store.task(item)
                 self.hide("hidden_logs", identities)
                 return {"deleted": len(identities)}
             if identity:
-                log = self.log(runtime.store.task(identity))
+                log = self.app.state.imported_history.get("llm_call_logs", identity) or self.log(
+                    runtime.store.task(identity)
+                )
                 if path.endswith("/reproduction-bundle"):
                     from fastapi.responses import Response
 
@@ -355,6 +358,12 @@ class TaskViews:
                 for t in runtime.store.tasks()
                 if t["id"] not in self.hidden("hidden_logs")["value"]
             ]
+            values.extend(
+                row
+                for row in self.app.state.imported_history.records("llm_call_logs")
+                if row["id"] not in self.hidden("hidden_logs")["value"]
+            )
+            values.sort(key=lambda row: row["created_at"], reverse=True)
             if path.endswith("/stats"):
                 today = iso()[:10]
                 rows = [v for v in values if v["created_at"].startswith(today)]
@@ -391,11 +400,18 @@ class TaskViews:
                 "page": page,
                 "page_size": size,
             }
-        if path == '/v1/model-test/generation-options':
+        if path == "/v1/model-test/generation-options":
             from .generation_catalog import generation_options
-            configured = bool(self.runtime.store.config('settings', {})['value'].get('temporary_upload_url'))
-            options = generation_options(self.catalog.view()['providers'],upload_configured=configured)
-            return {'items':[row for row in options['models'] if row['kind'] in {'image','video'}]}
+
+            configured = bool(
+                self.runtime.store.config("settings", {})["value"].get("temporary_upload_url")
+            )
+            options = generation_options(
+                self.catalog.view()["providers"], upload_configured=configured
+            )
+            return {
+                "items": [row for row in options["models"] if row["kind"] in {"image", "video"}]
+            }
         if path.endswith(("/options", "-options")):
             capability = "speech_recognition" if "transcription" in path else None
             rows = []

@@ -11,15 +11,17 @@ class Input(BaseModel):
 
 class Login(Input):
     username: str = Field(min_length=3, max_length=64)
-    password: str = Field(min_length=12, max_length=256, repr=False)
+    password: str = Field(min_length=10, max_length=256, repr=False)
 
 
 class CreateAccount(Login):
+    password: str = Field(min_length=12, max_length=256, repr=False)
     display_name: str = Field(min_length=1, max_length=120)
     role: Literal["admin", "user"] = "user"
 
 
 class RegisterAccount(Login):
+    password: str = Field(min_length=12, max_length=256, repr=False)
     display_name: str = Field(min_length=1, max_length=120)
     invitation: str = Field(min_length=32, max_length=256, repr=False)
 

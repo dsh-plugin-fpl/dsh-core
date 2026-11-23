@@ -124,7 +124,9 @@ class Catalog:
                     "kind": provider["kind"],
                     "base_url": provider["base_url"],
                     "enabled": provider["enabled"],
-                    "credential_ref": "PROVIDER_" + provider["id"].replace("-", "_"),
+                    "credential_ref": ""
+                    if provider["kind"].startswith("local_")
+                    else "PROVIDER_" + provider["id"].replace("-", "_"),
                     "models": [
                         {
                             "id": m["slug"],

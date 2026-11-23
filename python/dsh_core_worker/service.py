@@ -8,7 +8,7 @@ from pathlib import Path
 
 from fastapi import FastAPI, Request, WebSocket, WebSocketDisconnect
 from fastapi.exceptions import RequestValidationError
-from fastapi.responses import FileResponse, JSONResponse, StreamingResponse, RedirectResponse
+from fastapi.responses import FileResponse, JSONResponse, RedirectResponse, StreamingResponse
 from pydantic import BaseModel, Field
 
 from .access import Access
@@ -53,21 +53,31 @@ def create_tenant_app(root, web_root=None, origin="http://127.0.0.1:9310", *, ac
         bridges.credentials = credentials
         app.state.credentials = credentials
         app.state.runtime = runtime
+        from .storage_history import StorageHistory
+
+        app.state.imported_history = StorageHistory(runtime.store.root, initialize=True)
+        from .file_library import FileLibrary
+
+        FileLibrary(runtime.resources, initialize=True)
         app.state.catalog = Catalog(runtime, credentials, bridges)
         bridges.model_catalog_view = app.state.catalog
         app.state.conversations = Conversations(runtime, app.state.catalog)
         from .integrations.assembly import Integrations
+
         app.state.integrations = Integrations(root / "integrations", runtime, access)
         try:
             await app.state.integrations.database.migrate()
             from .integrations.external_schema import migrate as migrate_external
+
             await migrate_external(app.state.integrations.database)
             from .integrations.external_core import ExternalSync
-            bridges.external_sync=ExternalSync(runtime,app.state.integrations,access)
+
+            bridges.external_sync = ExternalSync(runtime, app.state.integrations, access)
             await bridges.external_sync.steps.recover()
             from .integrations.transfers import Transfers
-            app.state.integration_transfers=Transfers(app.state.integrations,bridges,access)
-            app.state.integration_validation_recovery=app.state.integrations.jobs
+
+            app.state.integration_transfers = Transfers(app.state.integrations, bridges, access)
+            app.state.integration_validation_recovery = app.state.integrations.jobs
             yield
         finally:
             for bridge in list(bridges.online.values()):
@@ -160,7 +170,12 @@ def create_tenant_app(root, web_root=None, origin="http://127.0.0.1:9310", *, ac
     async def session(body: LaunchIn):
         value, csrf = access.exchange(body.ticket)
         response = JSONResponse(
-            {"csrf": csrf, "owner": access.profile() if hasattr(access, "profile") else {"id": "local-owner", "name": "本机所有者"}}
+            {
+                "csrf": csrf,
+                "owner": access.profile()
+                if hasattr(access, "profile")
+                else {"id": "local-owner", "name": "本机所有者"},
+            }
         )
         response.set_cookie("core_session", value, httponly=True, samesite="strict", max_age=86400)
         response.set_cookie("core_csrf", csrf, samesite="strict", max_age=86400)
@@ -168,7 +183,11 @@ def create_tenant_app(root, web_root=None, origin="http://127.0.0.1:9310", *, ac
 
     @app.get("/v1/session")
     async def current_session():
-        return {"owner": access.profile() if hasattr(access, "profile") else {"id": "local-owner", "name": "本机所有者"}}
+        return {
+            "owner": access.profile()
+            if hasattr(access, "profile")
+            else {"id": "local-owner", "name": "本机所有者"}
+        }
 
     @app.get("/v1/state")
     async def state():
@@ -213,6 +232,13 @@ def create_tenant_app(root, web_root=None, origin="http://127.0.0.1:9310", *, ac
         if body.method in ("task.submit", "resource.put", "resource.upload.begin"):
             params = {**params, "application_id": "core"}
         return await app.state.runtime.invoke(body.method, params)
+
+    from .file_library_api import install as install_file_library
+
+    install_file_library(app)
+    from .storage_history import register as register_imported_history
+
+    register_imported_history(app)
 
     @app.post("/v1/tasks", response_model=TaskOut)
     async def submit(body: Execution):
@@ -348,7 +374,7 @@ def create_tenant_app(root, web_root=None, origin="http://127.0.0.1:9310", *, ac
                         "id": message["id"],
                         "error": {
                             "code": getattr(error, "code", "bridge_error"),
-                            "data": error.details if isinstance(error,CoreError) else {},
+                            "data": error.details if isinstance(error, CoreError) else {},
                             "message": str(error)
                             if isinstance(error, CoreError)
                             else "连接请求失败",
@@ -392,6 +418,7 @@ def create_tenant_app(root, web_root=None, origin="http://127.0.0.1:9310", *, ac
             await asyncio.gather(*pending, return_exceptions=True)
 
     from .integrations.assembly import register as register_integrations
+
     register_integrations(app)
 
     from .voice_http import register_voice
@@ -404,7 +431,7 @@ def create_tenant_app(root, web_root=None, origin="http://127.0.0.1:9310", *, ac
 
     @app.get("/settings", include_in_schema=False)
     async def legacy_connections():
-        return RedirectResponse("/integrations?kind=external-connections",status_code=307)
+        return RedirectResponse("/integrations?kind=external-connections", status_code=307)
 
     @app.get("/{path:path}", include_in_schema=False)
     async def static(path: str):
@@ -426,4 +453,5 @@ def create_tenant_app(root, web_root=None, origin="http://127.0.0.1:9310", *, ac
 
 def create_app(root, web_root=None, origin="http://127.0.0.1:9310"):
     from .identity_gateway import create_unified_app
+
     return create_unified_app(root, create_tenant_app, web_root, origin)

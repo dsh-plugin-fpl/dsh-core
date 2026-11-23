@@ -19,19 +19,26 @@ from .private_files import atomic_private
 
 def main():
     repository = Path(__file__).resolve().parents[2]
+    if len(sys.argv) > 1 and sys.argv[1].startswith("storage-"):
+        from .storage_cli import main as storage_main
+
+        storage_main(repository)
+        return
     parser = argparse.ArgumentParser(description="未来道具研究所本机独立服务")
     parser.add_argument(
         "command", choices=["start", "serve", "stop", "status", "dashboard", "start-with-dsh"]
     )
-    parser.add_argument("--root", type=Path, default=repository / ".runtime/core")
+    parser.add_argument("--root", type=Path)
     parser.add_argument("--web-root", type=Path, default=repository / "web/dist")
     parser.add_argument("--port", type=int, default=9310)
     parser.add_argument("--no-open", action="store_true")
-    parser.add_argument("--output",type=Path,help="将一次性登录入口写入仅所有者可读的文件")
+    parser.add_argument("--output", type=Path, help="将一次性登录入口写入仅所有者可读的文件")
     args = parser.parse_args()
     if not 1024 <= args.port <= 65535:
         parser.error("端口必须介于 1024 和 65535")
-    root = args.root.resolve()
+    from .storage_location import root_for
+
+    root = root_for("core", repository / ".runtime/core", args.root)
     root.mkdir(mode=0o700, parents=True, exist_ok=True)
     origin = f"http://127.0.0.1:{args.port}"
     registration = root / "service.json"
@@ -55,10 +62,15 @@ def main():
         lifecycle_lock = (root / "launcher.lock").open("a")
         fcntl.flock(lifecycle_lock, fcntl.LOCK_EX)
     current, ready = registered(), probe()
-    if args.command in ("start", "start-with-dsh", "dashboard") and current.get("port") not in (None, args.port):
+    if args.command in ("start", "start-with-dsh", "dashboard") and current.get("port") not in (
+        None,
+        args.port,
+    ):
         previous = probe(f"http://127.0.0.1:{current['port']}")
         if previous.get("instance") == current.get("instance"):
-            raise SystemExit(f"此运行目录已在端口 {current['port']} 启动，请使用相同端口或指定其他 --root")
+            raise SystemExit(
+                f"此运行目录已在端口 {current['port']} 启动，请使用相同端口或指定其他 --root"
+            )
     if args.command == "serve":
         import uvicorn
 
@@ -149,11 +161,14 @@ def main():
     if ready.get("instance") != current.get("instance"):
         raise SystemExit("此端口正在运行其他 Core 实例，请检查配置")
     if not args.no_open or args.output:
-        access=Access(root/'access');ticket=access.ticket();url=origin+'/#ticket='+ticket
+        access = Access(root / "access")
+        ticket = access.ticket()
+        url = origin + "/#ticket=" + ticket
         if args.output:
-            args.output.parent.mkdir(parents=True,exist_ok=True,mode=0o700)
-            atomic_private(args.output,json.dumps({'url':url}).encode())
-        if not args.no_open:webbrowser.open(url)
+            args.output.parent.mkdir(parents=True, exist_ok=True, mode=0o700)
+            atomic_private(args.output, json.dumps({"url": url}).encode())
+        if not args.no_open:
+            webbrowser.open(url)
     if args.command == "start-with-dsh":
         if sys.platform != "darwin":
             print("Core 已启动；请在本平台手动打开 DeepSeek Harness")

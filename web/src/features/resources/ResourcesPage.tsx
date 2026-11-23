@@ -2,16 +2,42 @@ import { useRef, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { fetchApiJson, requestApi } from "@platform/api/client";
 import { Feedback } from "@shared/ui/RequestFeedback";
-import { Plus, File, Download } from "lucide-react";
+import {
+  Plus,
+  File,
+  Download,
+  Folder,
+  Search,
+  ChevronRight,
+} from "lucide-react";
 import { DetailDialog } from "@shared/ui/DetailDialog";
 import type { components } from "@generated/api";
+import "./resources.css";
 type Resource = components["schemas"]["ResourceOut"];
 export function Files() {
   const input = useRef<HTMLInputElement>(null);
+  const [folder, setFolder] = useState<string | null>(null),
+    [cursor, setCursor] = useState<string | null>(null),
+    [previous, setPrevious] = useState<(string | null)[]>([]),
+    [search, setSearch] = useState("");
+  const openFolder = (id: string | null) => {
+    setFolder(id);
+    setCursor(null);
+    setPrevious([]);
+    setSearch("");
+  };
   const cache = useQueryClient(),
     q = useQuery({
-      queryKey: ["core-resources"],
-      queryFn: () => fetchApiJson<{ items: Resource[] }>("/v1/resources"),
+      queryKey: ["core-file-library", folder, cursor, search],
+      queryFn: () =>
+        fetchApiJson<components["schemas"]["LibraryPage"]>(
+          "/v1/file-library?" +
+            new URLSearchParams({
+              ...(folder ? { folder_id: folder } : {}),
+              ...(cursor ? { after: cursor } : {}),
+              ...(search ? { search } : {}),
+            }),
+        ),
       refetchInterval: 4000,
     });
   const [preview, setPreview] = useState<Resource | null>(null),
@@ -71,7 +97,7 @@ export function Files() {
           throw e;
         }
       }
-      await cache.invalidateQueries({ queryKey: ["core-resources"] });
+      await cache.invalidateQueries({ queryKey: ["core-file-library"] });
     } catch (e) {
       setError((e as Error).message);
     } finally {
@@ -105,7 +131,48 @@ export function Files() {
         />
       </header>
       <Feedback error={error || q.error?.message} />
-      {!q.data?.items.length ? (
+      <nav aria-label="文件夹路径" className="storage-breadcrumbs">
+        <button className="btn" onClick={() => openFolder(null)}>
+          全部文件
+        </button>
+        {q.data?.breadcrumbs.map((item) => (
+          <span key={item.id}>
+            <ChevronRight size={14} aria-hidden />
+            <button className="btn" onClick={() => openFolder(item.id)}>
+              {item.name}
+            </button>
+          </span>
+        ))}
+      </nav>
+      <label className="storage-file-search">
+        <Search size={18} aria-hidden />
+        <input
+          aria-label="搜索全部文件"
+          placeholder="搜索全部文件…"
+          value={search}
+          onChange={(e) => {
+            setSearch(e.target.value);
+            setCursor(null);
+            setPrevious([]);
+          }}
+        />
+      </label>
+      {!!q.data?.folders.length && (
+        <div className="core-files">
+          {q.data.folders.map((item) => (
+            <article className="home-panel core-file" key={item.id}>
+              <button
+                onClick={() => openFolder(item.id)}
+                aria-label={"打开文件夹 " + item.name}
+              >
+                <Folder size={40} />
+                <strong>{item.name}</strong>
+              </button>
+            </article>
+          ))}
+        </div>
+      )}
+      {!q.data?.items.length && !q.data?.folders.length ? (
         <p className="core-empty">
           还没有文件，上传素材或完成一次生成后会显示在这里。
         </p>
@@ -142,6 +209,30 @@ export function Files() {
             </article>
           ))}
         </div>
+      )}
+      {(!!previous.length || q.data?.next_cursor) && (
+        <nav className="storage-breadcrumbs" aria-label="文件分页">
+          <button
+            className="btn"
+            disabled={!previous.length}
+            onClick={() => {
+              setCursor(previous.at(-1) ?? null);
+              setPrevious(previous.slice(0, -1));
+            }}
+          >
+            上一页
+          </button>
+          <button
+            className="btn"
+            disabled={!q.data?.next_cursor}
+            onClick={() => {
+              setPrevious([...previous, cursor]);
+              setCursor(q.data?.next_cursor ?? null);
+            }}
+          >
+            下一页
+          </button>
+        </nav>
       )}
       {preview && (
         <DetailDialog title={preview.name} onClose={() => setPreview(null)}>

@@ -1,3 +1,4 @@
+import { StoragePage } from "@features/storage/StoragePage";
 import { AccountsPage } from "@features/accounts/AccountsPage";
 import { useCoreAccount } from "@platform/auth/AccountAccess";
 import {
@@ -103,7 +104,9 @@ export function App() {
       assistant={null}
     >
       <Suspense fallback={<p className="page-loading">正在打开页面…</p>}>
-        {path.split("?")[0] === "/account" ? (
+        {path.split("?")[0] === "/storage" ? (
+          <StoragePage />
+        ) : path.split("?")[0] === "/account" ? (
           <AccountsPage />
         ) : page === "home" ? (
           <Home navigate={navigate} />

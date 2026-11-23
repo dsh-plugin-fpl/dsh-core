@@ -88,3 +88,6 @@ DSH 连接层单独使用 `pnpm build:connector` 和 `pnpm pack --pack-destinati
 看板名称为「未来道具研究所」，技术包与应用 ID 保持兼容。打开右上角账号进入 `/account`，管理员可创建/禁用账号、设置密码和撤销应用授权。初始本机账号沿用原 Core 状态；新账号拥有独立配置、资源和任务。首次可以用 `pnpm dashboard --no-open --output .runtime/core-launch.json` 生成仅本机可读的一次性入口，然后在账号页设置密码。不要发送该文件或提交到 Git。
 
 工坊在自己的仓库运行 `pnpm setup`，再用其文档的 `connect-core --launch-file` 入口登记统一身份；9360–9365 对应视觉、剪辑、演示、思绪、Galgame、录音标注。应用直接登录和独立桥接也会出现在 Core 目录中。DSH 插件开关只控制连接层，独立服务使用自身启动器。应用包要求 Core 0.4.0，老的 DSH Core 连接器与原任务、资源协议仍兼容。
+
+
+统一数据位置与旧 FPL 交接见 [存储与迁移](docs/storage.md)。本机所有者可从看板顶部“存储”进入设置，未来工坊初始化自动使用该根目录的自有子目录。

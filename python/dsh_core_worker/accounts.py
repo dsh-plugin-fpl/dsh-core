@@ -70,6 +70,21 @@ def password_hash(value, salt=None):
 
 
 def verify_password(value, encoded):
+    if isinstance(encoded, str) and encoded.startswith("$argon2id$"):
+        try:
+            from argon2 import PasswordHasher, extract_parameters
+            from argon2.exceptions import VerificationError
+
+            params = extract_parameters(encoded)
+            if (
+                not 1 <= params.time_cost <= 10
+                or not 1 <= params.parallelism <= 4
+                or not 8192 <= params.memory_cost <= 65536
+            ):
+                return False
+            return PasswordHasher().verify(encoded, value)
+        except (ValueError, TypeError, VerificationError):
+            return False
     try:
         salt, _ = encoded.split(":")
         return hmac.compare_digest(password_hash(value, salt), encoded)

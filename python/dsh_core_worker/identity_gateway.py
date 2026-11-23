@@ -17,9 +17,9 @@ from .identity_contracts import (
     AccountList,
     AccountProfile,
     Application,
-    ApplicationRegistrationResult,
     ApplicationDirectory,
     ApplicationDirectoryResult,
+    ApplicationRegistrationResult,
     CreateAccount,
     IdentityMe,
     Login,
@@ -135,6 +135,18 @@ def create_unified_app(root, factory, web_root=None, origin="http://127.0.0.1:93
 
     @app.middleware("http")
     async def boundary(request, call_next):
+        from .storage_admission import paused
+
+        if (
+            request.method not in {"GET", "HEAD", "OPTIONS"}
+            and paused(root)
+            and not request.url.path.startswith("/v1/storage/")
+        ):
+            return JSONResponse(
+                {"code": "storage_migrating", "detail": "存储迁移中，请稍后重试"},
+                503,
+                headers={"Retry-After": "5"},
+            )
         if request.headers.get("host") != origin.split("://", 1)[1]:
             return JSONResponse({"code": "invalid_host"}, 403)
         client_api = request.url.path in {
@@ -332,6 +344,10 @@ def create_unified_app(root, factory, web_root=None, origin="http://127.0.0.1:93
         accounts.client(body.get("application_id"), token)
         return body, token
 
+    from .storage_api import install as install_storage
+
+    install_storage(app, Path(root), accounts, current)
+
     from .core_peer_api import install as install_peers
 
     install_peers(app, accounts, Path(root), client_request)
@@ -428,7 +444,7 @@ def create_unified_app(root, factory, web_root=None, origin="http://127.0.0.1:93
             {
                 path: value
                 for path, value in identity["paths"].items()
-                if path.startswith("/v1/identity/")
+                if path.startswith(("/v1/identity/", "/v1/storage"))
             }
         )
         core.setdefault("components", {}).setdefault("schemas", {}).update(
@@ -503,4 +519,4 @@ def create_unified_app(root, factory, web_root=None, origin="http://127.0.0.1:93
     return app
 
 
-LOGIN_HTML = """<!doctype html><html lang="zh-CN"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>登录 · 未来道具研究所</title><style>body{font:16px system-ui;background:#1c1e1b;color:#eee7da;display:grid;place-items:center;min-height:95vh}form{width:min(360px,85vw);padding:32px;border:1px solid #393e37;border-radius:20px}label{display:grid;gap:8px;margin:20px 0}input,button{font:inherit;padding:12px;border-radius:10px;border:1px solid #555;background:#282c26;color:inherit}button{background:#eb8054;cursor:pointer;width:100%}p{line-height:1.7}#error{color:#ff9e87}</style><form><h1>未来道具研究所</h1><p>登录后使用你的应用与私人资源。</p><label>账号<input name="username" autocomplete="username" required maxlength="64"></label><label>密码<input name="password" type="password" autocomplete="current-password" required minlength="12" maxlength="256"></label><button>登录</button><p id="error" role="alert"></p></form><script>const form=document.querySelector('form');form.onsubmit=async e=>{e.preventDefault();const button=form.querySelector('button');button.disabled=true;try{const response=await fetch('/v1/identity/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(Object.fromEntries(new FormData(form)))});if(!response.ok)throw new Error('账号或密码无效，或登录尝试过多。');const query=new URLSearchParams(location.search);const app=query.get('application_id'),state=query.get('state');location.assign(app&&state?'/v1/identity/authorize?'+new URLSearchParams({application_id:app,state}):'/')}catch(error){document.querySelector('#error').textContent=error.message;button.disabled=false}};</script></html>"""
+LOGIN_HTML = """<!doctype html><html lang="zh-CN"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>登录 · 未来道具研究所</title><style>body{font:16px system-ui;background:#1c1e1b;color:#eee7da;display:grid;place-items:center;min-height:95vh}form{width:min(360px,85vw);padding:32px;border:1px solid #393e37;border-radius:20px}label{display:grid;gap:8px;margin:20px 0}input,button{font:inherit;padding:12px;border-radius:10px;border:1px solid #555;background:#282c26;color:inherit}button{background:#eb8054;cursor:pointer;width:100%}p{line-height:1.7}#error{color:#ff9e87}</style><form><h1>未来道具研究所</h1><p>登录后使用你的应用与私人资源。</p><label>账号<input name="username" autocomplete="username" required maxlength="64"></label><label>密码<input name="password" type="password" autocomplete="current-password" required minlength="10" maxlength="256"></label><button>登录</button><p id="error" role="alert"></p></form><script>const form=document.querySelector('form');form.onsubmit=async e=>{e.preventDefault();const button=form.querySelector('button');button.disabled=true;try{const response=await fetch('/v1/identity/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(Object.fromEntries(new FormData(form)))});if(!response.ok)throw new Error('账号或密码无效，或登录尝试过多。');const query=new URLSearchParams(location.search);const app=query.get('application_id'),state=query.get('state');location.assign(app&&state?'/v1/identity/authorize?'+new URLSearchParams({application_id:app,state}):'/')}catch(error){document.querySelector('#error').textContent=error.message;button.disabled=false}};</script></html>"""

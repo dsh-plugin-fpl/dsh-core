@@ -1,0 +1,28 @@
+.storage-breadcrumbs {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.storage-breadcrumbs span {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.storage-file-search {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 10px 14px;
+  margin-bottom: 18px;
+}
+.storage-file-search input {
+  background: transparent;
+  border: 0;
+  color: var(--text);
+  font: inherit;
+  min-width: 0;
+  flex: 1;
+}
