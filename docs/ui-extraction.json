@@ -224,5 +224,16 @@
     "folder_license": "web/public/licenses/react-bits-folder-LICENSE.txt, copied with the existing folder geometry."
   },
   "contract": "Core-owned fpl_page_contract.json is the adopted subset, not a runtime dependency on the FPL website.",
-  "integration_source_commit": "ffce0d2061e3a314074027e322f9633a3ef2e33f"
+  "integration_source_commit": "ffce0d2061e3a314074027e322f9633a3ef2e33f",
+  "file_browser_source": {
+    "source_commit": "7a869f6a45135e6f4a1cd238dd4d8728572a36c8",
+    "files": {
+      "web/src/features/files/AssetBrowser.tsx": "f3a3c51710dae10b8e747a46788db19a81bf7a0208319d076c272295c1fe0502",
+      "web/src/features/files/AssetBrowserParts.tsx": "80676f31a1cfef3949b05491cf56c7567e7a4714d9b9d10fb65e9a6650158de8",
+      "web/src/features/files/styles/asset-browser-foundation.css": "2655f02cbd437cc2c2a93d08b58c977eade5c5695ae69ee627718881852d6c76",
+      "web/src/features/files/styles/asset-browser-components.css": "2c74da040dc0e66a782e4654f86e2546c40e8dccce4171e037734db209e51dad",
+      "web/src/features/files/styles/file-library.css": "cc50f7e143d734a3b4a68f6890859f4b94d8da4aba2c5926c523d02f43eca031"
+    },
+    "target": "web/src/features/resources; Core-owned API adaptation, no runtime FPL import"
+  }
 }

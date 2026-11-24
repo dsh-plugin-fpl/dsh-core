@@ -68,41 +68,6 @@
   padding: 12px;
   border-radius: 10px;
 }
-.core-files {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
-  gap: 16px;
-}
-.core-file {
-  padding: 14px;
-  display: grid;
-  gap: 10px;
-  min-width: 0;
-}
-.core-file > button {
-  height: 160px;
-  background: var(--surface-soft);
-  border: 0;
-  border-radius: 10px;
-  color: var(--muted);
-  cursor: pointer;
-}
-.core-file img {
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
-}
-.core-file strong {
-  overflow-wrap: anywhere;
-}
-.core-file small {
-  color: var(--muted);
-}
-.core-file a {
-  display: flex;
-  align-items: center;
-  gap: 5px;
-}
 .core-detail {
   position: fixed;
   inset: 8vh 8vw;

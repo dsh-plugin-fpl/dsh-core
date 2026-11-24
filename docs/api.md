@@ -95,3 +95,19 @@ Core 的 peer-grant/peer-verify 签发绑定当前账号、来源/目标应用�
 ## 本机服务生命周期（0.5）
 
 ctx.dshCore.manageLocalService({id,endpoint,installation,serviceDirectory?}) 提供可等待的 start()/stop()，仅供本机插件调用，不经 WS/HTTP RPC 开放。启动验证安装归属，调用固定的提供方 CLI，串行处理快速开关；Core 卸载等待工坊停止。失败时显示明确错误与私有日志。Config 的 manageService 默认 true，false 为仅连接模式；serviceDirectory 覆写本机包安装描述。
+
+
+## 文件管理（原版浏览器适配）
+
+`GET /v1/file-library` 继续返回当前账号的 `items`、`folders`、`breadcrumbs` 和 `next_cursor`，增加匹配范围的 `file_count`、`folder_count`。查询支持 `folder_id`、`search`（全库文件及文件夹名称）、`kind=all|image|video|audio|pdf|text|file`、`sort=updated|name|size`、`limit`（1–200）和 `after`。同一次分页保持查询和排序；失效游标返回 409，请从第一页重新读取。历史时间缺失时返回 null，不伪造更新时间。
+
+- `GET/POST /v1/file-library/folders`：读取账号内目录或新建目录（`name`、可空 `parent_id`）。
+- `PATCH/DELETE /v1/file-library/folders/{id}`：重命名、移动或删除空文件夹。PATCH 显式传 `parent_id: null` 表示移到根目录；省略则保留。拒绝同级同名、循环目录和非空删除。
+- `PATCH/DELETE /v1/file-library/entries/{id}`：修改文件显示名（`name`）、位置（可空 `folder_id`），或从文件管理移除。PATCH 使用 `expected_revision`，DELETE 使用同名查询参数，旧版本返回 409。原始资源保持不可变，移除只隐藏文件管理条目，工坊已有引用继续有效。
+- `GET /v1/file-library/entries/{id}/content?download=true`：经过账号和库条目校验的内容与下载入口，下载采用当前显示名。移除后此入口返回 404；公共 `/v1/resources/{id}/content` 继续服务原有工坊引用。非安全媒体仍强制附件，SVG 和 PDF 由看板通过受认证 Blob 预览；文本预览最多读取 200 KiB。PDF/SVG 大于 32 MiB 时下载查看。
+- `POST /v1/file-library/archive-imports`：multipart `request_id`（UUID）、可空 `parent_id`、`archive`（ZIP）。
+- `POST /v1/file-library/directory-imports`：multipart `request_id`、可空 `parent_id`、顺序对应的 `paths` 和 `files`。
+- `GET /v1/file-library/imports/{request_id}`：读取当前账号的导入状态与完成回执。相同请求及内容返回原结果，内容或目标变化返回 409；中断后可用同一回执继续，已完成原件与条目不会重复生成。浏览器仅查询未知结果，须用户重新选择相同输入后显式继续。
+- `GET /v1/file-library/folder-export?folder_id=...`：导出当前文件夹及其子目录，不指定则导出文件库。ZIP 在账号运行目录内生成短生命周期临时文件，逐原件校验摘要后传输，关闭响应时释放。
+
+导入预检拒绝绝对路径、上级路径、重复/冲突路径、符号链接和加密归档。单次含隐式父目录最多 5000 项，ZIP 压缩输入和解压后的文件合计均最多 256 MiB。逐文件提交允许保留部分成功；发生中断时保留回执并提示核对或继续，不自动重复导入。以上所有操作复用账号会话、Origin 和 CSRF 验证；管理员也不能操作其他账号的条目，不改变既有迁移账本或 schema。

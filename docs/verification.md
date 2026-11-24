@@ -112,3 +112,13 @@ Core 提供所有者限定的存储设置、预检与可恢复切换；六工坊
 Core 227 项 Python、9 项连接层测试及构建通过；存储页面 Chrome 明暗主题和 1440/800/390px 验证通过。六工坊 Python 测试分别为视觉 22、剪辑 13、演示 60、思绪 97、Galgame 72、录音标注 9，各自三项 Node 测试及构建通过。来源导出和仓库架构共 53 项测试通过。密钥、账号、来源内容和完整回执只保存在私有运行目录。
 
 六工坊 DSH 名称改为 dsh-fpl- 前缀，包 ID 与稳定应用 ID 保持兼容。更新包已构建；本轮桌面插件热更新仍待正常 GUI 安装，不能用 CLI 绕过 desktop profile 管理。
+
+
+## 2026-11-24：原版文件管理恢复
+
+- `pnpm build`：通过连接器、TypeScript 和看板构建；仅保留既有依赖 use-client 和大 chunk 提示。
+- `pnpm test`：13 个连接器测试、233 个 Python 测试通过。新增文件库隔离/CSRF、并发版本、目录循环、空目录删除、文件显示名/位置/移除和原件保留、分页筛选搜索、ZIP/目录往返、导入幂等与中断恢复、路径和数量限制，以及超过默认 multipart 1000 字段的预检回归。
+- `CORE_TEST_BROWSER_CHANNEL=chrome pnpm --dir web test:e2e`：4 个真实 Chrome 旅程通过。1920/800/390px × 明暗主题 × 列表/网格共 12 张截图，无横向溢出；完成真实文件选择、SVG/文本预览、新建/重命名/移动/移除、空目录删除、ZIP/本地文件夹导入与 ZIP 下载。
+- 最终 multipart 适配后单独重跑 `playwright test e2e/files.spec.ts`：通过（4.4s）。最终 ruff、Prettier、`tsc --noEmit` 与 `git diff --check` 均通过。
+- 本机证据：`.local/files-browser/`、`.local/files-full-tests.log`、`.local/files-browser-tests.log`、`.local/files-browser-final.log`、`.local/files-render-check-build.log`。所有自动化使用隔离服务、账号和生成文件；未调用真实付费供应商，未修改现有业务数据或迁移账本。
+- 运行实例：只读核对时 9310 Core 尚未加载新文件编辑接口。自动审批拒绝正式停止/重启步骤，理由是用户尚未明确授权这次服务中断；重载未执行，等待显式授权后通过正常 CLI 应用。
