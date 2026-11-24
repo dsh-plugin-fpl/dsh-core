@@ -4,18 +4,14 @@
     min-height: 0;
   }
   .model-test-page[data-compact-panel]
-    > :is(
-      .generation-test-grid,
-      .transcription-test-grid,
-      .realtime-voice-layout
-    ) {
+    > :is(.generation-test-grid, .transcription-test-grid) {
     display: block;
     min-height: 0;
     flex: 1;
     overflow: auto;
   }
   .model-test-page[data-compact-panel]
-    :is(.generation-test-result, .transcription-result, .realtime-voice-stage) {
+    :is(.generation-test-result, .transcription-result) {
     min-height: 0;
     height: 100%;
   }
@@ -24,16 +20,14 @@
       .generation-test-history,
       .generation-test-settings,
       .transcription-history,
-      .transcription-settings,
-      .realtime-voice-settings
+      .transcription-settings
     ),
   .model-test-page[data-compact-panel="settings"]
     :is(
       .generation-test-history,
       .generation-test-result,
       .transcription-history,
-      .transcription-result,
-      .realtime-voice-stage
+      .transcription-result
     ),
   .model-test-page[data-compact-panel="history"]
     :is(
@@ -50,11 +44,7 @@
     height: 100%;
   }
   .model-test-page[data-compact-panel]
-    :is(
-      .generation-test-settings,
-      .transcription-settings,
-      .realtime-voice-settings
-    ) {
+    :is(.generation-test-settings, .transcription-settings) {
     width: 100%;
     height: 100%;
     overflow: auto;

@@ -327,7 +327,7 @@
             "required": false,
             "schema": {
               "default": "",
-              "pattern": "^(|openai|deepseek|anthropic|senseaudio_asr|senseaudio_asr_pro|senseaudio_realtime)$",
+              "pattern": "^(|openai|deepseek|anthropic)$",
               "title": "Provider Kind",
               "type": "string"
             }
@@ -5353,14 +5353,6 @@
             "title": "Provider Id"
           },
           "provider_kind": {
-            "enum": [
-              "senseaudio_image",
-              "volcengine_image",
-              "senseaudio_video",
-              "volcengine_video",
-              "zealman_video",
-              "autodl_video"
-            ],
             "title": "Provider Kind",
             "type": "string"
           },
@@ -5870,9 +5862,7 @@
           },
           "provider_kind": {
             "enum": [
-              "openai",
-              "senseaudio_asr",
-              "senseaudio_asr_pro"
+              "openai"
             ],
             "title": "Provider Kind",
             "type": "string"
@@ -6326,11 +6316,6 @@
             "title": "Provider Id"
           },
           "provider_kind": {
-            "enum": [
-              "openai",
-              "senseaudio_asr",
-              "senseaudio_asr_pro"
-            ],
             "title": "Provider Kind",
             "type": "string"
           },
@@ -6704,16 +6689,9 @@
               "openai",
               "deepseek",
               "anthropic",
-              "senseaudio_image",
               "volcengine_video",
-              "senseaudio_video",
               "zealman_video",
-              "autodl_video",
-              "senseaudio_asr",
-              "senseaudio_asr_pro",
-              "senseaudio_realtime",
-              "senseaudio_music",
-              "senseaudio_sfx"
+              "autodl_video"
             ],
             "title": "Kind",
             "type": "string"
@@ -6793,16 +6771,9 @@
               "openai",
               "deepseek",
               "anthropic",
-              "senseaudio_image",
               "volcengine_video",
-              "senseaudio_video",
               "zealman_video",
-              "autodl_video",
-              "senseaudio_asr",
-              "senseaudio_asr_pro",
-              "senseaudio_realtime",
-              "senseaudio_music",
-              "senseaudio_sfx"
+              "autodl_video"
             ],
             "title": "Kind",
             "type": "string"
@@ -6990,16 +6961,9 @@
               "openai",
               "deepseek",
               "anthropic",
-              "senseaudio_image",
               "volcengine_video",
-              "senseaudio_video",
               "zealman_video",
-              "autodl_video",
-              "senseaudio_asr",
-              "senseaudio_asr_pro",
-              "senseaudio_realtime",
-              "senseaudio_music",
-              "senseaudio_sfx"
+              "autodl_video"
             ],
             "title": "Provider Kind",
             "type": "string"

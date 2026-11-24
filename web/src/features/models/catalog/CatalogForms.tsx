@@ -242,8 +242,6 @@ export function ModelForm({
   > = {
     deepseek: ["chat", "tools"],
     volcengine_image: ["image_generation"],
-    senseaudio_image: ["image_generation"],
-    senseaudio_video: ["video_generation"],
     volcengine_video: ["video_generation"],
     zealman_video: ["video_generation"],
     autodl_video: ["video_generation"],
@@ -251,11 +249,6 @@ export function ModelForm({
     local_zonos_tts: ["speech_synthesis"],
     local_relayvsr: ["video_enhancement"],
     local_ffmpeg: ["video_enhancement"],
-    senseaudio_asr: ["speech_recognition"],
-    senseaudio_asr_pro: ["speech_recognition"],
-    senseaudio_realtime: ["voice"],
-    senseaudio_music: ["audio_generation"],
-    senseaudio_sfx: ["audio_generation"],
   };
   const [capabilities, setCapabilities] = useState<ModelInput["capabilities"]>(
     source?.capabilities ??

@@ -8,18 +8,8 @@ from dsh_core_worker.extracted.apps.model_service.transcription.catalog_values i
 )
 from dsh_core_worker.extracted.apps.model_service.transcription.parameters import parameter_capabilities
 
-# Keep SenseAudio limits local so capabilities/transcription does not import llm.
+# Shared OpenAI-compatible transcription limit.
 MAX_ASR_FILE_BYTES = 10 * 1024 * 1024
-MAX_PRO_ASR_FILE_BYTES = 100 * 1024 * 1024
-SENSEAUDIO_ASR_KINDS = frozenset({"senseaudio_asr", "senseaudio_asr_pro"})
-
-
-def _max_asr_file_bytes(*, pro: bool = False) -> int:
-    return MAX_PRO_ASR_FILE_BYTES if pro else MAX_ASR_FILE_BYTES
-
-
-def _is_senseaudio_error(exc: Exception, *, name: str) -> bool:
-    return any(base.__name__ == name for base in type(exc).mro())
 
 
 _LANGUAGE_ALIASES = {
@@ -43,7 +33,7 @@ def model_supports_transcription(
     }
     return bool(
         provider is not None
-        and provider.kind in {"openai", *SENSEAUDIO_ASR_KINDS}
+        and provider.kind == "openai"
         and provider.enabled
         and model.enabled
         and "speech_recognition" in declared
@@ -51,8 +41,6 @@ def model_supports_transcription(
 
 
 def max_transcription_input_bytes(provider: TranscriptionProvider) -> int:
-    if provider.kind in SENSEAUDIO_ASR_KINDS:
-        return _max_asr_file_bytes(pro=provider.kind == "senseaudio_asr_pro")
     return MAX_ASR_FILE_BYTES
 
 
@@ -95,12 +83,8 @@ def _match_transcription_language(options, language_tag: str | None) -> str | No
 
 
 def safe_transcription_error(exc: Exception) -> str:
-    if _is_senseaudio_error(exc, name="SenseAudioAsrFileTooLarge"):
-        return str(exc)
     if isinstance(exc, httpx.TimeoutException):
         return "语音识别请求超时"
-    if _is_senseaudio_error(exc, name="SenseAudioProviderError"):
-        return str(exc)[:4000]
     if isinstance(exc, httpx.HTTPStatusError):
         return f"语音识别供应商返回错误（HTTP {exc.response.status_code}）"
     if isinstance(exc, ValueError):

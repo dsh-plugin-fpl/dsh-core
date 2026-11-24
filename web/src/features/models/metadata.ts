@@ -28,10 +28,6 @@ export const providerMetadata = {
   openai: { label: "OpenAI 兼容", optionLabel: "OpenAI 兼容" },
   deepseek: { label: "DeepSeek 官方", optionLabel: "DeepSeek 官方" },
   anthropic: { label: "Anthropic", optionLabel: "Anthropic" },
-  senseaudio_image: {
-    label: "SenseAudio 图片",
-    optionLabel: "SenseAudio 图片生成",
-  },
   autodl_video: {
     label: "AutoDL 工作流",
     optionLabel: "AutoDL · zealman 视频工作流",
@@ -39,30 +35,6 @@ export const providerMetadata = {
   zealman_video: {
     label: "ZEALMAN 视频",
     optionLabel: "ZEALMAN · H3 工作流视频",
-  },
-  senseaudio_video: {
-    label: "SenseAudio 视频",
-    optionLabel: "SenseAudio 视频生成",
-  },
-  senseaudio_music: {
-    label: "SenseAudio 音乐",
-    optionLabel: "SenseAudio 音乐生成",
-  },
-  senseaudio_sfx: {
-    label: "SenseAudio 音效",
-    optionLabel: "SenseAudio 音效生成",
-  },
-  senseaudio_asr: {
-    label: "SenseAudio 语音识别",
-    optionLabel: "SenseAudio 专业说话人识别",
-  },
-  senseaudio_asr_pro: {
-    label: "SenseAudio ASR API",
-    optionLabel: "ASR API 专业语音识别",
-  },
-  senseaudio_realtime: {
-    label: "SenseAudio 实时语音",
-    optionLabel: "SenseAudio 实时语音",
   },
 } satisfies Record<
   ProviderInput["kind"],

@@ -2,6 +2,8 @@
 
 `/integrations` 复用 FPL 的工具 API、MCP、Skill 与外部连接页面。外部连接逐项展示 DSH 配对和飞书自建应用，统一名称、类型、状态和操作；连接 DSH、配对凭据与飞书配置使用弹窗。旧 `/settings` 跳转到 `/integrations?kind=external-connections`。应用目录仍由实际安装的 DSH 应用插件发布，不硬编码未安装工坊。
 
+工坊的独立应用桥接属于应用身份，不作为外部连接展示或计数。`GET /v1/bridges` 保留完整列表并返回 `kind: dsh | application` 和可空的 `application_id`，分类来自当前账号持久的应用身份绑定，与名称、在线状态及是否发布应用入口无关。顶部 DSH 状态只统计 `kind=dsh` 的在线配对；工坊入口和运行状态仍由 `/v1/applications` 在「应用」中呈现。
+
 ## 本机管理
 
 - 工具 API：JSON Schema、请求模板、Bearer / API-Key、启停、检查和最近检查记录。

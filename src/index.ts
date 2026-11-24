@@ -15,6 +15,9 @@ import {
 } from "./integrations/types.js";
 import { dashboardSchema } from "./applications.js";
 import { LocalService, type LocalServiceOptions } from "./lifecycle.js";
+import { RuntimeManager, type ManagedServiceOptions, type ManagedService } from "./runtime-manager.js";
+import { registerNativeTools, type NativeToolSpec, type WorkshopExecutionContext } from "./native-tools.js";
+import { SetupAuthorization } from "./setup-authorization.js";
 import { remoteInfo } from "./remote.js";
 import type {
   Application,
@@ -36,8 +39,10 @@ export interface Config {
   credential?: string;
   serviceDirectory?: string;
   manageService?: boolean;
+  runtimeRoot?: string;
 }
 export const Config: Schema<Config> = Schema.object({
+  runtimeRoot: Schema.string().description("高级：托管运行环境目录；不影响现有数据位置"),
   manageService: Schema.boolean()
     .default(true)
     .description("随插件开关启动和正常停止独立服务"),
@@ -58,7 +63,9 @@ declare module "@deepseek-ai/cordis" {
 }
 export class DshCore extends TypertRemoteService implements CoreApi {
   private connection?: CoreConnection;
-  private localServices = new Set<LocalService>();
+  private localServices = new Set<ManagedService>();
+  readonly runtime: RuntimeManager;
+  private setupAuthorization: SetupAuthorization;
   private integrationAdapters = new Map<string, IntegrationAdapter>();
   private managedIntegrations?: ManagedIntegrations;
   private integrationSupport = false;
@@ -73,6 +80,13 @@ export class DshCore extends TypertRemoteService implements CoreApi {
     super(ctx, "dshCore");
     this.endpoint = config.endpoint || "http://127.0.0.1:9310";
     this.credential = config.credential || "DSH_CORE_BRIDGE";
+    this.runtime = new RuntimeManager(config.runtimeRoot);
+    this.setupAuthorization = new SetupAuthorization(this.runtime, async (token) => {
+      await this.ctx.credentials.set(credentialRef(this.credential), token);
+      this.initialization = this.connect();
+      await this.initialization;
+    });
+    ctx.effect(() => () => this.runtime.dispose());
     const url = new URL(this.endpoint);
     if (
       !["http:", "https:"].includes(url.protocol) ||
@@ -190,15 +204,16 @@ export class DshCore extends TypertRemoteService implements CoreApi {
     });
     ctx.effect(() => () => scope.dispose());
   }
-  manageLocalService(options: LocalServiceOptions) {
-    const service = new LocalService(options);
-    this.localServices.add(service);
-    const stop = service.stop.bind(service);
-    service.stop = () =>
-      stop().then(() => {
-        this.localServices.delete(service);
-      });
+  manageLocalService(options: ManagedServiceOptions) {
+    const service = this.runtime.register(options);
+    if (options.id !== "core") this.localServices.add(service);
+    const dispose = service.dispose.bind(service);
+    service.dispose = () => dispose().then(() => { this.localServices.delete(service); });
     return service;
+  }
+  localServiceConfiguration(id: string) { return this.runtime.configuration(id); }
+  registerNativeTools(ctx: Context, specs: readonly NativeToolSpec[], request: (operation: { method: string; path: string }, args: any, execution: WorkshopExecutionContext) => Promise<any>) {
+    return registerNativeTools(ctx, specs, request);
   }
   async stopLocalServices() {
     const result = await Promise.allSettled(
@@ -392,6 +407,7 @@ export class DshCore extends TypertRemoteService implements CoreApi {
   resourceChunk(
     id: string,
     offset = 0,
+    signal?: AbortSignal,
   ): Promise<
     Resource & {
       data_base64: string;
@@ -400,7 +416,7 @@ export class DshCore extends TypertRemoteService implements CoreApi {
       eof: boolean;
     }
   > {
-    return this.call("resource.chunk", { id, offset });
+    return this.call("resource.chunk", { id, offset }, signal);
   }
   putResource(data: {
     name: string;
@@ -454,11 +470,52 @@ export class DshCore extends TypertRemoteService implements CoreApi {
       throw e;
     }
   }
+  async importResourceStream(source: AsyncIterable<Uint8Array>,
+    metadata: { name: string; mime_type: string; application_id: string; byte_size: number; sha256?: string }, signal?: AbortSignal): Promise<Resource> {
+    if (!this.applications.has(metadata.application_id)) throw new ConnectionError("application_unregistered", "请先登记调用方应用");
+    if (!Number.isSafeInteger(metadata.byte_size) || metadata.byte_size < 0 || metadata.byte_size > 256 * 1024 * 1024)
+      throw new ConnectionError("resource_size", "Core 资源超过大小限制");
+    const upload = await this.call("resource.upload.begin", { name: metadata.name, mime_type: metadata.mime_type,
+      application_id: metadata.application_id, byte_size: metadata.byte_size }, signal);
+    let offset = 0;
+    try {
+      for await (const data of source) {
+        signal?.throwIfAborted();
+        if (offset + data.byteLength > metadata.byte_size) throw new ConnectionError("resource_size", "资源流超过声明长度");
+        for (let index = 0; index < data.byteLength; index += 1024 * 1024) {
+          const chunk = data.subarray(index, index + 1024 * 1024);
+          await this.call("resource.upload.append", { id: upload.id, offset, data_base64: Buffer.from(chunk).toString("base64") }, signal);
+          offset += chunk.byteLength;
+        }
+      }
+      if (offset !== metadata.byte_size) throw new ConnectionError("resource_size", "资源流未完整传输");
+      const result = await this.call<Resource>("resource.upload.finish", { id: upload.id }, signal);
+      if (metadata.sha256 && result.sha256 !== metadata.sha256) throw new ConnectionError("resource_digest", "Core 资源摘要不匹配");
+      return result;
+    } catch (error) { await this.call("resource.upload.abort", { id: upload.id }).catch(() => {}); throw error; }
+  }
   async invoke(request: RpcRequest): Promise<CoreResult<any>> {
     try {
       const invocation = this.ctx.invocation;
       if (invocation && invocation.peer.principal.kind !== "owner")
         throw new ConnectionError("forbidden", "请使用此 Harness 的所有者身份");
+      if (request.method.startsWith("setup.")) {
+        const id = String(request.params.id || "core");
+        switch (request.method) {
+          case "setup.status": return { ok: true, value: await this.runtime.status() };
+          case "setup.install": await this.runtime.install(id); break;
+          case "setup.cancel": this.runtime.cancel(id); break;
+          case "setup.start": await this.runtime.start(id); break;
+          case "setup.stop":
+            if (id === "core") await this.stopLocalServices();
+            await this.runtime.stop(id); break;
+          case "setup.open": return { ok: true, value: await this.runtime.openDashboard() };
+          case "setup.authorize.begin": return { ok: true, value: await this.setupAuthorization.begin(request.params.ids) };
+          case "setup.authorize.finish": return { ok: true, value: await this.setupAuthorization.finish() };
+          default: throw new ConnectionError("setup_method", "未知安装操作");
+        }
+        return { ok: true, value: await this.runtime.status() };
+      }
       if (request.method === "integrations.copies")
         return {
           ok: true,
@@ -493,7 +550,6 @@ export class DshCore extends TypertRemoteService implements CoreApi {
         return { ok: true, value: { configured: true } };
       }
       if (request.method === "state") {
-        await this.initialization;
         return {
           ok: true,
           value: {
@@ -510,9 +566,9 @@ export class DshCore extends TypertRemoteService implements CoreApi {
       return {
         ok: false,
         error: {
-          code: e instanceof ConnectionError ? e.code : "core_error",
+            code: e instanceof Error && "code" in e ? String(e.code) : "core_error",
           message:
-            e instanceof ConnectionError ? e.message : "Core 连接操作失败",
+            e instanceof Error && "code" in e ? e.message : "Core 连接操作失败",
         },
       };
     }
@@ -655,18 +711,21 @@ export class DshCore extends TypertRemoteService implements CoreApi {
   }
 }
 export async function* apply(ctx: Context, config: Config = {}) {
-  const lifecycle = new LocalService({
+  let service: DshCore | undefined;
+  let lifecycle: ManagedService | undefined;
+  yield async () => {
+    await service?.stopLocalServices();
+    await lifecycle?.stop();
+  };
+  service = new DshCore(ctx, config);
+  lifecycle = service.manageLocalService({
     id: "core",
     endpoint: config.endpoint || "http://127.0.0.1:9310",
     installation: new URL("./service-installation.json", import.meta.url),
     serviceDirectory: config.serviceDirectory,
     manageService: config.manageService,
+    manifest: new URL("./runtime/service.json", import.meta.url),
   });
-  let service: DshCore | undefined;
-  yield async () => {
-    await service?.stopLocalServices();
-    await lifecycle.stop();
-  };
-  await lifecycle.start();
-  service = new DshCore(ctx, config);
+  // Keep the setup surface mounted even when installation is missing or repair is needed.
+  await lifecycle.start().catch(error => service!.runtime.failed("core", error));
 }

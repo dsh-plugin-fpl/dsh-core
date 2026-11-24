@@ -3,7 +3,6 @@
 from dsh_core_worker.extracted.apps.model_service.catalog.visual_generation import VisualGenerationValidationError
 from dsh_core_worker.extracted.apps.model_service.providers import autodl_workflows
 from dsh_core_worker.extracted.apps.model_service.providers.seedance_parameters import normalize_video_parameters
-from dsh_core_worker.extracted.apps.model_service.providers.senseaudio_image import IMAGE_MODEL_SIZES
 from dsh_core_worker.extracted.apps.model_service.providers.volcengine_image import SEEDREAM_SIZES
 from dsh_core_worker.extracted.apps.model_service.providers.zealman_workflows import (
     REFERENCE_MIME_TYPES as WORKFLOW_MIME_TYPES,
@@ -36,16 +35,12 @@ async def prepare_visual_payload(
     payload["input_snapshot"] = input_snapshot
     reference_assets = {}
     if isinstance(body, ImageGenerationTaskCreateIn):
-        sizes = (
-            SEEDREAM_SIZES
-            if provider_kind == "volcengine_image"
-            else IMAGE_MODEL_SIZES.get(model_slug)
-        )
+        sizes = SEEDREAM_SIZES if provider_kind == "volcengine_image" else ()
         if not sizes or body.size not in sizes:
             raise VisualGenerationValidationError(
                 "当前模型不支持所选图片尺寸", code="unsupported_size"
             )
-        prompt_limit = 6000 if model_slug == "senseaudio-image-2.0-260319" else 2000
+        prompt_limit = 2000
         if len(body.prompt) > prompt_limit:
             raise VisualGenerationValidationError(
                 f"当前模型提示词最多支持 {prompt_limit} 个字符",
@@ -59,7 +54,7 @@ async def prepare_visual_payload(
                 ]
             )
         )
-        if len(reference_ids) > (14 if provider_kind == "volcengine_image" else 1):
+        if len(reference_ids) > 14:
             raise VisualGenerationValidationError(
                 "当前图片模型不支持所选参考图数量", code="too_many_references"
             )
@@ -163,8 +158,7 @@ async def prepare_visual_payload(
             except ValueError as exc:
                 raise VisualGenerationValidationError(str(exc), code="invalid_reference") from None
     elif isinstance(body, AudioGenerationTaskCreateIn):
-        for asset_id in body.reference_asset_ids:
-            reference_assets[asset_id] = await reference(asset_id, "audio")
+        raise VisualGenerationValidationError("当前没有可用的音频生成供应商", code="unsupported_provider")
     if reference_titles:
         payload["reference_filenames"] = {
             asset_id: download_filename(title, reference_assets[asset_id].original_filename)

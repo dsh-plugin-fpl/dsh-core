@@ -1,6 +1,5 @@
 /** Native DSH discovery uses public settings/inventory/skill interfaces only. */
 import type { Context } from "@deepseek-ai/cordis";
-import { readPluginInventory } from "@deepseek-ai/dsh-host-plugin-inventory";
 import { createHash } from "node:crypto";
 import { exportSkill } from "./archives.js";
 import {
@@ -16,7 +15,18 @@ export function nativeAdapter(ctx: Context): IntegrationAdapter {
     // ConfigEditor is the public full-config reader. Settings forms expose volatile fields only.
     const editor = ctx.get("configEditor") as any;
     if (!editor || !ctx.get("loader")) return [];
-    const inventory = await readPluginInventory(ctx);
+    let inventoryModule;
+    try {
+      inventoryModule = await import("@deepseek-ai/dsh-host-plugin-inventory");
+    } catch (error: any) {
+      // An absent optional provider disables discovery, not the Core bridge.
+      // Missing transitive dependencies and provider implementation errors must surface.
+      if (error.code === "ERR_MODULE_NOT_FOUND" &&
+          error.message.startsWith("Cannot find package '@deepseek-ai/dsh-host-plugin-inventory'"))
+        return [];
+      throw error;
+    }
+    const inventory = await inventoryModule.readPluginInventory(ctx);
     const entries = new Map(
       inventory.entries
         .filter((e) => e.moduleName === "@deepseek-ai/dsh-mcp-client")

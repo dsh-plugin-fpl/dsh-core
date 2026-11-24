@@ -251,7 +251,7 @@ class Accounts:
                 db.execute("DELETE FROM account_session WHERE account_id=?", (identity,))
         return {"updated": True}
 
-    def register_client(self, identity, origin, callback):
+    def register_client(self, identity, origin, callback, *, token=None):
         from urllib.parse import urlsplit
 
         parsed = urlsplit(origin)
@@ -266,9 +266,15 @@ class Accounts:
             or "#" in callback
         ):
             raise CoreError("应用回调地址无效", "validation")
-        token = secrets.token_urlsafe(40)
+        supplied = token is not None
+        token = token or secrets.token_urlsafe(40)
+        if not isinstance(token, str) or not 32 <= len(token) <= 256:
+            raise CoreError("应用凭据无效", "validation")
         with self.connection() as db:
-            if db.execute("SELECT 1 FROM app_client WHERE id=?", (identity,)).fetchone():
+            existing = db.execute("SELECT * FROM app_client WHERE id=?", (identity,)).fetchone()
+            if existing and supplied and hmac.compare_digest(existing["digest"], digest(token)) and existing["origin"] == origin and existing["callback"] == callback:
+                return {"id": identity, "token": token, "origin": origin, "callback": callback}
+            if existing:
                 raise CoreError("应用已登记，请显式撤销后重新配对", "revision_conflict")
             db.execute(
                 "INSERT INTO app_client VALUES(?,?,?,?)",
@@ -408,3 +414,13 @@ class Accounts:
                     (account_id, application_id),
                 )
             ]
+
+    def bridge_applications(self, account_id):
+        with self.connection() as db:
+            return {
+                row["bridge_id"]: row["application_id"]
+                for row in db.execute(
+                    "SELECT bridge_id,application_id FROM identity_bridge_binding WHERE account_id=?",
+                    (account_id,),
+                )
+            }

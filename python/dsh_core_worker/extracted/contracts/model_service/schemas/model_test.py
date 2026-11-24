@@ -229,14 +229,7 @@ class ModelTestGenerationTaskOut(BaseModel):
     id: str
     provider_id: str | None
     model_id: str | None
-    provider_kind: Literal[
-        "senseaudio_image",
-        "volcengine_image",
-        "senseaudio_video",
-        "volcengine_video",
-        "zealman_video",
-        "autodl_video",
-    ]
+    provider_kind: str
     kind: Literal["image", "video"]
     provider_name: str
     model_slug: str
@@ -346,7 +339,7 @@ class ModelTestTranscriptionTaskOut(BaseModel):
     id: str
     provider_id: str | None
     model_id: str | None
-    provider_kind: Literal["openai", "senseaudio_asr", "senseaudio_asr_pro"]
+    provider_kind: str
     provider_name: str
     model_slug: str
     language: str
@@ -374,7 +367,7 @@ class ModelTestTranscriptionOptionOut(BaseModel):
     id: str
     provider_id: str
     provider_name: str
-    provider_kind: Literal["openai", "senseaudio_asr", "senseaudio_asr_pro"]
+    provider_kind: Literal["openai"]
     slug: str
     label: str
     description: str

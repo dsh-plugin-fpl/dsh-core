@@ -14,6 +14,10 @@ DSH 使用独立配对凭据连接 `/v1/bridge`，凭据保存于 DSH Credential
 
 目录统一使用 catalog revision CAS。冲突返回 409、`revision_conflict` 和当前目录，页面保留输入。密钥响应仅返回是否配置，不返回明文。会话保存消息、参数和附件，执行使用结构化历史，失败或取消的 assistant 消息不进入下一轮上下文。
 
+SenseAudio 适配器已退役。账号运行时在任务恢复前，以同一事务移除其目录、连接、默认模型引用及专属密钥；其他连接共用的凭据保留。历史任务和资源仍可读取，未完成任务标记 `interrupted` / `provider_removed`，不再允许恢复。旧数据导入跳过这些连接和密钥，在回执中记录 `skipped_retired_providers` 数量。历史任务的 `provider_kind` 是不参与路由的字符串，当前模型选项与配置仍使用受限枚举。
+
+实时语音的兼容选项接口返回 `{"models":[]}`；已认证的旧 WebSocket 客户端收到 `capability_unavailable` 后正常关闭。通用 `voice` / `audio_generation` 能力标识保留，当前没有对应远程供应商实现。
+
 `/v1/tasks` 提交与查询持久任务，`/v1/resources` 管理资源；资源通过内容入口鉴权读取。图片、视频、音频可预览，其他类型以附件下载。文件内容保存 SHA-256，分块读写沿用现有校验与恢复协议。
 
 ## DSH 公共调用接口

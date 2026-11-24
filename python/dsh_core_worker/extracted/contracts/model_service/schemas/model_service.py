@@ -9,7 +9,6 @@ from dsh_core_worker.extracted.contracts.model_service.schemas.provider_types im
 from dsh_core_worker.extracted.contracts.model_service.schemas.provider_urls import zealman_root_url
 from dsh_core_worker.extracted.runtime.http.outbound_urls import (
     normalize_provider_base_url,
-    normalize_provider_websocket_url,
 )
 
 ModelCapability = Literal[
@@ -86,11 +85,7 @@ class ProviderIn(BaseModel):
             self.base_url = "https://ark.cn-beijing.volces.com/api/v3"
         if self.kind == "deepseek" and not self.base_url.strip():
             self.base_url = DEEPSEEK_BASE_URL
-        self.base_url = (
-            normalize_provider_websocket_url(self.base_url)
-            if self.kind == "senseaudio_realtime"
-            else normalize_provider_base_url(self.base_url)
-        )
+        self.base_url = normalize_provider_base_url(self.base_url)
         if self.kind == "zealman_video":
             self.base_url = zealman_root_url(self.base_url)
         return self

@@ -39,6 +39,8 @@ export function publicImageSources(source: string, width = 64) {
   const resource = (value: string | undefined) =>
     value && owned ? programAsset(value) : value;
   const variants = imageVariants[canonical];
+  if (canonical.startsWith("/brand/") && import.meta.env.VITE_FPL_LOCAL_BRAND !== "1")
+    return { src: programAsset(canonical) };
   if (!variants) return { src: owned ? resource(canonical) : source };
   const sizes = Object.keys(variants)
     .map(Number)

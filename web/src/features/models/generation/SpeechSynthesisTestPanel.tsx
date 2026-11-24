@@ -122,8 +122,6 @@ function SpeechWorkspace({
           enhancement: models.some((model) =>
             model.capabilities.includes("video_enhancement"),
           ),
-          realtime_voice:
-            !draft.busy && models.some((m) => m.capabilities.includes("voice")),
         }}
         onSelectMode={onSelectMode}
         modelId={modelId}

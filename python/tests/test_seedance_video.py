@@ -158,7 +158,7 @@ def test_version_capabilities_and_legacy_boundaries():
     )
     for params in ({"duration": 30}, {"ratio": "adaptive"}, {"audio_asset_ids": ["a"]}):
         with pytest.raises(ValueError):
-            normalize_video_parameters("senseaudio_video", V20, params)
+            normalize_video_parameters("zealman_video", V20, params)
     from dsh_core_worker.contracts import Connection
 
     provider = Connection(id="ark", name="Ark", kind="volcengine_video")

@@ -57,13 +57,23 @@ class Access:
 
     def pair(self, name):
         identity, token = secrets.token_hex(8), secrets.token_urlsafe(40)
+        return self.ensure_pair({"id": identity, "name": str(name)[:120], "token": token})
+
+    def ensure_pair(self, receipt):
+        """Complete a Core-owned persisted issuance intent without rotating its credential."""
+        identity, token = receipt["id"], receipt["token"]
         values = self.read("bridges.enc")
-        values[identity] = {"id": identity, "name": str(name)[:120], "digest": self.digest(token)}
+        if identity in values and not secrets.compare_digest(values[identity]["digest"], self.digest(token)):
+            raise CoreError("配对回执冲突", "revision_conflict")
+        values[identity] = {"id": identity, "name": str(receipt["name"])[:120], "digest": self.digest(token)}
         self.write("bridges.enc", values)
         return {"id": identity, "name": values[identity]["name"], "token": token}
 
     def bridges(self):
-        return [{"id": v["id"], "name": v["name"]} for v in self.read("bridges.enc").values()]
+        return [
+            {"id": v["id"], "name": v["name"], "kind": "dsh", "application_id": None}
+            for v in self.read("bridges.enc").values()
+        ]
 
     def authenticate_bridge(self, token):
         for value in self.read("bridges.enc").values():

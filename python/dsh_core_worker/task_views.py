@@ -9,6 +9,8 @@ from fastapi import Request
 
 from .contracts import CoreError
 from .conversations import iso
+from .retired_providers import retired_task
+from .extracted.apps.model_service.transcription.support import MAX_ASR_FILE_BYTES
 
 
 class TaskViews:
@@ -130,7 +132,8 @@ class TaskViews:
             "result_mime_type": result.get("mime_type", ""),
             "result_byte_size": result.get("byte_size", 0),
             "result_available": bool(outputs),
-            "can_retry_materialization": bool(task["provider_task_id"] or task["result_url"])
+            "can_retry_materialization": not retired_task(task)
+            and bool(task["provider_task_id"] or task["result_url"])
             and task["status"] in ("failed", "cancelled", "recoverable", "interrupted"),
             "error_message": (task["error"] or {}).get("message"),
             "log_id": task["id"],
@@ -430,7 +433,7 @@ class TaskViews:
                         "label": model["label"],
                         "description": model["description"],
                     }
-                    if capability and capability in model["capabilities"]:
+                    if capability and provider["kind"] == "openai" and capability in model["capabilities"]:
                         from .extracted.apps.model_service.transcription.parameters import (
                             parameter_capabilities,
                         )
@@ -438,7 +441,7 @@ class TaskViews:
                         rows.append(
                             {
                                 **base,
-                                "max_input_bytes": 100 * 1024 * 1024,
+                                "max_input_bytes": MAX_ASR_FILE_BYTES,
                                 "parameter_capabilities": parameter_capabilities(
                                     SimpleNamespace(**model), SimpleNamespace(**provider)
                                 ).model_dump(),
@@ -483,7 +486,7 @@ class TaskViews:
             result = {"items": rows}
             if capability:
                 result.update(
-                    max_input_bytes=100 * 1024 * 1024,
+                    max_input_bytes=MAX_ASR_FILE_BYTES,
                     accepted_extensions=[".wav", ".mp3", ".m4a", ".flac", ".ogg"],
                     accepted_mime_types=[
                         "audio/wav",

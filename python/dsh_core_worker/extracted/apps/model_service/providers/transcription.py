@@ -5,10 +5,9 @@ from typing import BinaryIO
 
 import httpx
 
-from dsh_core_worker.extracted.apps.model_service.providers.senseaudio_asr import MAX_ASR_FILE_BYTES, transcribe_audio
+from dsh_core_worker.extracted.apps.model_service.transcription.support import MAX_ASR_FILE_BYTES
 from dsh_core_worker.extracted.runtime.http.outbound_urls import require_safe_provider_base_url
 
-SENSEAUDIO_ASR_KINDS = frozenset({"senseaudio_asr", "senseaudio_asr_pro"})
 
 
 @dataclass(frozen=True)
@@ -53,54 +52,6 @@ async def transcribe_model_audio(
 ) -> TranscriptionResult:
     """Normalize supported ASR providers to text plus optional diarized segments."""
     base_url = require_safe_provider_base_url(base_url)
-    options = parameters or {}
-    if provider_kind in SENSEAUDIO_ASR_KINDS:
-        result = await transcribe_audio(
-            base_url=base_url,
-            api_key=api_key,
-            model=model,
-            filename=filename,
-            source=source,
-            mime_type=mime_type,
-            byte_size=byte_size,
-            language=language,
-            target_language=options.get("target_language") or None,
-            enable_word_timestamps=options.get("enable_word_timestamps") is True,
-            enable_text_edit=options.get("enable_text_edit") is True,
-            enable_speaker_diarization=options.get("enable_speaker_diarization") is True,
-            max_speakers=(
-                int(options["max_speakers"])
-                if isinstance(options.get("max_speakers"), int)
-                else None
-            ),
-            enable_punctuation=options.get("enable_punctuation") is True,
-            hotwords=(
-                str(options["hotwords"]) if isinstance(options.get("hotwords"), str) else None
-            ),
-            abbreviations=options.get("abbreviations") is True,
-            pro=provider_kind == "senseaudio_asr_pro",
-            transport=transport,
-        )
-        return TranscriptionResult(
-            text=result.text,
-            segments=tuple(
-                TranscriptSegment(
-                    speaker=item.speaker,
-                    start_ms=item.start_ms,
-                    end_ms=item.end_ms,
-                    text=item.text,
-                    translation=item.translation,
-                    speaker_candidates=item.speaker_candidates,
-                    is_overlap=item.is_overlap,
-                )
-                for item in result.segments
-            ),
-            words=tuple(
-                TranscriptWord(word=item.word, start_ms=item.start_ms, end_ms=item.end_ms)
-                for item in result.words
-            ),
-            detail=result.detail,
-        )
     if provider_kind != "openai":
         raise ValueError("当前供应商不支持语音识别")
     if byte_size > MAX_ASR_FILE_BYTES:

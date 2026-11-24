@@ -1,4 +1,4 @@
-import { programAsset } from "@platform/programAsset";
+import { programAsset, localBrandEnabled } from "@platform/programAsset";
 import { ResponsiveImage } from "@shared/ui/ResponsiveImage";
 import { useEffect, useRef, useState } from "react";
 
@@ -54,7 +54,7 @@ export function HomeHeroPet() {
       data-playing={ready && !reduced && !failed}
     >
       <ResponsiveImage src={POSTER} alt="" width="640" height="360" />
-      {!reduced && !failed && (
+      {localBrandEnabled && !reduced && !failed && (
         <video
           ref={videoRef}
           src={ANIMATION}

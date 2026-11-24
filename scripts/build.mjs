@@ -4,6 +4,7 @@ import { execFileSync } from "node:child_process";
 await rm("lib", { recursive: true, force: true });
 await mkdir("lib", { recursive: true });
 try {
+  if (process.env.DSH_FPL_INCLUDE_LOCAL_BRAND !== "1") throw Object.assign(new Error("Use distributable icon"), { code: "ENOENT" });
   await cp(".runtime/assets/brand/icon.webp", "lib/icon.webp");
 } catch (error) {
   if (error.code !== "ENOENT") throw error;
@@ -19,6 +20,9 @@ await build({
     "src/contracts.ts",
     "src/remote.ts",
     "src/connection.ts",
+    "src/runtime-manager.ts",
+    "src/native-tools.ts",
+    "src/runtime-bootstrap.ts",
   ],
   outdir: "lib",
   bundle: true,
@@ -40,13 +44,4 @@ const client = await build({
 await writeFile(
   "lib/client.js",
   `window.__ModuleLoader__.load({id:"@dsh-plugin-fpl/dsh-core",factory:(require)=>{var module={exports:{}};var exports=module.exports;\n${client.outputFiles[0].text}\nreturn module.exports;}});\n`,
-);
-
-await writeFile(
-  "lib/service-installation.json",
-  JSON.stringify(
-    { version: 1, id: "core", repository: process.cwd(), port: 9310 },
-    null,
-    2,
-  ) + "\n",
 );

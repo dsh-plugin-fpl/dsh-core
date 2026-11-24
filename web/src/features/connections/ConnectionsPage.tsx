@@ -2,14 +2,12 @@ import { useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { fetchApiJson } from "@platform/api/client";
 import { IntegrationModal } from "@features/integrations/components";
+import { fetchBridges } from "./api";
 export function useDshConnections() {
   const cache = useQueryClient();
   const query = useQuery({
     queryKey: ["bridges"],
-    queryFn: () =>
-      fetchApiJson<{
-        items: { id: string; name: string; connected: boolean }[];
-      }>("/v1/bridges"),
+    queryFn: fetchBridges,
     refetchInterval: 2000,
   });
   const [name, setName] = useState("DSH"),

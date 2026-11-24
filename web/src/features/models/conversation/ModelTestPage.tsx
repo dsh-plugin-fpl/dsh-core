@@ -77,7 +77,9 @@ export function ModelTestPage({
     queryKey: modelQueryKeys.conversations,
     queryFn: getModelTestConversations,
   });
-  const [activeId, setActiveId] = useState<string | null>(initialConversationId ?? null);
+  const [activeId, setActiveId] = useState<string | null>(
+    initialConversationId ?? null,
+  );
   const [input, setInput] = useState("");
   const [error, setError] = useState("");
   const [modeNotice, setModeNotice] = useState("");
@@ -136,14 +138,9 @@ export function ModelTestPage({
       return;
     }
     if (
-      ![
-        "image",
-        "video",
-        "synthesis",
-        "speech",
-        "realtime_voice",
-        "enhancement",
-      ].includes(initialMode)
+      !["image", "video", "synthesis", "speech", "enhancement"].includes(
+        initialMode,
+      )
     )
       return;
     autoCreated.current = true;
@@ -249,7 +246,10 @@ export function ModelTestPage({
   const detailQuery = useQuery({
     queryKey: modelQueryKeys.conversation(activeId),
     queryFn: () => getModelTestConversation(activeId as string),
-    enabled: Boolean(activeId && conversationsQuery.data?.items.some((item) => item.id === activeId)),
+    enabled: Boolean(
+      activeId &&
+      conversationsQuery.data?.items.some((item) => item.id === activeId),
+    ),
   });
   const conversation = detailQuery.data;
   const draftAttachments = conversation?.draft_attachments ?? [];
@@ -474,7 +474,21 @@ export function ModelTestPage({
   };
 
   const stopGeneration = () => {
-    if(conversation) void fetch(`/v1/model-test/conversations/${encodeURIComponent(conversation.id)}/stop`, {method:"POST",headers:{"X-Core-CSRF":decodeURIComponent(document.cookie.split("; ").find(c=>c.startsWith("core_csrf="))?.split("=")[1]||"")}});
+    if (conversation)
+      void fetch(
+        `/v1/model-test/conversations/${encodeURIComponent(conversation.id)}/stop`,
+        {
+          method: "POST",
+          headers: {
+            "X-Core-CSRF": decodeURIComponent(
+              document.cookie
+                .split("; ")
+                .find((c) => c.startsWith("core_csrf="))
+                ?.split("=")[1] || "",
+            ),
+          },
+        },
+      );
     const messageId = activeMessageIdRef.current;
     if (messageId) {
       setStoppedPreview({ messageId, content: streamedContent });
@@ -534,24 +548,17 @@ export function ModelTestPage({
     ),
     chat: Boolean(textModels.length),
     image: availableModels.some(
-      (model) => model.providerKind === "senseaudio_image",
+      (model) => model.providerKind === "volcengine_image",
     ),
     video: availableModels.some((model) =>
-      [
-        "senseaudio_video",
-        "zealman_video",
-        "volcengine_video",
-        "autodl_video",
-      ].includes(model.providerKind),
+      ["zealman_video", "volcengine_video", "autodl_video"].includes(
+        model.providerKind,
+      ),
     ),
     speech: availableModels.some(
       (model) =>
-        ["openai", "senseaudio_asr", "senseaudio_asr_pro"].includes(
-          model.providerKind,
-        ) && model.capabilities.includes("speech_recognition"),
-    ),
-    realtime_voice: availableModels.some((model) =>
-      model.capabilities.includes("voice"),
+        ["openai"].includes(model.providerKind) &&
+        model.capabilities.includes("speech_recognition"),
     ),
   };
   const selectMode = (mode: ModelTestMode) => {

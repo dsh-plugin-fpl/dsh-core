@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-import asyncio
-import base64
 from pathlib import Path
 from urllib.parse import urljoin
 
@@ -125,12 +123,3 @@ async def download_generated_media(
     if size == 0 or detected is None:
         raise GenerationMaterializationError("生成结果不是受支持的图片、视频或音频")
     return size, *detected
-
-
-async def read_data_uri(*, path: Path, mime_type: str, max_bytes: int | None = None) -> str:
-    if not path.is_file():
-        raise ValueError("参考素材文件已不存在")
-    if max_bytes is not None and path.stat().st_size > max_bytes:
-        raise ValueError("参考图片超过 SenseAudio 的 30 MB 限制")
-    data = await asyncio.to_thread(path.read_bytes)
-    return f"data:{mime_type};base64,{base64.b64encode(data).decode('ascii')}"

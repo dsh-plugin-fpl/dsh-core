@@ -18,7 +18,7 @@ from .catalog import Catalog
 from .contracts import CoreError, Execution
 from .conversations import Conversations
 from .credentials import ProviderCredentials
-from .http_schemas import ResourceListOut, TaskListOut, TaskOut
+from .http_schemas import BridgeListOut, ResourceListOut, TaskListOut, TaskOut
 from .runtime import Runtime
 
 
@@ -326,7 +326,7 @@ def create_tenant_app(root, web_root=None, origin="http://127.0.0.1:9310", *, ac
     async def resource_content(identity: str, download: bool = False):
         return content_response(identity, download)
 
-    @app.get("/v1/bridges")
+    @app.get("/v1/bridges", response_model=BridgeListOut)
     async def bridge_list():
         return {"items": [{**v, "connected": v["id"] in bridges.online} for v in access.bridges()]}
 

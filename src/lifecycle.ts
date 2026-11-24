@@ -31,6 +31,10 @@ export interface LocalServiceOptions {
   serviceDirectory?: string;
   installation: URL;
   manageService?: boolean;
+  /** Explicit provider-owned state root for managed installs; omitted for legacy/external installs. */
+  stateRoot?: string;
+  /** Independent managed interpreter used for lifecycle locks and dependency-free stop. */
+  lockPython?: string;
 }
 interface Installation {
   version: number;
@@ -134,7 +138,7 @@ export class LocalService {
     const log = join(logDirectory, this.options.id + ".log");
     const core = this.options.id === "core";
     const executable = core
-      ? join(this.directory, ".runtime/worker-venv/bin/python")
+      ? (action === "stop" && this.options.lockPython || join(this.directory, ".runtime/worker-venv/bin/python"))
       : process.execPath;
     const args = core
       ? [
@@ -153,6 +157,8 @@ export class LocalService {
           "--port",
           this.endpoint.port || "80",
         ];
+    if (this.options.stateRoot)
+      args.push(core ? "--root" : "--state-root", this.options.stateRoot);
     try {
       const result = await execute(executable, args, {
         cwd: this.directory,
@@ -163,6 +169,7 @@ export class LocalService {
           ...process.env,
           ELECTRON_RUN_AS_NODE: "1",
           PYTHONPATH: join(this.directory, "python"),
+          DSH_FPL_LOCK_PYTHON: this.options.lockPython || process.env.DSH_FPL_LOCK_PYTHON,
         },
       });
       await appendFile(
@@ -194,7 +201,8 @@ export class LocalService {
       this.attempted = true;
     }));
   }
-  stop() {
+  stop(lockPython?: string) {
+    if (lockPython) this.options.lockPython = lockPython;
     if (this.options.manageService === false) return Promise.resolve();
     this.stopRequested = true;
     return (this.stopping ??= serial(this.key, async () => {

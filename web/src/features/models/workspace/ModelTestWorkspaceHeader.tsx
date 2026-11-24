@@ -10,13 +10,7 @@ import { CustomSelect, type SelectOption } from "@shared/ui/CustomSelect";
 import "./model-test-header.css";
 
 export type ModelTestMode =
-  | "chat"
-  | "image"
-  | "video"
-  | "speech"
-  | "synthesis"
-  | "realtime_voice"
-  | "enhancement";
+  "chat" | "image" | "video" | "speech" | "synthesis" | "enhancement";
 
 const modes: Array<{
   id: ModelTestMode;
@@ -29,7 +23,6 @@ const modes: Array<{
   { id: "enhancement", label: "视频增强", icon: Video },
   { id: "synthesis", label: "语音合成", icon: AudioLines },
   { id: "speech", label: "语音识别", icon: Mic2 },
-  { id: "realtime_voice", label: "实时语音", icon: AudioLines },
 ];
 
 export function ModelTestWorkspaceHeader({

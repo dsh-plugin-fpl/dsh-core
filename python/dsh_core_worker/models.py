@@ -41,16 +41,9 @@ PROVIDER_CAPABILITIES = {
     "deepseek": ["chat", "tools"],
     "anthropic": ["chat", "vision", "tools"],
     "volcengine_image": ["image_generation"],
-    "senseaudio_image": ["image_generation"],
     "volcengine_video": ["video_generation"],
-    "senseaudio_video": ["video_generation"],
     "zealman_video": ["video_generation"],
     "autodl_video": ["video_generation"],
-    "senseaudio_asr": ["speech_recognition"],
-    "senseaudio_asr_pro": ["speech_recognition"],
-    "senseaudio_realtime": ["voice"],
-    "senseaudio_music": ["audio_generation"],
-    "senseaudio_sfx": ["audio_generation"],
     "local_qwen_tts": ["speech_synthesis"],
     "local_zonos_tts": ["speech_synthesis"],
     "local_relayvsr": ["video_enhancement"],
@@ -61,7 +54,6 @@ PROVIDER_CAPABILITIES = {
 class Models:
     def __init__(self, store, resources, host):
         self.store, self.resources, self.host = store, resources, host
-        self.voices = {}
 
     def reference(self, request, identity, kind=None, accepted_mimes=None):
         path, info = self.resources.path(identity)
@@ -97,8 +89,6 @@ class Models:
             data.setdefault("reference_asset_ids", request.resource_ids)
             if kind == "video":
                 data.setdefault("mode", "reference")
-        if connection["kind"] == "senseaudio_sfx":
-            data.setdefault("mode", "sfx")
         body = TypeAdapter(GenerationTaskCreateIn).validate_python(data)
         upload_url = self.store.config("settings", {})["value"].get("temporary_upload_url", "")
 
@@ -245,7 +235,7 @@ class Models:
             await emit("assistant_delta", {"text": result.text})
             return asdict(result)
         if request.capability == "voice":
-            return await self.voice(task, request, connection, key, emit)
+            raise CoreError("当前没有可用的实时语音供应商", "capability_unavailable", status=409)
         return await self.generate(task, request, args, emit, scratch)
 
     async def generate(self, task, request, args, emit, scratch):
@@ -319,55 +309,5 @@ class Models:
         )
         return {"resources": [resource], "provider_task_id": task["provider_task_id"]}
 
-    async def voice(self, task, request, connection, key, emit):
-        from .extracted.apps.model_service.providers.realtime.senseaudio import (
-            ResolvedRealtimeModel,
-            SenseAudioRealtimeBridge,
-        )
-
-        model = ResolvedRealtimeModel(
-            id=request.model,
-            provider_id=connection["id"],
-            provider_name=connection["name"],
-            provider_kind=connection["kind"],
-            slug=request.model,
-            label=request.model,
-            base_url=connection["base_url"],
-            api_key=key,
-        )
-        bridge = SenseAudioRealtimeBridge(
-            model=model,
-            instructions=request.prompt,
-            greeting="",
-            voice=request.parameters.get("voice", ""),
-        )
-        self.voices[task["id"]] = bridge
-        try:
-            await bridge.start()
-            while True:
-                event = await bridge.outbound.get()
-                await emit("voice", event)
-                if event.get("type") == "error":
-                    raise CoreError("实时语音连接失败", "voice_provider_failed")
-                if event.get("type") in ("closed", "provider_closed"):
-                    break
-            return {}
-        finally:
-            self.voices.pop(task["id"], None)
-            await bridge.close()
-
     async def voice_command(self, identity, command, value):
-        bridge = self.voices.get(identity)
-        if not bridge:
-            raise CoreError("语音会话未运行", "not_running")
-        if command == "append":
-            if len(value) > 128 * 1024:
-                raise CoreError("音频分片超过限制")
-            bridge.append_audio(value)
-        elif command == "commit":
-            bridge.commit_input(value)
-        elif command == "interrupt":
-            bridge.interrupt(value)
-        else:
-            raise CoreError("未知语音命令")
-        return {"accepted": True}
+        raise CoreError("当前没有可用的实时语音供应商", "capability_unavailable", status=409)

@@ -11,9 +11,7 @@ import time
 import webbrowser
 from pathlib import Path
 
-import httpx
-
-from .access import Access
+from urllib.request import ProxyHandler, build_opener
 from .private_files import atomic_private
 
 
@@ -58,9 +56,9 @@ def main():
 
     def probe(endpoint=origin):
         try:
-            response = httpx.get(endpoint + "/ready", timeout=1, trust_env=False)
-            return response.json() if response.status_code == 200 else {}
-        except (httpx.HTTPError, ValueError):
+            with build_opener(ProxyHandler({})).open(endpoint + "/ready", timeout=1) as response:
+                return json.loads(response.read(1024 * 1024)) if response.status == 200 else {}
+        except (OSError, ValueError):
             return {}
 
     if args.command != "serve":
@@ -141,6 +139,7 @@ def main():
             time.sleep(0.1)
         raise SystemExit("服务仍在正常退出，请稍后检查状态；未强制中断进程")
     if not ready:
+        from .access import Access
         with socket.socket() as check:
             check.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
             try:
@@ -190,6 +189,7 @@ def main():
     if ready.get("instance") != current.get("instance"):
         raise SystemExit("此端口正在运行其他 Core 实例，请检查配置")
     if not args.no_open or args.output:
+        from .access import Access
         access = Access(root / "access")
         ticket = access.ticket()
         url = origin + "/#ticket=" + ticket

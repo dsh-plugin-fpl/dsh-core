@@ -122,3 +122,21 @@ Core 227 项 Python、9 项连接层测试及构建通过；存储页面 Chrome 
 - 最终 multipart 适配后单独重跑 `playwright test e2e/files.spec.ts`：通过（4.4s）。最终 ruff、Prettier、`tsc --noEmit` 与 `git diff --check` 均通过。
 - 本机证据：`.local/files-browser/`、`.local/files-full-tests.log`、`.local/files-browser-tests.log`、`.local/files-browser-final.log`、`.local/files-render-check-build.log`。所有自动化使用隔离服务、账号和生成文件；未调用真实付费供应商，未修改现有业务数据或迁移账本。
 - 运行实例：只读核对时 9310 Core 尚未加载新文件编辑接口。自动审批拒绝正式停止/重启步骤，理由是用户尚未明确授权这次服务中断；重载未执行，等待显式授权后通过正常 CLI 应用。
+
+## 2026-11-24：应用与外部连接分类修正
+
+- `pnpm build` 与生成的 OpenAPI/TypeScript 契约通过；桥接响应新增 `kind`、`application_id`，未改变配对和应用注册协议。
+- `pnpm test`：20 个连接器测试、239 个 Python 测试通过。新增分类回归覆盖名称与身份不一致、应用在线及断线、撤权后重启、账号绑定隔离，并确认应用仍在应用目录中。
+- `CORE_TEST_BROWSER_CHANNEL=chrome pnpm --dir web test:e2e`：4 个 Chrome 场景通过。真实隔离应用桥接不出现在外部连接列表，应用仍可打开；DSH 断开且应用仍在线时，顶部显示「连接 DSH」。外部连接在明暗主题及 1440/860/390px 截图复核通过，无横向溢出；证据在 `.local/browser-tests/integrations-*.png`。
+- 补充计数断言后单独重跑 `independent.spec.ts` 通过（16.9s）：DSH、飞书及独立应用同时在线时，外部连接仍为 2 个。断言等待初始目录加载完成，避免读取部分加载时的瞬时计数。
+- TypeScript、Prettier、新增 Python 测试的 Ruff 检查和 `git diff --check` 通过。扩展 Ruff 检查发现 `identity_gateway.py` 既有的未使用局部变量 `session`（RUF059），本次未修改该行。总仓库结构检查仍因任务开始前已有的 Core 固定版本偏移失败（索引 `d7f5b648dde1`，工作树 HEAD `bb15fae3eb78`），本次未更新 gitlink。
+- 验证使用隔离服务与账号，未操作真实配置和业务数据，未重启当前 9310 实例，未提交、推送或发布。
+
+
+## 2026-11-24：SenseAudio 退役验收
+
+- `pnpm build`、`pnpm test` 与 `pnpm test:consumer` 通过；退役专项覆盖类型拒绝、目录/默认值/密钥清理、共享凭据、失败回滚、重复启动、跨账号启动及旧数据导入。
+- 旧任务保留输入、输出和供应商回执，未完成任务中断，HTTP/WS 手动恢复与界面重试均被拦截。实时语音兼容接口返回空选项或明确的能力不可用响应。
+- 六工坊构建、26 项 Node 测试与 287 项 Python 测试通过。公开契约与生成客户端不再包含退役供应商枚举，历史任务的供应商标识仍可读取。
+- Chrome 的 4 项端到端测试通过；隔离旧配置夹具验证七类连接在启动后移除，协议菜单保留方舟等其他提供方，目录在明暗主题和 1440/800/390px 下可读。截图位于本地 `.local/browser-tests/retired-catalog-*`，不包含真实账号数据。
+- 正常启动器已用于加载本机源码变更；真实目录只做授权清理与只读核对，没有创建验收账号、提交任务或执行付费供应商调用。整套真实供应商付费生成未执行，来源审计记录保留。

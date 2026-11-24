@@ -1112,7 +1112,9 @@
             "description": "Successful Response",
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/BridgeListOut"
+                }
               }
             }
           }
@@ -5560,7 +5562,7 @@
             "required": false,
             "schema": {
               "default": "",
-              "pattern": "^(|openai|deepseek|anthropic|senseaudio_asr|senseaudio_asr_pro|senseaudio_realtime)$",
+              "pattern": "^(|openai|deepseek|anthropic)$",
               "title": "Provider Kind",
               "type": "string"
             }
@@ -6905,6 +6907,163 @@
           }
         }
       }
+    },
+    "/v1/setup/authorizations": {
+      "post": {
+        "summary": "Create",
+        "operationId": "create_v1_setup_authorizations_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SetupRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/setup/authorizations/{identity}": {
+      "get": {
+        "summary": "Describe",
+        "operationId": "describe_v1_setup_authorizations__identity__get",
+        "parameters": [
+          {
+            "name": "identity",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Identity"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/setup/authorizations/{identity}/approve": {
+      "post": {
+        "summary": "Approve",
+        "operationId": "approve_v1_setup_authorizations__identity__approve_post",
+        "parameters": [
+          {
+            "name": "identity",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Identity"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/setup/authorizations/{identity}/exchange": {
+      "post": {
+        "summary": "Exchange",
+        "operationId": "exchange_v1_setup_authorizations__identity__exchange_post",
+        "parameters": [
+          {
+            "name": "identity",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Identity"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SetupProof"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -7253,6 +7412,66 @@
           "files"
         ],
         "title": "Body_import_directory_v1_file_library_directory_imports_post"
+      },
+      "BridgeListOut": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/BridgeOut"
+            },
+            "type": "array",
+            "title": "Items"
+          }
+        },
+        "type": "object",
+        "required": [
+          "items"
+        ],
+        "title": "BridgeListOut"
+      },
+      "BridgeOut": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "connected": {
+            "type": "boolean",
+            "title": "Connected"
+          },
+          "kind": {
+            "type": "string",
+            "enum": [
+              "dsh",
+              "application"
+            ],
+            "title": "Kind"
+          },
+          "application_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Application Id"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "name",
+          "connected",
+          "kind",
+          "application_id"
+        ],
+        "title": "BridgeOut"
       },
       "Choice": {
         "properties": {
@@ -12391,14 +12610,6 @@
             "title": "Provider Id"
           },
           "provider_kind": {
-            "enum": [
-              "senseaudio_image",
-              "volcengine_image",
-              "senseaudio_video",
-              "volcengine_video",
-              "zealman_video",
-              "autodl_video"
-            ],
             "title": "Provider Kind",
             "type": "string"
           },
@@ -12908,9 +13119,7 @@
           },
           "provider_kind": {
             "enum": [
-              "openai",
-              "senseaudio_asr",
-              "senseaudio_asr_pro"
+              "openai"
             ],
             "title": "Provider Kind",
             "type": "string"
@@ -13364,11 +13573,6 @@
             "title": "Provider Id"
           },
           "provider_kind": {
-            "enum": [
-              "openai",
-              "senseaudio_asr",
-              "senseaudio_asr_pro"
-            ],
             "title": "Provider Kind",
             "type": "string"
           },
@@ -13742,16 +13946,9 @@
               "openai",
               "deepseek",
               "anthropic",
-              "senseaudio_image",
               "volcengine_video",
-              "senseaudio_video",
               "zealman_video",
-              "autodl_video",
-              "senseaudio_asr",
-              "senseaudio_asr_pro",
-              "senseaudio_realtime",
-              "senseaudio_music",
-              "senseaudio_sfx"
+              "autodl_video"
             ],
             "title": "Kind",
             "type": "string"
@@ -13831,16 +14028,9 @@
               "openai",
               "deepseek",
               "anthropic",
-              "senseaudio_image",
               "volcengine_video",
-              "senseaudio_video",
               "zealman_video",
-              "autodl_video",
-              "senseaudio_asr",
-              "senseaudio_asr_pro",
-              "senseaudio_realtime",
-              "senseaudio_music",
-              "senseaudio_sfx"
+              "autodl_video"
             ],
             "title": "Kind",
             "type": "string"
@@ -14028,16 +14218,9 @@
               "openai",
               "deepseek",
               "anthropic",
-              "senseaudio_image",
               "volcengine_video",
-              "senseaudio_video",
               "zealman_video",
-              "autodl_video",
-              "senseaudio_asr",
-              "senseaudio_asr_pro",
-              "senseaudio_realtime",
-              "senseaudio_music",
-              "senseaudio_sfx"
+              "autodl_video"
             ],
             "title": "Provider Kind",
             "type": "string"
@@ -15537,6 +15720,104 @@
           "invitation"
         ],
         "title": "RegisterAccount"
+      },
+      "SetupApplication": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "enum": [
+              "dsh-visual-workshop",
+              "dsh-video-editor",
+              "dsh-presentation-workshop",
+              "dsh-thought-workshop",
+              "dsh-galgame-workshop",
+              "dsh-audio-annotation"
+            ],
+            "title": "Id"
+          },
+          "origin": {
+            "type": "string",
+            "maxLength": 100,
+            "title": "Origin"
+          },
+          "expected_account": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 100
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Expected Account"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "id",
+          "origin"
+        ],
+        "title": "SetupApplication"
+      },
+      "SetupProof": {
+        "properties": {
+          "verifier": {
+            "type": "string",
+            "maxLength": 128,
+            "minLength": 40,
+            "title": "Verifier"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "verifier"
+        ],
+        "title": "SetupProof"
+      },
+      "SetupRequest": {
+        "properties": {
+          "profile": {
+            "type": "string",
+            "maxLength": 120,
+            "minLength": 1,
+            "title": "Profile"
+          },
+          "challenge": {
+            "type": "string",
+            "pattern": "^[a-f0-9]{64}$",
+            "title": "Challenge"
+          },
+          "applications": {
+            "items": {
+              "$ref": "#/components/schemas/SetupApplication"
+            },
+            "type": "array",
+            "maxItems": 6,
+            "title": "Applications"
+          },
+          "expected_account": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 100
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Expected Account"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "profile",
+          "challenge"
+        ],
+        "title": "SetupRequest"
       },
       "StorageJob": {
         "properties": {

@@ -2399,6 +2399,74 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/setup/authorizations": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Create */
+        post: operations["create_v1_setup_authorizations_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/setup/authorizations/{identity}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Describe */
+        get: operations["describe_v1_setup_authorizations__identity__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/setup/authorizations/{identity}/approve": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Approve */
+        post: operations["approve_v1_setup_authorizations__identity__approve_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/setup/authorizations/{identity}/exchange": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Exchange */
+        post: operations["exchange_v1_setup_authorizations__identity__exchange_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -2530,6 +2598,27 @@ export interface components {
             files: string[];
             /** Parent Id */
             parent_id?: string | null;
+        };
+        /** BridgeListOut */
+        BridgeListOut: {
+            /** Items */
+            items: components["schemas"]["BridgeOut"][];
+        };
+        /** BridgeOut */
+        BridgeOut: {
+            /** Id */
+            id: string;
+            /** Name */
+            name: string;
+            /** Connected */
+            connected: boolean;
+            /**
+             * Kind
+             * @enum {string}
+             */
+            kind: "dsh" | "application";
+            /** Application Id */
+            application_id: string | null;
         };
         /** Choice */
         Choice: {
@@ -4517,11 +4606,8 @@ export interface components {
             progress: number;
             /** Provider Id */
             provider_id: string | null;
-            /**
-             * Provider Kind
-             * @enum {string}
-             */
-            provider_kind: "senseaudio_image" | "volcengine_image" | "senseaudio_video" | "volcengine_video" | "zealman_video" | "autodl_video";
+            /** Provider Kind */
+            provider_kind: string;
             /** Provider Name */
             provider_name: string;
             /** Request Payload */
@@ -4683,7 +4769,7 @@ export interface components {
              * Provider Kind
              * @enum {string}
              */
-            provider_kind: "openai" | "senseaudio_asr" | "senseaudio_asr_pro";
+            provider_kind: "openai";
             /** Provider Name */
             provider_name: string;
             /** Slug */
@@ -4852,11 +4938,8 @@ export interface components {
             parameters: components["schemas"]["ModelTestTranscriptionParametersOut"];
             /** Provider Id */
             provider_id: string | null;
-            /**
-             * Provider Kind
-             * @enum {string}
-             */
-            provider_kind: "openai" | "senseaudio_asr" | "senseaudio_asr_pro";
+            /** Provider Kind */
+            provider_kind: string;
             /** Provider Name */
             provider_name: string;
             result_detail: components["schemas"]["ModelTestTranscriptionResultDetailOut"];
@@ -4977,7 +5060,7 @@ export interface components {
              * Kind
              * @enum {string}
              */
-            kind: "local_qwen_tts" | "local_zonos_tts" | "local_relayvsr" | "local_ffmpeg" | "volcengine_image" | "openai" | "deepseek" | "anthropic" | "senseaudio_image" | "volcengine_video" | "senseaudio_video" | "zealman_video" | "autodl_video" | "senseaudio_asr" | "senseaudio_asr_pro" | "senseaudio_realtime" | "senseaudio_music" | "senseaudio_sfx";
+            kind: "local_qwen_tts" | "local_zonos_tts" | "local_relayvsr" | "local_ffmpeg" | "volcengine_image" | "openai" | "deepseek" | "anthropic" | "volcengine_video" | "zealman_video" | "autodl_video";
             /** Name */
             name: string;
             /** Supplier Id */
@@ -5005,7 +5088,7 @@ export interface components {
              * Kind
              * @enum {string}
              */
-            kind: "local_qwen_tts" | "local_zonos_tts" | "local_relayvsr" | "local_ffmpeg" | "volcengine_image" | "openai" | "deepseek" | "anthropic" | "senseaudio_image" | "volcengine_video" | "senseaudio_video" | "zealman_video" | "autodl_video" | "senseaudio_asr" | "senseaudio_asr_pro" | "senseaudio_realtime" | "senseaudio_music" | "senseaudio_sfx";
+            kind: "local_qwen_tts" | "local_zonos_tts" | "local_relayvsr" | "local_ffmpeg" | "volcengine_image" | "openai" | "deepseek" | "anthropic" | "volcengine_video" | "zealman_video" | "autodl_video";
             /** Managed Fields */
             managed_fields?: string[];
             /** Models */
@@ -5076,7 +5159,7 @@ export interface components {
              * Provider Kind
              * @enum {string}
              */
-            provider_kind: "local_qwen_tts" | "local_zonos_tts" | "local_relayvsr" | "local_ffmpeg" | "volcengine_image" | "openai" | "deepseek" | "anthropic" | "senseaudio_image" | "volcengine_video" | "senseaudio_video" | "zealman_video" | "autodl_video" | "senseaudio_asr" | "senseaudio_asr_pro" | "senseaudio_realtime" | "senseaudio_music" | "senseaudio_sfx";
+            provider_kind: "local_qwen_tts" | "local_zonos_tts" | "local_relayvsr" | "local_ffmpeg" | "volcengine_image" | "openai" | "deepseek" | "anthropic" | "volcengine_video" | "zealman_video" | "autodl_video";
             /** Provider Name */
             provider_name: string;
             /** Slug */
@@ -5590,6 +5673,34 @@ export interface components {
             display_name: string;
             /** Invitation */
             invitation: string;
+        };
+        /** SetupApplication */
+        SetupApplication: {
+            /**
+             * Id
+             * @enum {string}
+             */
+            id: "dsh-visual-workshop" | "dsh-video-editor" | "dsh-presentation-workshop" | "dsh-thought-workshop" | "dsh-galgame-workshop" | "dsh-audio-annotation";
+            /** Origin */
+            origin: string;
+            /** Expected Account */
+            expected_account?: string | null;
+        };
+        /** SetupProof */
+        SetupProof: {
+            /** Verifier */
+            verifier: string;
+        };
+        /** SetupRequest */
+        SetupRequest: {
+            /** Profile */
+            profile: string;
+            /** Challenge */
+            challenge: string;
+            /** Applications */
+            applications?: components["schemas"]["SetupApplication"][];
+            /** Expected Account */
+            expected_account?: string | null;
         };
         /** StorageJob */
         StorageJob: {
@@ -6562,7 +6673,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": unknown;
+                    "application/json": components["schemas"]["BridgeListOut"];
                 };
             };
         };
@@ -10754,6 +10865,136 @@ export interface operations {
                 };
                 content: {
                     "application/json": unknown;
+                };
+            };
+        };
+    };
+    create_v1_setup_authorizations_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SetupRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    describe_v1_setup_authorizations__identity__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                identity: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    approve_v1_setup_authorizations__identity__approve_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                identity: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    exchange_v1_setup_authorizations__identity__exchange_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                identity: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SetupProof"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
                 };
             };
         };

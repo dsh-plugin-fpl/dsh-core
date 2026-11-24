@@ -11,6 +11,7 @@ from .catalog import Catalog
 from .credentials import ProviderCredentials
 from .file_library import FileLibrary
 from .store import encode
+from .retired_providers import RETIRED_PROVIDER_KINDS, retire_providers
 
 
 def parsed(value, default=None):
@@ -34,6 +35,7 @@ def timestamp(value):
 def import_catalog(
     store, access, rows, source_owner, source_id, transfer, aliases, checkpoint=lambda: None
 ):
+    retire_providers(store)
     credentials = ProviderCredentials(store, access.cipher)
     # An offline import has no connected DSH model registrations or execution runtime.
     catalog = Catalog(
@@ -71,6 +73,12 @@ def import_catalog(
     pending_credentials = []
     for row in rows.get("model_providers", []):
         if row["owner_user_id"] != source_owner:
+            continue
+        if row["kind"] in RETIRED_PROVIDER_KINDS:
+            # Only keep an in-memory redaction value for imported historical logs.
+            # Never persist a credential or routing record for a retired provider.
+            if row.get("api_key_ciphertext"):
+                secrets.append(transfer.decrypt(row["api_key_ciphertext"].encode()).decode())
             continue
         original_id = row["id"]
         identity = aliases.setdefault(
@@ -128,19 +136,13 @@ def import_catalog(
     # Old insecure public HTTP endpoints remain in imported history, never active routing.
     from .extracted.runtime.http.outbound_urls import (
         normalize_provider_base_url,
-        normalize_provider_websocket_url,
     )
 
     for provider in value["providers"]:
         if provider["kind"].startswith("local_"):
             continue
         try:
-            normalize = (
-                normalize_provider_websocket_url
-                if provider["kind"] == "senseaudio_realtime"
-                else normalize_provider_base_url
-            )
-            normalize(provider["base_url"])
+            normalize_provider_base_url(provider["base_url"])
         except ValueError:
             provider["legacy_base_url"] = provider["base_url"]
             provider["base_url"] = "https://migration-disabled.invalid"

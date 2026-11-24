@@ -25,12 +25,11 @@ def provider(kind, slug, capability):
     }
 
 
-def test_catalog_uses_provider_sizes_seedance_limits_audio_and_workflow_parameters():
+def test_catalog_uses_provider_sizes_seedance_limits_and_workflow_parameters():
     rows = generation_options(
         [
             provider("volcengine_image", "doubao-seedream-4-5-251128", "image_generation"),
             provider("volcengine_video", "doubao-seedance-2-5-260628", "video_generation"),
-            provider("senseaudio_music", "senseaudio-music-1.0", "audio_generation"),
             provider("zealman_video", "U17-9图1视频3音频V1-api", "video_generation"),
         ],
         upload_configured=True,
@@ -41,8 +40,7 @@ def test_catalog_uses_provider_sizes_seedance_limits_audio_and_workflow_paramete
     assert rows[1]["max_reference_images"] == 30
     assert rows[1]["video_capabilities"]["duration_max"] == 30
     assert rows[1]["video_capabilities"]["reference_video_upload_configured"] is True
-    assert rows[2]["kind"] == "audio"
-    assert rows[3]["workflow_capabilities"]["reference_limits"]["image"] == 9
+    assert rows[2]["workflow_capabilities"]["reference_limits"]["image"] == 9
 
 
 def test_unsupported_or_disabled_generation_models_are_not_advertised():

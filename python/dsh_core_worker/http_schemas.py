@@ -7,6 +7,18 @@ from pydantic import BaseModel, ConfigDict, Field, model_validator
 from .contracts import Capability, HistoryMessage
 
 
+class BridgeOut(BaseModel):
+    id: str
+    name: str
+    connected: bool
+    kind: Literal["dsh", "application"]
+    application_id: str | None
+
+
+class BridgeListOut(BaseModel):
+    items: list[BridgeOut]
+
+
 class ResourceOut(BaseModel):
     id: str
     name: str
@@ -72,10 +84,12 @@ class TaskOut(BaseModel):
     @classmethod
     def resume_capability(cls, data):
         if isinstance(data, dict):
+            from .retired_providers import retired_task
+
             request = data.get("request", {})
             data = {
                 **data,
-                "can_resume": data.get("status")
+                "can_resume": not retired_task(data) and data.get("status")
                 in ("failed", "cancelled", "interrupted", "recoverable")
                 and bool(
                     data.get("provider_task_id")

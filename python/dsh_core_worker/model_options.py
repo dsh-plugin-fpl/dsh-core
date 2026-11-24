@@ -1,6 +1,7 @@
 """Redacted model options for application writing and speech recognition ports."""
 
 from types import SimpleNamespace
+from .extracted.apps.model_service.transcription.support import MAX_ASR_FILE_BYTES
 
 
 def application_options(catalog):
@@ -16,9 +17,7 @@ def application_options(catalog):
                 continue
             rows.append(
                 {
-                    "byte_limit": 100 * 1024**2
-                    if provider["kind"] == "senseaudio_asr_pro"
-                    else 10 * 1024**2,
+                    "byte_limit": MAX_ASR_FILE_BYTES,
                     "id": model["id"],
                     "label": provider["name"] + " · " + model["label"],
                     "connection_id": provider["id"],
@@ -28,7 +27,7 @@ def application_options(catalog):
                     "capabilities": model["capabilities"],
                 }
             )
-            if "speech_recognition" in model["capabilities"]:
+            if provider["kind"] == "openai" and "speech_recognition" in model["capabilities"]:
                 transcription.append(
                     {
                         "id": model["id"],
@@ -38,9 +37,7 @@ def application_options(catalog):
                         "slug": model["slug"],
                         "label": model["label"],
                         "description": model["description"],
-                        "max_input_bytes": 100 * 1024**2
-                        if provider["kind"] == "senseaudio_asr_pro"
-                        else 10 * 1024**2,
+                        "max_input_bytes": MAX_ASR_FILE_BYTES,
                         "parameter_capabilities": parameter_capabilities(
                             SimpleNamespace(**model), SimpleNamespace(**provider)
                         ).model_dump(),
@@ -50,7 +47,7 @@ def application_options(catalog):
         "models": rows,
         "transcription": {
             "items": transcription,
-            "max_input_bytes": 100 * 1024**2,
+            "max_input_bytes": MAX_ASR_FILE_BYTES,
             "accepted_extensions": [".wav", ".mp3", ".m4a", ".ogg", ".flac"],
             "accepted_mime_types": [
                 "audio/wav",
@@ -81,7 +78,8 @@ def transcription_parameters(catalog, params):
             if model["id"] != params.get("model_id"):
                 continue
             if (
-                not provider["enabled"]
+                provider["kind"] != "openai"
+                or not provider["enabled"]
                 or not model["enabled"]
                 or "speech_recognition" not in model["capabilities"]
             ):

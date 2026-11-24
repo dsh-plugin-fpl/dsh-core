@@ -135,9 +135,6 @@ export function VideoEnhancementPanel({
           speech: models.some((model) =>
             model.capabilities.includes("speech_recognition"),
           ),
-          realtime_voice: models.some((model) =>
-            model.capabilities.includes("voice"),
-          ),
         }}
         onSelectMode={onSelectMode}
         modelId={modelId}
@@ -149,7 +146,8 @@ export function VideoEnhancementPanel({
       <div className="video-enhancement-body">
         <h2>视频清晰度增强</h2>
         <p>
-          本机处理视频并导出 1080p MP4。RelayVSR 首版支持最多 300 帧、1080p 输入。
+          本机处理视频并导出 1080p MP4。RelayVSR 首版支持最多 300 帧、1080p
+          输入。
         </p>
         {fast && <p>使用本机 FFmpeg 等比放大并轻微锐化，保留原帧率。</p>}
         <form onSubmit={submit} className="video-enhancement-controls">

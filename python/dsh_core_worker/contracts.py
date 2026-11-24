@@ -47,7 +47,6 @@ class Connection(RequestModel):
     def validate_connection(self):
         from .extracted.runtime.http.outbound_urls import (
             normalize_provider_base_url,
-            normalize_provider_websocket_url,
         )
 
         if len({m.id for m in self.models}) != len(self.models):
@@ -64,11 +63,7 @@ class Connection(RequestModel):
                 "autodl_video": "https://www.autodl.art",
             }.get(self.kind, "")
             self.base_url = self.base_url or default
-            normalize = (
-                normalize_provider_websocket_url
-                if self.kind == "senseaudio_realtime"
-                else normalize_provider_base_url
-            )
+            normalize = normalize_provider_base_url
             self.base_url = normalize(self.base_url)
             if not self.base_url:
                 raise ValueError("请填写供应商地址")

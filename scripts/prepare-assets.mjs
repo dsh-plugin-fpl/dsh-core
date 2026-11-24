@@ -1,20 +1,14 @@
-import { cp, mkdir, access } from "node:fs/promises";
+import { cp, mkdir, access, rm } from "node:fs/promises";
 import { dirname, resolve } from "node:path";
-import { createRequire } from "node:module";
 import { fileURLToPath } from "node:url";
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
-const require = createRequire(resolve(root, "web/package.json"));
-const vad = dirname(require.resolve("@ricky0123/vad-web/package.json"));
-const target = resolve(root, "web/public/voice-vad");
-await mkdir(target, { recursive: true });
-for (const name of ["silero_vad_v5.onnx", "vad.worklet.bundle.min.js"])
-  await cp(resolve(vad, "dist", name), resolve(target, name));
-await cp(
-  require.resolve("onnxruntime-web/ort-wasm-simd-threaded.wasm"),
-  resolve(target, "ort-wasm-simd-threaded.wasm"),
-);
 const branding = resolve(root, ".runtime/assets/brand");
+const publicBrand = resolve(root, "web/public/brand");
+await rm(publicBrand, { recursive: true, force: true });
+await mkdir(publicBrand, { recursive: true });
+await cp(resolve(root, "src/icon.webp"), resolve(publicBrand, "icon.webp"));
 try {
+  if (process.env.DSH_FPL_INCLUDE_LOCAL_BRAND !== "1") throw Object.assign(new Error("Public assets"), { code: "ENOENT" });
   await access(branding);
   await cp(branding, resolve(root, "web/public/brand"), { recursive: true });
 } catch (error) {

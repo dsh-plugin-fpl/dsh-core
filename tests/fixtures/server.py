@@ -18,7 +18,28 @@ parser.add_argument("--web-root", type=Path)
 parser.add_argument("--mock-models", action="store_true")
 parser.add_argument("--mock-model-delay", type=float, default=0.05)
 parser.add_argument("--mock-external", action="store_true")
+parser.add_argument("--retired-provider-fixture", action="store_true")
 args = parser.parse_args()
+if args.retired_provider_fixture:
+    from dsh_core_worker.retired_providers import RETIRED_PROVIDER_KINDS
+    from dsh_core_worker.store import Store
+
+    store = Store(args.root / "state")
+    providers = [
+        {"id": kind, "kind": kind, "name": "Retired fixture", "models": [{"id": kind + "-model"}]}
+        for kind in sorted(RETIRED_PROVIDER_KINDS)
+    ]
+    store.save_config("catalog", {
+        "providers": providers, "suppliers": [],
+        "default_model_ids": {"speech_recognition": "senseaudio_asr-model"},
+    }, 0)
+    store.save_config("connections", [
+        {"id": p["id"], "kind": p["kind"], "credential_ref": "PROVIDER_" + p["id"]}
+        for p in providers
+    ], 0)
+    for provider in providers:
+        store.save_config("credential:PROVIDER_" + provider["id"], "isolated-fixture-secret", 0)
+    store.close()
 app = create_app(args.root, args.web_root, origin=f"http://127.0.0.1:{args.port}")
 pair = app.state.access.pair("DSH")
 (args.root / "fixture-pair.json").write_text(json.dumps(pair))

@@ -9,7 +9,7 @@ from uuid import uuid4
 
 import httpx
 
-from dsh_core_worker.extracted.apps.model_service.providers._senseaudio import (
+from dsh_core_worker.extracted.apps.model_service.providers.common import (
     ProviderTaskStatus,
     sanitize_provider_message,
 )

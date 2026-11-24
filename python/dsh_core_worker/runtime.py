@@ -38,6 +38,14 @@ class Runtime:
             self.lock.close()
             raise CoreError("此配置已有执行进程", "profile_busy") from None
         self.store = Store(root)
+        from .retired_providers import retire_providers
+
+        try:
+            retire_providers(self.store)
+        except BaseException:
+            self.store.db.close()
+            self.lock.close()
+            raise
         self.resources = Resources(self.store)
         self.models = Models(self.store, self.resources, host)
         self.agents = Agents(self.store, host)
@@ -242,6 +250,10 @@ class Runtime:
             return task
         if method == "task.resume":
             task = self.store.task(p["id"])
+            from .retired_providers import REMOVED_ERROR, retired_task
+
+            if retired_task(task):
+                raise CoreError(REMOVED_ERROR["message"], REMOVED_ERROR["code"], status=409)
             local = (
                 task["request"]["kind"] == "local"
                 and task["connection"].get("kind") != "local_management"

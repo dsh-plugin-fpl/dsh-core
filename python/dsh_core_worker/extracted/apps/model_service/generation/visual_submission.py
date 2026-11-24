@@ -56,25 +56,7 @@ async def submit_visual_generation(
         value = reference_filenames.get(str(asset_id))
         return value if isinstance(value, str) and value.strip() else None
 
-    if provider_kind in {"senseaudio_music", "senseaudio_sfx"}:
-        reference_urls = [
-            await inputs.temporary_url(
-                str(asset_id),
-                "audio",
-                owner_user_id,
-                reference_filename(asset_id),
-            )
-            for asset_id in payload.get("reference_asset_ids", [])
-        ]
-        return await submit_generation_task(
-            provider_kind=provider_kind,
-            base_url=base_url,
-            api_key=api_key,
-            model_slug=model_slug,
-            payload=payload,
-            audio_reference_urls=reference_urls,
-        )
-    if provider_kind in {"senseaudio_image", "volcengine_image"}:
+    if provider_kind == "volcengine_image":
         reference_id = payload.get("reference_asset_id")
         reference = (
             await inputs.data_uri(str(reference_id), owner_user_id) if reference_id else None

@@ -12,7 +12,7 @@
 
 ## 公共能力
 
-18 个 provider kind：`local_qwen_tts`、`local_zonos_tts`、`local_relayvsr`、`local_ffmpeg`、`volcengine_image`、`openai`、`deepseek`、`anthropic`、`senseaudio_image`、`volcengine_video`、`senseaudio_video`、`zealman_video`、`autodl_video`、`senseaudio_asr`、`senseaudio_asr_pro`、`senseaudio_realtime`、`senseaudio_music`、`senseaudio_sfx`。
+11 个 provider kind：`local_qwen_tts`、`local_zonos_tts`、`local_relayvsr`、`local_ffmpeg`、`volcengine_image`、`openai`、`deepseek`、`anthropic`、`volcengine_video`、`zealman_video`、`autodl_video`。
 
 五种 CLI：Codex、Claude Code、OpenCode、DeepSeek Harness、Pi，沿用各 CLI 的登录。Qwen3 TTS、Zonos3 Mini、RelayVSR 使用固定清单与下载校验；FFmpeg 使用本机程序。RelayVSR 首版限制为单次 300 帧、1080p 输入。
 

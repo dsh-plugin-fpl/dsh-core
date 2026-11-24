@@ -2,7 +2,7 @@
 
 import httpx
 
-from dsh_core_worker.extracted.apps.model_service.providers._senseaudio import sanitize_provider_message
+from dsh_core_worker.extracted.apps.model_service.providers.common import sanitize_provider_message
 
 ARK_BASE_URL = "https://ark.cn-beijing.volces.com/api/v3"
 SEEDREAM_MODEL = "doubao-seedream-4-5-251128"

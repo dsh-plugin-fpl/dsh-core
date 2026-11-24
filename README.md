@@ -98,3 +98,11 @@ DSH 连接层单独使用 `pnpm build:connector` 和 `pnpm pack --pack-destinati
 按用户选择，启用插件会调用所属应用公开启动器，等待就绪后登记；关闭、卸载或退出 Harness 会正常停止该服务，保留项目、账号、配对与任务回执，不自动重提结果未知的付费调用。Core 关闭时先等待依赖工坊停止，再停止自身。
 
 本机安装包保存路径型服务安装描述，不包含解释器、账号或密钥。其他机器请先安装并 setup 独立服务，在插件参数 serviceDirectory 指定正式服务目录。manageService 默认 true；显式设为 false 可保留只连接、服务常驻模式。统一存储下自动定位本应用 plugin.json，原 credentialFile 仍兼容。启动失败会报告原因与安装目录 .runtime/plugin-lifecycle 私有日志；迁移停写期间拒绝从插件启动。
+
+## DSH 托管安装与原生工具（候选）
+
+当前源码候选面向 macOS，兼容 DSH `0.2.2-rc.1` 与 `0.2.2-rc.5`。在 DSH 插件管理中启用 Core 和需要的工坊，再打开设置 → **FPL 安装与连接**：先安装 Core，再安装工坊，打开 Core 看板确认账号，选择工坊并授权，最后回到向导完成连接。首次安装会联网准备 uv（本机缺失时）、固定 Python 3.13.15 和锁定的生产依赖；FFmpeg / ffprobe 由用户另行安装。
+
+每个 npm 候选包自带自己的 Python 服务与已编译界面；不依赖开发仓库或安装机路径。代码和环境默认保存在 `~/Library/Application Support/DSH-FPL-Runtime/.runtime`，业务数据仍由各自独立服务管理。已有 `serviceDirectory`、外部常驻服务和手动配对入口继续有效。
+
+详见 [安装、修复与兼容约定](docs/managed-setup.md)。`pnpm pack:plugin` 会重建并打包 `.runtime/packages/` 中的候选 tarball；不会发布。候选源码保留现有版本号，正式发布前须统一确定新版本和最小 Core 依赖，并重新验收对应包摘要。

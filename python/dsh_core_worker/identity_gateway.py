@@ -46,6 +46,14 @@ class AccountAccess(Access):
     def authorize_bridge(self, identity):
         self.accounts.authorize_bridge(self.identity, identity)
 
+    def bridges(self):
+        applications = self.accounts.bridge_applications(self.identity)
+        return [
+            {**row, "kind": "application", "application_id": applications[row["id"]]}
+            if row["id"] in applications else row
+            for row in super().bridges()
+        ]
+
     def profile(self):
         return self.accounts.account(self.identity)
 
@@ -150,6 +158,7 @@ def create_unified_app(root, factory, web_root=None, origin="http://127.0.0.1:93
         if request.headers.get("host") != origin.split("://", 1)[1]:
             return JSONResponse({"code": "invalid_host"}, 403)
         client_api = request.url.path in {
+            "/v1/setup/authorizations",
             "/v1/identity/exchange",
             "/v1/identity/introspect",
             "/v1/identity/directory",
@@ -158,7 +167,7 @@ def create_unified_app(root, factory, web_root=None, origin="http://127.0.0.1:93
             "/v1/identity/bridge",
             "/v1/identity/peer-grant",
             "/v1/identity/peer-verify",
-        }
+        } or (request.url.path.startswith("/v1/setup/authorizations/") and request.url.path.endswith("/exchange"))
         if (
             request.method not in {"GET", "HEAD"}
             and not client_api
@@ -430,6 +439,10 @@ def create_unified_app(root, factory, web_root=None, origin="http://127.0.0.1:93
         accounts.bind_bridge(profile["id"], body["application_id"], pair["id"])
         return {**pair, "account_id": profile["id"]}
 
+    from .setup_authorizations import register_setup_routes
+
+    register_setup_routes(app, root, services, current, origin)
+
     @app.get("/v1/openapi.json")
     async def openapi():
         return combined_schema()
@@ -444,7 +457,7 @@ def create_unified_app(root, factory, web_root=None, origin="http://127.0.0.1:93
             {
                 path: value
                 for path, value in identity["paths"].items()
-                if path.startswith(("/v1/identity/", "/v1/storage"))
+                if path.startswith(("/v1/identity/", "/v1/storage", "/v1/setup/"))
             }
         )
         core.setdefault("components", {}).setdefault("schemas", {}).update(
@@ -498,6 +511,13 @@ def create_unified_app(root, factory, web_root=None, origin="http://127.0.0.1:93
 
     @app.websocket("/{path:path}")
     async def ws(socket: WebSocket, path: str):
+        if path == "v1/model-test/realtime":
+            session = accounts.session(cookie(socket.scope))
+            if session:
+                tenant = await services.ensure(accounts.account(session["account_id"]))
+                return await tenant(socket.scope, socket.receive, socket.send)
+            await socket.close(code=1008)
+            return
         token = (
             dict(socket.scope.get("headers", []))
             .get(b"authorization", b"")

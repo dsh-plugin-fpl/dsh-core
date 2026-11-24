@@ -3,6 +3,7 @@ import {
   DshPairingModal,
   useDshConnections,
 } from "@features/connections/ConnectionsPage";
+import { isDshConnection } from "@features/connections/api";
 import { ConfirmDialog } from "@shared/ui/ConfirmDialog";
 import { LoadingState } from "@shared/ui/LoadingState";
 import { useState } from "react";
@@ -187,7 +188,7 @@ export function ExternalConnectionsPanel({
   if (!canManage)
     return <PanelMessage>外部连接由账号所有者管理与使用。</PanelMessage>;
   const items = query.data?.items ?? [];
-  const bridges = dsh.query.data?.items || [];
+  const bridges = (dsh.query.data?.items || []).filter(isDshConnection);
   const total = items.length + bridges.length;
   const bridgeCards = bridges.filter((c) =>
     c.name.toLowerCase().includes(search.toLowerCase()),
@@ -200,7 +201,10 @@ export function ExternalConnectionsPanel({
       <div className="external-connections-heading">
         <div>
           <h2>外部连接</h2>
-          <p>统一管理 DSH 配对与外部服务，按需连接已安装应用。</p>
+          <p>
+            管理 DSH
+            配对和飞书等外部服务。工坊入口与运行状态请在「应用」中查看。
+          </p>
         </div>
         <div className="external-connections-add">
           <button className="btn" onClick={dsh.open}>
@@ -272,7 +276,7 @@ export function ExternalConnectionsPanel({
               </div>
               <p className="external-connection-card-meta">
                 <span>DeepSeek Harness</span>
-                <span>{c.connected ? "应用与工具" : "等待连接"}</span>
+                <span>{c.connected ? "宿主配对" : "等待连接"}</span>
               </p>
             </div>
             <div className="external-connection-actions">

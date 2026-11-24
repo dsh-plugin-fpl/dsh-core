@@ -9,15 +9,8 @@ export function ProviderIcon({
     | "anthropic"
     | "volcengine_image"
     | "volcengine_video"
-    | "senseaudio_image"
-    | "senseaudio_video"
     | "zealman_video"
     | "autodl_video"
-    | "senseaudio_music"
-    | "senseaudio_sfx"
-    | "senseaudio_asr"
-    | "senseaudio_asr_pro"
-    | "senseaudio_realtime"
     | "local_qwen_tts"
     | "local_zonos_tts"
     | "local_relayvsr"
@@ -29,17 +22,6 @@ export function ProviderIcon({
       <ResponsiveImage
         className="provider-brand-icon"
         src={`/providers/${kind === "local_qwen_tts" ? "qwen" : "deepseek"}-logo.svg`}
-        width={size}
-        height={size}
-        alt=""
-        aria-hidden="true"
-      />
-    );
-  if (kind.startsWith("senseaudio_"))
-    return (
-      <ResponsiveImage
-        className="provider-brand-icon"
-        src="/providers/senseaudio-logo.svg"
         width={size}
         height={size}
         alt=""

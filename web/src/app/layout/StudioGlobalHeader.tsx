@@ -2,18 +2,19 @@ import { useCoreAccount } from "@platform/auth/AccountAccess";
 import { requestApi } from "@platform/api/client";
 import { ThemeToggle } from "@shared/ui/ThemeToggle";
 import { useQuery } from "@tanstack/react-query";
-import { fetchApiJson } from "@platform/api/client";
+import { fetchBridges, isDshConnection } from "@features/connections/api";
 import { HardDrive, Network, UserRound } from "lucide-react";
 import "./studio-global-header.css";
 export function StudioGlobalHeader(_: { assistant?: unknown }) {
   const profile = useCoreAccount();
   const q = useQuery({
     queryKey: ["bridges"],
-    queryFn: () =>
-      fetchApiJson<{ items: { connected: boolean }[] }>("/v1/bridges"),
+    queryFn: fetchBridges,
     refetchInterval: 3000,
   });
-  const connected = q.data?.items.some((b) => b.connected);
+  const connected = q.data?.items.some(
+    (b) => isDshConnection(b) && b.connected,
+  );
   return (
     <header className="studio-panel studio-global-header">
       <div className="studio-header-start">

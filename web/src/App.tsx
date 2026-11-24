@@ -1,5 +1,6 @@
 import { StoragePage } from "@features/storage/StoragePage";
 import { AccountsPage } from "@features/accounts/AccountsPage";
+import { SetupAuthorizationPage } from "@features/accounts/SetupAuthorizationPage";
 import { useCoreAccount } from "@platform/auth/AccountAccess";
 import {
   useEffect,
@@ -102,7 +103,9 @@ export function App() {
       assistant={null}
     >
       <Suspense fallback={<p className="page-loading">正在打开页面…</p>}>
-        {path.split("?")[0] === "/storage" ? (
+        {path.split("?")[0] === "/setup/authorize" ? (
+          <SetupAuthorizationPage />
+        ) : path.split("?")[0] === "/storage" ? (
           <StoragePage />
         ) : path.split("?")[0] === "/account" ? (
           <AccountsPage />

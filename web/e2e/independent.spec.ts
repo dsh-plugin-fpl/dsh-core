@@ -57,6 +57,7 @@ test.beforeAll(async () => {
       "--web-root",
       resolve(root, "web/dist"),
       "--mock-models",
+      "--retired-provider-fixture",
     ],
     { cwd: root, stdio: "ignore" },
   );
@@ -163,6 +164,10 @@ test("FPL shell, catalog editing, test history, files, bridge pairing and narrow
   ).toBeVisible();
   await page.getByRole("button", { name: "添加接入连接", exact: true }).click();
   const dialog = page.getByRole("dialog");
+  await dialog.getByRole("combobox", { name: "接入协议" }).click();
+  await expect(page.getByRole("option", { name: /SenseAudio/i })).toHaveCount(0);
+  await expect(page.getByRole("option", { name: "火山方舟 · Seedream 原生多图", exact: true })).toBeVisible();
+  await page.keyboard.press("Escape");
   await dialog.getByLabel("连接名称").fill("独立测试连接");
   await dialog
     .getByLabel("服务地址", { exact: true })
@@ -183,11 +188,29 @@ test("FPL shell, catalog editing, test history, files, bridge pairing and narrow
     fullPage: false,
     animations: "disabled",
   });
+  const retiredCatalog = await (await page.request.get(origin + "/v1/model-providers")).json();
+  expect(retiredCatalog.providers).toHaveLength(1);
+  expect(retiredCatalog.providers[0].kind).toBe("openai");
+  expect(retiredCatalog.default_model_ids.speech_recognition).toBeUndefined();
+  for (const theme of ["浅色", "深色"]) {
+    await page.getByRole("button", { name: theme, exact: true }).click();
+    for (const width of [1440, 800, 390]) {
+      await page.setViewportSize({ width, height: 1000 });
+      await expect(page.getByText("独立对话模型", { exact: true })).toBeVisible();
+      await expect(page.getByText(/SenseAudio/i)).toHaveCount(0);
+      await page.screenshot({
+        path: resolve(root, `.local/browser-tests/retired-catalog-${theme}-${width}.png`),
+        animations: "disabled",
+      });
+    }
+    await page.setViewportSize({ width: 1440, height: 1000 });
+  }
   // Use the catalog's real test action, then send a message through the production SSE adapter.
   const catalog = await page.request.get(origin + "/v1/model-providers");
   const id = (await catalog.json()).providers[0].models[0].id;
   await page.goto(origin + "/model-test?model=" + encodeURIComponent(id));
   await expect(page.locator("textarea").last()).toBeVisible();
+  await expect(page.getByRole("button", { name: "实时语音", exact: true })).toHaveCount(0);
   const composer = page.getByPlaceholder("输入要测试的问题");
   await composer.fill("验证独立服务");
   await page.getByRole("button", { name: "发送", exact: true }).click();
@@ -395,6 +418,80 @@ test("FPL shell, catalog editing, test history, files, bridge pairing and narrow
   await expect(
     page.getByRole("button", { name: "连接", exact: true }),
   ).toHaveCount(0);
+  await expect(page.locator(".external-connections-toolbar > span")).toHaveText(
+    "2 个连接 · 本机所有者",
+  );
+  const csrf = (await page.context().cookies()).find(
+    (c) => c.name === "core_csrf",
+  )!.value;
+  const headers = { Origin: origin, "X-Core-CSRF": csrf };
+  const appPairResponse = await page.request.post(origin + "/v1/bridges", {
+    headers,
+    data: { name: "独立工坊连接" },
+  });
+  expect(appPairResponse.ok()).toBeTruthy();
+  const appPair = await appPairResponse.json();
+  const appIdentity = await page.request.post(
+    origin + "/v1/identity/applications",
+    {
+      headers,
+      data: {
+        id: "independent-workshop",
+        origin,
+        callback: "/apps/independent-workshop",
+        bridge_id: appPair.id,
+      },
+    },
+  );
+  expect(appIdentity.ok()).toBeTruthy();
+  const appBridge = new WebSocket(
+    origin.replace("http:", "ws:") + "/v1/bridge",
+    {
+      headers: { Authorization: "Bearer " + appPair.token },
+    },
+  );
+  await new Promise<void>((resolve, reject) => {
+    appBridge.once("open", resolve);
+    appBridge.once("error", reject);
+  });
+  const registered = new Promise<void>((resolve, reject) => {
+    appBridge.once("message", (raw) => {
+      const response = JSON.parse(raw.toString());
+      response.error ? reject(new Error(response.error.message)) : resolve();
+    });
+  });
+  appBridge.send(
+    JSON.stringify({
+      jsonrpc: "2.0",
+      id: "register",
+      method: "application.register",
+      params: {
+        id: "independent-workshop",
+        name: "独立工坊",
+        dashboard: { category: "knowledge", url: origin + "/health" },
+      },
+    }),
+  );
+  await registered;
+  // Refresh to ensure this assertion observes the newly classified catalog.
+  await page.reload();
+  const externalPanel = page.getByRole("region", {
+    name: "外部连接",
+    exact: true,
+  });
+  await expect(externalPanel.getByText("DSH", { exact: true })).toBeVisible();
+  await expect(
+    externalPanel.getByText("独立工坊连接", { exact: true }),
+  ).toHaveCount(0);
+  await expect(
+    externalPanel.locator(".external-connections-toolbar > span"),
+  ).toHaveText("2 个连接 · 本机所有者");
+  const bridgeList = await page.request.get(origin + "/v1/bridges");
+  expect(
+    (await bridgeList.json()).items.find(
+      (b: { id: string }) => b.id === appPair.id,
+    ).kind,
+  ).toBe("application");
   for (const theme of ["浅色", "深色"]) {
     await page.getByRole("button", { name: theme, exact: true }).click();
     for (const width of [1440, 860, 390]) {
@@ -422,7 +519,29 @@ test("FPL shell, catalog editing, test history, files, bridge pairing and narrow
   }
   await page.setViewportSize({ width: 1440, height: 1000 });
   bridge.close();
+  await expect(
+    page
+      .locator(".studio-header-actions")
+      .getByText("连接 DSH", { exact: true }),
+  ).toBeVisible();
   await page.goto(origin + "/apps");
+  await expect(
+    page.getByRole("button", { name: "打开独立工坊", exact: true }),
+  ).toBeVisible();
+  await expect(
+    page
+      .locator(".application-card")
+      .filter({ hasText: "独立工坊" })
+      .getByText("可打开", { exact: true }),
+  ).toBeVisible();
+  appBridge.close();
+  expect(
+    (
+      await page.request.delete(origin + "/v1/bridges/" + appPair.id, {
+        headers,
+      })
+    ).ok(),
+  ).toBeTruthy();
   await expect(page.getByText("应用未连接", { exact: true })).toBeVisible();
   await page.goto(origin + "/settings");
   await page.getByRole("button", { name: "连接 DSH", exact: true }).click();

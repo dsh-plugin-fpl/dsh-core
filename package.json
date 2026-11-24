@@ -19,6 +19,16 @@
     "./lifecycle": {
       "types": "./lib/lifecycle.d.ts",
       "import": "./lib/lifecycle.js"
+    },
+    "./package.json": "./package.json",
+    "./service-manifest.json": "./lib/runtime/service.json",
+    "./runtime-manager": {
+      "types": "./lib/runtime-manager.d.ts",
+      "import": "./lib/runtime-manager.js"
+    },
+    "./native-tools": {
+      "types": "./lib/native-tools.d.ts",
+      "import": "./lib/native-tools.js"
     }
   },
   "files": [
@@ -29,7 +39,8 @@
     "docs/integrations.md",
     "locale",
     "docs/PLUGIN.md",
-    "docs/PLUGIN.zh.md"
+    "docs/PLUGIN.zh.md",
+    "docs/managed-setup.md"
   ],
   "dsh": {
     "bundle": {
@@ -44,13 +55,13 @@
   },
   "engines": {
     "node": ">=22",
-    "dsh": ">=0.2.1-rc.2"
+    "dsh": "0.2.2-rc.1 || 0.2.2-rc.5"
   },
   "scripts": {
     "build": "pnpm build:connector && pnpm build:dashboard",
     "typecheck": "tsc --noEmit",
     "test": "pnpm test:connector && pnpm test:python",
-    "pack:plugin": "pnpm build && pnpm pack --pack-destination .runtime/packages",
+    "pack:plugin": "node scripts/pack-plugin.mjs",
     "test:consumer": "tsc --noEmit --strict --skipLibCheck --target es2023 --module nodenext --moduleResolution nodenext examples/consumer.ts",
     "build:connector": "node scripts/build.mjs",
     "build:dashboard": "pnpm --dir web build",
@@ -64,17 +75,19 @@
     "contracts:generate": "node scripts/core.mjs contracts",
     "test:connector": "node --test tests/*.test.mjs",
     "release:service": "pnpm build:dashboard && node scripts/release-service.mjs",
-    "test:harness": "node scripts/verify-harness.mjs"
+    "test:harness": "node scripts/verify-harness.mjs",
+    "prepack": "node scripts/prepack.mjs"
   },
   "peerDependencies": {
-    "@deepseek-ai/cordis": "~4.0.5",
-    "@deepseek-ai/dsh-credentials": "0.2.1-rc.2",
-    "@deepseek-ai/dsh-typert-protocol": "0.2.1-rc.2",
-    "@deepseek-ai/schemastery": "~3.18.5",
+    "@deepseek-ai/cordis": "~4.1.0",
+    "@deepseek-ai/dsh-credentials": "0.2.2-rc.1 || 0.2.2-rc.5",
+    "@deepseek-ai/dsh-typert-protocol": "0.2.2-rc.1 || 0.2.2-rc.5",
+    "@deepseek-ai/schemastery": ">=3.18.5 <4",
     "react": "^18.2.0",
-    "@deepseek-ai/dsh-tools": "0.2.1-rc.2",
-    "@deepseek-ai/dsh-mcp-client": "^0.2.1-rc.2 || ^0.2.2-rc.1",
-    "@deepseek-ai/dsh-host-plugin-inventory": "^0.2.1-rc.2 || ^0.2.2-rc.1"
+    "@deepseek-ai/dsh-tools": "0.2.2-rc.1 || 0.2.2-rc.5",
+    "@deepseek-ai/dsh-mcp-client": "0.2.2-rc.1 || 0.2.2-rc.5",
+    "@deepseek-ai/dsh-host-plugin-inventory": "0.2.2-rc.1 || 0.2.2-rc.5",
+    "@deepseek-ai/dsh-llm": "0.2.2-rc.1 || 0.2.2-rc.5"
   },
   "dependencies": {
     "zod": "^4.4.3",
@@ -83,12 +96,12 @@
     "ajv": "^8.17.1"
   },
   "devDependencies": {
-    "@deepseek-ai/cordis": "~4.0.5",
-    "@deepseek-ai/dsh-app-boot": "0.2.1-rc.2",
-    "@deepseek-ai/dsh-credentials": "0.2.1-rc.2",
-    "@deepseek-ai/dsh-llm": "0.2.1-rc.2",
-    "@deepseek-ai/dsh-typert-protocol": "0.2.1-rc.2",
-    "@deepseek-ai/dsh-typert-registry": "0.2.1-rc.2",
+    "@deepseek-ai/cordis": "~4.1.0",
+    "@deepseek-ai/dsh-app-boot": "0.2.2-rc.1",
+    "@deepseek-ai/dsh-credentials": "0.2.2-rc.1",
+    "@deepseek-ai/dsh-llm": "0.2.2-rc.1",
+    "@deepseek-ai/dsh-typert-protocol": "0.2.2-rc.1",
+    "@deepseek-ai/dsh-typert-registry": "0.2.2-rc.1",
     "@deepseek-ai/schemastery": "~3.18.5",
     "@types/node": "^24.0.0",
     "@types/react": "^18.3.0",
@@ -97,9 +110,9 @@
     "react": "^18.2.0",
     "typescript": "^5.9.0",
     "@types/ws": "^8.18.1",
-    "@deepseek-ai/dsh-tools": "0.2.1-rc.2",
-    "@deepseek-ai/dsh-mcp-client": "0.2.1-rc.2",
-    "@deepseek-ai/dsh-host-plugin-inventory": "0.2.1-rc.2"
+    "@deepseek-ai/dsh-tools": "0.2.2-rc.1",
+    "@deepseek-ai/dsh-mcp-client": "0.2.2-rc.1",
+    "@deepseek-ai/dsh-host-plugin-inventory": "0.2.2-rc.1"
   },
   "icon": "./lib/icon.webp",
   "peerDependenciesMeta": {
@@ -109,5 +122,21 @@
     "@deepseek-ai/dsh-host-plugin-inventory": {
       "optional": true
     }
-  }
+  },
+  "os": [
+    "darwin"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/dsh-plugin-fpl/dsh-core.git"
+  },
+  "bugs": {
+    "url": "https://github.com/dsh-plugin-fpl/dsh-core/issues"
+  },
+  "keywords": [
+    "dsh-plugin",
+    "deepseek-harness",
+    "fpl",
+    "dsh-core"
+  ]
 }

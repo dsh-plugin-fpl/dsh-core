@@ -13,40 +13,13 @@ from dsh_core_worker.extracted.contracts.model_service.transcription import (
     ModelTestTranscriptionParametersOut,
 )
 
-OFFICIAL_LANGUAGES = (
+OPENAI_LANGUAGES = (
     ("auto", "自动识别"),
     ("zh", "中文"),
     ("en", "English"),
     ("ja", "日本語"),
     ("ko", "한국어"),
-    ("yue", "粤语"),
-    ("ar", "阿拉伯语"),
-    ("nl", "荷兰语"),
-    ("fr", "Français"),
-    ("de", "Deutsch"),
-    ("id", "印尼语"),
-    ("it", "Italiano"),
-    ("ms", "马来语"),
-    ("pt", "Português"),
-    ("ru", "Русский"),
-    ("es", "Español"),
-    ("th", "ไทย"),
-    ("tr", "Türkçe"),
-    ("ur", "乌尔都语"),
-    ("vi", "Tiếng Việt"),
 )
-PRO_LANGUAGES = (
-    ("auto", "自动识别"),
-    ("Chinese", "简体中文"),
-    ("English", "English"),
-    ("Japanese", "日本語"),
-    ("Korean", "한국어"),
-    ("French", "Français"),
-    ("German", "Deutsch"),
-    ("Spanish", "Español"),
-    ("Portuguese", "Português"),
-)
-OPENAI_LANGUAGES = OFFICIAL_LANGUAGES[:5]
 
 
 class TranscriptionParameterError(ValueError):
@@ -55,7 +28,6 @@ class TranscriptionParameterError(ValueError):
 
 @dataclass(frozen=True)
 class ParameterSupport:
-    custom_pro: bool = False
     word_timestamps: bool = False
     text_edit: bool = False
     speaker_diarization: bool = False
@@ -69,40 +41,15 @@ class ParameterSupport:
 def parameter_support(
     model: TranscriptionModel, provider: TranscriptionProvider
 ) -> ParameterSupport:
-    if provider.kind == "openai":
-        return ParameterSupport()
-    if provider.kind == "senseaudio_asr_pro":
-        return ParameterSupport(
-            custom_pro=True,
-            word_timestamps=True,
-            text_edit=True,
-            speaker_diarization=True,
-            target_language=True,
-        )
-    slug = model.slug.lower()
-    if "deepthink" in slug:
-        return ParameterSupport(target_language=True, abbreviations=True)
-    if "lite" in slug:
-        return ParameterSupport(hotwords=True, abbreviations=True)
-    is_pro = "asr-pro" in slug
-    return ParameterSupport(
-        word_timestamps=True,
-        speaker_diarization=True,
-        max_speakers=is_pro,
-        punctuation=True,
-        abbreviations=True,
-        target_language=is_pro,
-    )
+    if provider.kind != "openai":
+        raise TranscriptionParameterError("当前供应商不支持语音识别")
+    return ParameterSupport()
 
 
 def _language_options(support: ParameterSupport, provider_kind: str):
-    values = (
-        PRO_LANGUAGES
-        if support.custom_pro
-        else (OPENAI_LANGUAGES if provider_kind == "openai" else OFFICIAL_LANGUAGES)
-    )
     return [
-        ModelTestTranscriptionLanguageOptionOut(value=value, label=label) for value, label in values
+        ModelTestTranscriptionLanguageOptionOut(value=value, label=label)
+        for value, label in OPENAI_LANGUAGES
     ]
 
 
@@ -125,7 +72,7 @@ def parameter_capabilities(
 ) -> ModelTestTranscriptionParameterCapabilitiesOut:
     support = parameter_support(model, provider)
     return ModelTestTranscriptionParameterCapabilitiesOut(
-        language_mode="candidates" if support.custom_pro else "select",
+        language_mode="select",
         language_options=_language_options(support, provider.kind),
         target_language_options=(
             _language_options(support, provider.kind)[1:] if support.target_language else []
@@ -155,25 +102,8 @@ def resolve_parameters(
     support = parameter_support(model, provider)
     defaults = default_parameters(support)
     language = (body.language or defaults.language).strip()
-    if support.custom_pro:
-        candidates = [item.strip() for item in language.split(",")]
-        if not candidates or any(not item for item in candidates) or len(candidates) > 8:
-            raise TranscriptionParameterError("识别语言最多支持 8 个非空候选")
-        if any(item.casefold() == "auto" for item in candidates) and len(candidates) != 1:
-            raise TranscriptionParameterError("auto 只能单独作为识别语言")
-        known = {value.casefold(): value for value, _label in PRO_LANGUAGES}
-        if any(item.casefold() not in known for item in candidates):
-            raise TranscriptionParameterError("当前 Pro 端点不支持所填识别语言候选")
-        language = ",".join(known[item.casefold()] for item in candidates)
-    else:
-        allowed = {
-            value
-            for value, _label in (
-                OPENAI_LANGUAGES if provider.kind == "openai" else OFFICIAL_LANGUAGES
-            )
-        }
-        if language not in allowed:
-            raise TranscriptionParameterError("当前模型不支持所选识别语言")
+    if language not in {value for value, _label in OPENAI_LANGUAGES}:
+        raise TranscriptionParameterError("当前模型不支持所选识别语言")
 
     target = (body.target_language or "").strip() or None
     if target and not support.target_language:
@@ -181,9 +111,7 @@ def resolve_parameters(
     if target:
         allowed_targets = {
             value.casefold(): value
-            for value, _label in (
-                PRO_LANGUAGES[1:] if support.custom_pro else OFFICIAL_LANGUAGES[1:]
-            )
+            for value, _label in OPENAI_LANGUAGES[1:]
         }
         normalized_target = allowed_targets.get(target.casefold())
         if normalized_target is None:

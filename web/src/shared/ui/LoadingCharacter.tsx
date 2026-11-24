@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 
-import { programAsset } from "@platform/programAsset";
+import { programAsset, localBrandEnabled } from "@platform/programAsset";
 
 const POSTER = programAsset("/brand/loading/kurisu-run.png");
 const WEBP_POSTER = programAsset("/brand/loading/kurisu-run.webp");
@@ -98,6 +98,7 @@ export function LoadingCharacter({
     return () => preference.removeEventListener("change", changed);
   }, []);
 
+  if (!localBrandEnabled) return <span className="fpl-loading-character" aria-hidden="true"><img src={programAsset("/brand/icon.webp")} width={96} height={96} alt="" /></span>;
   return active && !reduced && !failed ? (
     <AnimatedCharacter onFailure={setFailed} paused={paused} />
   ) : (

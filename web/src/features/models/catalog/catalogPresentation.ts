@@ -77,21 +77,15 @@ export function modelTestMode(model: CatalogModel, provider: CatalogProvider) {
     model.capabilities.includes("chat")
   )
     return "chat";
-  if (["senseaudio_image", "volcengine_image"].includes(provider.kind))
-    return "image";
+  if (["volcengine_image"].includes(provider.kind)) return "image";
   if (
-    [
-      "senseaudio_video",
-      "zealman_video",
-      "volcengine_video",
-      "autodl_video",
-    ].includes(provider.kind)
+    ["zealman_video", "volcengine_video", "autodl_video"].includes(
+      provider.kind,
+    )
   )
     return "video";
   if (
-    ["openai", "senseaudio_asr", "senseaudio_asr_pro"].includes(
-      provider.kind,
-    ) &&
+    ["openai"].includes(provider.kind) &&
     model.capabilities.includes("speech_recognition")
   )
     return "speech";
@@ -101,6 +95,5 @@ export function modelTestMode(model: CatalogModel, provider: CatalogProvider) {
   )
     return "synthesis";
   if (model.capabilities.includes("video_enhancement")) return "enhancement";
-  if (provider.kind === "senseaudio_realtime") return "realtime_voice";
   return null;
 }

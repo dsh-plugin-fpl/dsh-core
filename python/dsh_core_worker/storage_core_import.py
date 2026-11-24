@@ -30,6 +30,7 @@ from .storage_records import (
     translated,
 )
 from .store import Store, encode
+from .retired_providers import RETIRED_PROVIDER_KINDS
 
 
 def owned(rows, owner, primary=False):
@@ -97,6 +98,13 @@ def archive(history, dataset, records, source_id, aliases, cipher, transfer, sec
         identity = str(row.get("id") or hashlib.sha256(encode(row).encode()).hexdigest())
         previous = history.get(dataset, identity)
         for field, item in list(value.items()):
+            if (
+                dataset == "model_providers"
+                and row.get("kind") in RETIRED_PROVIDER_KINDS
+                and field == "api_key_ciphertext"
+            ):
+                value[field] = None
+                continue
             if field.endswith("ciphertext") and item:
                 plain = transfer.decrypt(item.encode())
                 prior = previous.get(field) if previous else None
@@ -276,6 +284,10 @@ def import_bundle(root, bundle, primary_source, key_file, receipt_file):
             models = owned(parts["models"][1], source_owner, source_owner == primary_source)
             _catalog, secrets = import_catalog(
                 store, access, models, source_owner, source_id, transfer, aliases, checkpoint
+            )
+            receipt.setdefault("skipped_retired_providers", {})[target_owner] = sum(
+                row.get("kind") in RETIRED_PROVIDER_KINDS
+                for row in models.get("model_providers", [])
             )
             receipt.setdefault("model_aliases", {})[source_owner] = {
                 key: value for key, value in aliases.items() if key != source_owner

@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { programAsset } from "@platform/programAsset";
+import { programAsset, localBrandEnabled } from "@platform/programAsset";
 import { LoadingCharacter } from "./LoadingCharacter";
 import "./loading-scene.css";
 
@@ -45,6 +45,7 @@ export function LoadingScene({
     return () => observer.disconnect();
   }, []);
   const props = variant === "inline" ? [] : PROPS;
+  if (!localBrandEnabled) return <span ref={root} className={`fpl-loading-scene fpl-loading-scene--${variant}`} aria-hidden="true"><svg viewBox="0 0 100 100" width="100%" height="100%"><circle cx="50" cy="50" r="32" fill="none" stroke="currentColor" strokeWidth="2" opacity=".2" /><circle cx="50" cy="50" r="18" fill="none" stroke="currentColor" strokeWidth="3" strokeDasharray="60 54" /></svg></span>;
   return (
     <span
       ref={root}

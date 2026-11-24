@@ -2,19 +2,14 @@
 
 from .extracted.apps.model_service.providers import autodl_workflows
 from .extracted.apps.model_service.providers.seedance_parameters import video_capabilities
-from .extracted.apps.model_service.providers.senseaudio_image import IMAGE_MODEL_SIZES
 from .extracted.apps.model_service.providers.volcengine_image import SEEDREAM_MODEL, SEEDREAM_SIZES
 from .extracted.apps.model_service.providers.zealman_workflows import WORKFLOWS, parameter_options
 
 KINDS = {
-    "senseaudio_image": "image",
     "volcengine_image": "image",
-    "senseaudio_video": "video",
     "volcengine_video": "video",
     "zealman_video": "video",
     "autodl_video": "video",
-    "senseaudio_music": "audio",
-    "senseaudio_sfx": "audio",
 }
 
 
@@ -43,7 +38,7 @@ def generation_options(providers, *, upload_configured=False):
             sizes = list(
                 SEEDREAM_SIZES
                 if provider_kind == "volcengine_image"
-                else IMAGE_MODEL_SIZES.get(slug, ())
+                else ()
             )
             if kind == "image" and not sizes:
                 continue
@@ -70,7 +65,7 @@ def generation_options(providers, *, upload_configured=False):
                     "max_prompt_length": 20000
                     if provider_kind == "autodl_video"
                     else 6000
-                    if provider_kind == "zealman_video" or slug == "senseaudio-image-2.0-260319"
+                    if provider_kind == "zealman_video"
                     else 2000,
                     "video_capabilities": caps.model_dump(mode="json") if caps else None,
                     "workflow_capabilities": parameter_options(slug)

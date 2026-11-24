@@ -166,6 +166,8 @@ export const methods = [
   "credential.set",
   "integrations.copies",
   "integrations.enable",
+  "setup.status", "setup.install", "setup.cancel", "setup.start", "setup.stop", "setup.open",
+  "setup.authorize.begin", "setup.authorize.finish",
 ] as const;
 export interface RpcRequest {
   method: (typeof methods)[number];
@@ -203,6 +205,7 @@ export interface CapabilityCatalog {
   temporary_upload_configured?: boolean;
 }
 export interface CoreApi {
+  importResourceStream(source: AsyncIterable<Uint8Array>, metadata: { name: string; mime_type: string; application_id: string; byte_size: number; sha256?: string }, signal?: AbortSignal): Promise<Resource>;
   capabilities(): Promise<CapabilityCatalog>;
   registerIntegrationAdapter(adapter: IntegrationAdapter): () => void;
   events(id: string, after?: number): Promise<TaskEvent[]>;
@@ -214,6 +217,7 @@ export interface CoreApi {
   resourceChunk(
     id: string,
     offset?: number,
+    signal?: AbortSignal,
   ): Promise<
     Resource & {
       data_base64: string;

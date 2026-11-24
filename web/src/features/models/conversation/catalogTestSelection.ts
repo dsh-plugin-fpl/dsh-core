@@ -47,7 +47,6 @@ export function preferredModeModel(
     enhancement: "video_enhancement",
     synthesis: "speech_synthesis",
     speech: "speech_recognition",
-    realtime_voice: "voice",
   };
   const candidates = models.filter((model) => {
     if (mode === "enhancement")
@@ -59,24 +58,13 @@ export function preferredModeModel(
       );
     if (mode === "speech")
       return (
-        ["openai", "senseaudio_asr", "senseaudio_asr_pro"].includes(
-          model.providerKind,
-        ) && model.capabilities.includes("speech_recognition")
-      );
-    if (mode === "realtime_voice")
-      return (
-        model.providerKind === "senseaudio_realtime" &&
-        model.capabilities.includes("voice")
+        ["openai"].includes(model.providerKind) &&
+        model.capabilities.includes("speech_recognition")
       );
     return (
       mode === "image"
-        ? ["senseaudio_image", "volcengine_image"]
-        : [
-            "senseaudio_video",
-            "zealman_video",
-            "volcengine_video",
-            "autodl_video",
-          ]
+        ? ["volcengine_image"]
+        : ["zealman_video", "volcengine_video", "autodl_video"]
     ).includes(model.providerKind);
   });
   return (

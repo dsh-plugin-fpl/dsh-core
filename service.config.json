@@ -1,0 +1,6 @@
+{
+  "id": "core",
+  "name": "未来道具研究所",
+  "module": "dsh_core_worker",
+  "port": 9310
+}

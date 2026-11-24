@@ -112,9 +112,8 @@ export function ModelTranscriptionTestPanel({
     () =>
       models.filter(
         (model) =>
-          ["openai", "senseaudio_asr", "senseaudio_asr_pro"].includes(
-            model.providerKind,
-          ) && model.capabilities.includes("speech_recognition"),
+          ["openai"].includes(model.providerKind) &&
+          model.capabilities.includes("speech_recognition"),
       ),
     [models],
   );
@@ -132,9 +131,6 @@ export function ModelTranscriptionTestPanel({
     speech: Boolean(speechModels.length),
     enhancement: models.some((model) =>
       model.capabilities.includes("video_enhancement"),
-    ),
-    realtime_voice: models.some((model) =>
-      model.capabilities.includes("voice"),
     ),
   };
   const modelOptions: SelectOption[] = speechModels.map((model) => ({
@@ -361,14 +357,12 @@ export function ModelTranscriptionTestPanel({
                 <div className="transcription-result-actions">
                   {activeTask.status === "completed" ? (
                     <>
-
                       <button
                         type="button"
                         onClick={() => downloadTranscriptionJson(activeTask)}
                       >
                         <Download aria-hidden /> 导出 JSON
                       </button>
-
                     </>
                   ) : null}
                   {!pendingStatuses.includes(activeTask.status) ? (
