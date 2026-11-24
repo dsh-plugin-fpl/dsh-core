@@ -54,7 +54,9 @@ export function StoragePage() {
             body: JSON.stringify({
               target_root: target ?? status.root,
               expected_revision: status.revision,
-              include_legacy: includeLegacy ?? (status.legacy_source_configured && !status.legacy_imported),
+              include_legacy:
+                includeLegacy ??
+                (status.legacy_source_configured && !status.legacy_imported),
             }),
           }),
         );
@@ -67,9 +69,18 @@ export function StoragePage() {
     }
   }
   async function jobAction(id: string, verb: "resume" | "cancel") {
-    setBusy(true); setError("");
-    try { await fetchApiJson<Job>(`/v1/storage/migrations/${id}/${verb}`, {method: "POST"}); await cache.invalidateQueries({queryKey: ["storage"]}); }
-    catch(e) {setError((e as Error).message);} finally {setBusy(false);}
+    setBusy(true);
+    setError("");
+    try {
+      await fetchApiJson<Job>(`/v1/storage/migrations/${id}/${verb}`, {
+        method: "POST",
+      });
+      await cache.invalidateQueries({ queryKey: ["storage"] });
+    } catch (e) {
+      setError((e as Error).message);
+    } finally {
+      setBusy(false);
+    }
   }
   return (
     <section className="page core-page storage-page">
@@ -110,7 +121,20 @@ export function StoragePage() {
                     spellCheck={false}
                   />
                 </label>
-                {status.legacy_source_configured && !status.legacy_imported && <label><input type="checkbox" checked={includeLegacy ?? !status.legacy_imported} onChange={(e) => {setIncludeLegacy(e.target.checked);setPlan(null);}} disabled={busy || migrating} /> 同时导入已登记的旧 FPL 数据</label>}
+                {status.legacy_source_configured && !status.legacy_imported && (
+                  <label>
+                    <input
+                      type="checkbox"
+                      checked={includeLegacy ?? !status.legacy_imported}
+                      onChange={(e) => {
+                        setIncludeLegacy(e.target.checked);
+                        setPlan(null);
+                      }}
+                      disabled={busy || migrating}
+                    />{" "}
+                    同时导入已登记的旧 FPL 数据
+                  </label>
+                )}
                 <p className="storage-hint">
                   Core
                   与每个工坊使用各自的子目录。迁移会保留原数据，并校验文件完整性。代码与开发环境仍保存在安装目录。
@@ -175,25 +199,38 @@ export function StoragePage() {
                   </button>
                 </article>
               )}
-              {status.jobs.map((job) => (
-                <article className="home-panel storage-panel" key={job.id}>
-                  <h2>
-                    {job.status === "completed"
-                      ? "迁移完成"
-                      : job.status === "rolled_back"
+              {status.jobs
+                .filter((job) => job.status !== "completed")
+                .map((job) => (
+                  <article className="home-panel storage-panel" key={job.id}>
+                    <h2>
+                      {job.status === "rolled_back"
                         ? "已恢复原目录"
                         : "迁移进度"}
-                  </h2>
-                  <p role="status" aria-live="polite">
-                    {job.message}
-                  </p>
-                  {job.status === "needs_recovery" && <button className="btn primary" disabled={busy} onClick={() => void jobAction(job.id, "resume")}>恢复迁移</button>}
-                  {["queued", "running"].includes(job.status) && <button className="btn" disabled={busy} onClick={() => void jobAction(job.id, "cancel")}>取消迁移并恢复原目录</button>}
-                  <small>
-                    {job.phase} · {job.id}
-                  </small>
-                </article>
-              ))}
+                    </h2>
+                    <p role="status" aria-live="polite">
+                      {job.message}
+                    </p>
+                    {job.status === "needs_recovery" && (
+                      <button
+                        className="btn primary"
+                        disabled={busy}
+                        onClick={() => void jobAction(job.id, "resume")}
+                      >
+                        恢复迁移
+                      </button>
+                    )}
+                    {["queued", "running"].includes(job.status) && (
+                      <button
+                        className="btn"
+                        disabled={busy}
+                        onClick={() => void jobAction(job.id, "cancel")}
+                      >
+                        取消迁移并恢复原目录
+                      </button>
+                    )}
+                  </article>
+                ))}
               {migrating && (
                 <p role="status">
                   迁移期间 Core

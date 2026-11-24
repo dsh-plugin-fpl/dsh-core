@@ -22,7 +22,7 @@ pnpm status
 pnpm stop
 ```
 
-`start` 和 `start:with-dsh` 重复运行会复用现有实例。关闭浏览器窗口或 DSH 不停止 Core；`stop` 显式停止 Core。没有开机自启动登记。端口可通过 `--port 9312` 指定，后续命令使用相同参数。
+`start` 和 `start:with-dsh` 重复运行会复用现有实例。关闭浏览器不停止 Core；插件托管模式随开关及 Harness 退出正常停止，manageService=false 时使用 stop 显式停止。没有开机自启动登记。端口可通过 `--port 9312` 指定，后续命令使用相同参数。
 
 服务、配置、加密密钥、资源与状态位于 `.runtime/core/`。首次使用从空目录开始，不导入已有 FPL 或 Harness profile 数据。日常操作通过看板与 `/v1` API 完成。
 
@@ -87,7 +87,14 @@ DSH 连接层单独使用 `pnpm build:connector` 和 `pnpm pack --pack-destinati
 
 看板名称为「未来道具研究所」，技术包与应用 ID 保持兼容。打开右上角账号进入 `/account`，管理员可创建/禁用账号、设置密码和撤销应用授权。初始本机账号沿用原 Core 状态；新账号拥有独立配置、资源和任务。首次可以用 `pnpm dashboard --no-open --output .runtime/core-launch.json` 生成仅本机可读的一次性入口，然后在账号页设置密码。不要发送该文件或提交到 Git。
 
-工坊在自己的仓库运行 `pnpm setup`，再用其文档的 `connect-core --launch-file` 入口登记统一身份；9360–9365 对应视觉、剪辑、演示、思绪、Galgame、录音标注。应用直接登录和独立桥接也会出现在 Core 目录中。DSH 插件开关只控制连接层，独立服务使用自身启动器。应用包要求 Core 0.4.0，老的 DSH Core 连接器与原任务、资源协议仍兼容。
+工坊在自己的仓库运行 `pnpm setup`，再用其文档的 `connect-core --launch-file` 入口登记统一身份；9360–9365 对应视觉、剪辑、演示、思绪、Galgame、录音标注。应用直接登录和独立桥接也会出现在 Core 目录中。DSH 插件默认通过所属启动器管理服务，工坊插件要求 Core 0.5.0，老的 DSH Core 连接器与原任务、资源协议仍兼容。
 
 
 统一数据位置与旧 FPL 交接见 [存储与迁移](docs/storage.md)。本机所有者可从看板顶部“存储”进入设置，未来工坊初始化自动使用该根目录的自有子目录。
+
+
+## 插件开关与本机服务（0.5）
+
+按用户选择，启用插件会调用所属应用公开启动器，等待就绪后登记；关闭、卸载或退出 Harness 会正常停止该服务，保留项目、账号、配对与任务回执，不自动重提结果未知的付费调用。Core 关闭时先等待依赖工坊停止，再停止自身。
+
+本机安装包保存路径型服务安装描述，不包含解释器、账号或密钥。其他机器请先安装并 setup 独立服务，在插件参数 serviceDirectory 指定正式服务目录。manageService 默认 true；显式设为 false 可保留只连接、服务常驻模式。统一存储下自动定位本应用 plugin.json，原 credentialFile 仍兼容。启动失败会报告原因与安装目录 .runtime/plugin-lifecycle 私有日志；迁移停写期间拒绝从插件启动。

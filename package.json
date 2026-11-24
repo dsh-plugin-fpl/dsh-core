@@ -1,6 +1,6 @@
 {
   "name": "@dsh-plugin-fpl/dsh-core",
-  "version": "0.4.0",
+  "version": "0.5.0",
   "description": "Independent FPL Core service, dashboard and optional DeepSeek Harness connection",
   "type": "module",
   "exports": {
@@ -15,7 +15,11 @@
     },
     "./remote": "./lib/remote.js",
     "./icon": "./lib/icon.webp",
-    "./locale/*.json": "./locale/*.json"
+    "./locale/*.json": "./locale/*.json",
+    "./lifecycle": {
+      "types": "./lib/lifecycle.d.ts",
+      "import": "./lib/lifecycle.js"
+    }
   },
   "files": [
     "lib",

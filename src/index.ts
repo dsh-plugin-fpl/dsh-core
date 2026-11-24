@@ -14,6 +14,7 @@ import {
   type IntegrationAdapter,
 } from "./integrations/types.js";
 import { dashboardSchema } from "./applications.js";
+import { LocalService, type LocalServiceOptions } from "./lifecycle.js";
 import { remoteInfo } from "./remote.js";
 import type {
   Application,
@@ -33,8 +34,16 @@ export const inject = ["typert", "credentials"];
 export interface Config {
   endpoint?: string;
   credential?: string;
+  serviceDirectory?: string;
+  manageService?: boolean;
 }
 export const Config: Schema<Config> = Schema.object({
+  manageService: Schema.boolean()
+    .default(true)
+    .description("随插件开关启动和正常停止独立服务"),
+  serviceDirectory: Schema.string().description(
+    "独立 Core 服务安装目录；留空使用本机安装包登记",
+  ),
   endpoint: Schema.string()
     .default("http://127.0.0.1:9310")
     .description("独立 Core 服务地址"),
@@ -49,6 +58,7 @@ declare module "@deepseek-ai/cordis" {
 }
 export class DshCore extends TypertRemoteService implements CoreApi {
   private connection?: CoreConnection;
+  private localServices = new Set<LocalService>();
   private integrationAdapters = new Map<string, IntegrationAdapter>();
   private managedIntegrations?: ManagedIntegrations;
   private integrationSupport = false;
@@ -179,6 +189,29 @@ export class DshCore extends TypertRemoteService implements CoreApi {
         toolContext.effect(() => toolContext.tools.register(tool));
     });
     ctx.effect(() => () => scope.dispose());
+  }
+  manageLocalService(options: LocalServiceOptions) {
+    const service = new LocalService(options);
+    this.localServices.add(service);
+    const stop = service.stop.bind(service);
+    service.stop = () =>
+      stop().then(() => {
+        this.localServices.delete(service);
+      });
+    return service;
+  }
+  async stopLocalServices() {
+    const result = await Promise.allSettled(
+      [...this.localServices].map((service) => service.stop()),
+    );
+    const failures = result.filter(
+      (row): row is PromiseRejectedResult => row.status === "rejected",
+    );
+    if (failures.length)
+      throw new AggregateError(
+        failures.map((row) => row.reason),
+        "工坊服务未完成停止；Core 暂时保留运行",
+      );
   }
   private async connect() {
     this.connection?.close();
@@ -621,6 +654,19 @@ export class DshCore extends TypertRemoteService implements CoreApi {
     throw new ConnectionError("host_method", "宿主回调未登记");
   }
 }
-export function apply(ctx: Context, config: Config) {
-  new DshCore(ctx, config);
+export async function* apply(ctx: Context, config: Config = {}) {
+  const lifecycle = new LocalService({
+    id: "core",
+    endpoint: config.endpoint || "http://127.0.0.1:9310",
+    installation: new URL("./service-installation.json", import.meta.url),
+    serviceDirectory: config.serviceDirectory,
+    manageService: config.manageService,
+  });
+  let service: DshCore | undefined;
+  yield async () => {
+    await service?.stopLocalServices();
+    await lifecycle.stop();
+  };
+  await lifecycle.start();
+  service = new DshCore(ctx, config);
 }

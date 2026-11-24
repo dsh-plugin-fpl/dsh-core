@@ -15,6 +15,7 @@ execFileSync("pnpm", ["exec", "tsc", "--emitDeclarationOnly"], {
 await build({
   entryPoints: [
     "src/index.ts",
+    "src/lifecycle.ts",
     "src/contracts.ts",
     "src/remote.ts",
     "src/connection.ts",
@@ -39,4 +40,13 @@ const client = await build({
 await writeFile(
   "lib/client.js",
   `window.__ModuleLoader__.load({id:"@dsh-plugin-fpl/dsh-core",factory:(require)=>{var module={exports:{}};var exports=module.exports;\n${client.outputFiles[0].text}\nreturn module.exports;}});\n`,
+);
+
+await writeFile(
+  "lib/service-installation.json",
+  JSON.stringify(
+    { version: 1, id: "core", repository: process.cwd(), port: 9310 },
+    null,
+    2,
+  ) + "\n",
 );

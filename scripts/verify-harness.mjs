@@ -89,7 +89,9 @@ const state = resolve(temporary, "state-" + Date.now()),
   report = resolve(temporary, "report-" + Date.now() + ".json");
 await writeFile(
   resolve(profile, "cordis.patch.yml"),
-  "- id: dsh-core\n  config:\n    endpoint: " + origin + "\n",
+  "- id: dsh-core\n  config:\n    manageService: false\n    endpoint: " +
+    origin +
+    "\n",
 );
 const skillRoot = resolve(temporary, "skill-" + Date.now());
 await mkdir(resolve(skillRoot, "references"), { recursive: true });

@@ -26,7 +26,15 @@ test.beforeAll(async () => {
       resolve(root, "web/dist"),
       "--mock-models",
     ],
-    { cwd: root, stdio: "ignore", env: {...process.env, DSH_FPL_STORAGE_CONFIG: resolve(state, "locator.json"), DSH_FPL_STORAGE_CONTROL: resolve(state, "control")} },
+    {
+      cwd: root,
+      stdio: "ignore",
+      env: {
+        ...process.env,
+        DSH_FPL_STORAGE_CONFIG: resolve(state, "locator.json"),
+        DSH_FPL_STORAGE_CONTROL: resolve(state, "control"),
+      },
+    },
   );
   await expect
     .poll(async () => {
@@ -45,19 +53,53 @@ test.afterAll(async () => {
   }
   if (state) await rm(state, { recursive: true, force: true });
 });
-test("storage settings remain readable in light and dark at desktop and phone widths", async ({ page }) => {
+test("storage settings remain readable in light and dark at desktop and phone widths", async ({
+  page,
+}) => {
   const ticket = await readFile(resolve(state, "fixture-launch.txt"), "utf8");
   await page.goto(origin + "/#ticket=" + ticket);
-  await expect(page.getByRole("heading", {name:"今天想从哪里开始？"})).toBeVisible();
+  await expect(
+    page.getByRole("heading", { name: "今天想从哪里开始？" }),
+  ).toBeVisible();
+  let failed = false;
+  await page.route("**/v1/storage", async (route) => {
+    const response = await route.fetch();
+    const value = await response.json();
+    value.jobs = [
+      {
+        id: "fixture-job",
+        status: failed ? "failed" : "completed",
+        phase: "completed",
+        message: failed ? "隔离迁移失败" : "统一存储迁移完成，原数据保留",
+      },
+    ];
+    await route.fulfill({ response, json: value });
+  });
   await page.goto(origin + "/storage");
-  await expect(page.getByRole("heading", {name:"存储与迁移"})).toBeVisible();
+  await expect(page.getByRole("heading", { name: "存储与迁移" })).toBeVisible();
+  await expect(page.getByText("统一存储迁移完成，原数据保留")).toHaveCount(0);
+  await expect(page.getByText("fixture-job")).toHaveCount(0);
   for (const width of [1440, 800, 390]) {
-    await page.setViewportSize({width, height:1000});
+    await page.setViewportSize({ width, height: 1000 });
     for (const theme of ["浅色", "深色"]) {
-      await page.getByRole("button", {name:theme,exact:true}).click();
+      await page.getByRole("button", { name: theme, exact: true }).click();
       await expect(page.getByLabel("统一存储根目录")).toBeVisible();
-      expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBeTruthy();
-      await page.screenshot({path:resolve(root, `.local/browser-results/storage-${width}-${theme}.png`),fullPage:true});
+      expect(
+        await page.evaluate(
+          () => document.documentElement.scrollWidth <= innerWidth,
+        ),
+      ).toBeTruthy();
+      await page.screenshot({
+        path: resolve(
+          root,
+          `.local/browser-results/storage-${width}-${theme}.png`,
+        ),
+        fullPage: true,
+      });
     }
   }
+  failed = true;
+  await page.reload();
+  await expect(page.getByText("隔离迁移失败")).toBeVisible();
+  await expect(page.getByText("fixture-job")).toHaveCount(0);
 });

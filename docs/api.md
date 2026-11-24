@@ -18,7 +18,7 @@ DSH 使用独立配对凭据连接 `/v1/bridge`，凭据保存于 DSH Credential
 
 ## DSH 公共调用接口
 
-`@dsh-plugin-fpl/dsh-core` 继续提供 `ctx.dshCore`；独立服务包和 DSH 插件分别发布。连接层不启动 Python，不保存业务数据库，不接管 Core 的生命周期。
+`@dsh-plugin-fpl/dsh-core` 继续提供 `ctx.dshCore`；独立服务包和 DSH 插件分别发布。连接层通过所属公开启动器管理本机生命周期，不保存业务数据库。
 
 - `registerApplication({id,name,tools,dashboard?})`：登记应用和带 JSON Schema 的工具；可选 dashboard 发布看板入口，返回注销函数。
 - `submit(request, signal?)`：返回持久任务回执。请求使用 `request_id`、`application_id`、`session_id`、能力、模型、输入、参数和资源 ID。
@@ -90,3 +90,8 @@ Core 的 peer-grant/peer-verify 签发绑定当前账号、来源/目标应用�
 
 
 应用后端目录 `/v1/identity/directory` 支持应用 session，或无 session 的明确 owner_user_id 模式。两者都需要 client secret；后台模式必须通过该账号仍启用和仍授权当前应用的检查，只返回用户名、显示名、活动状态等公开值。完整输入和响应在生成 OpenAPI 中；此模式不签发浏览器身份或访问其他账号的私人 Core 状态。
+
+
+## 本机服务生命周期（0.5）
+
+ctx.dshCore.manageLocalService({id,endpoint,installation,serviceDirectory?}) 提供可等待的 start()/stop()，仅供本机插件调用，不经 WS/HTTP RPC 开放。启动验证安装归属，调用固定的提供方 CLI，串行处理快速开关；Core 卸载等待工坊停止。失败时显示明确错误与私有日志。Config 的 manageService 默认 true，false 为仅连接模式；serviceDirectory 覆写本机包安装描述。

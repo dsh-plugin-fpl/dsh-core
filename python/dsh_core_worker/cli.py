@@ -32,6 +32,7 @@ def main():
     parser.add_argument("--web-root", type=Path, default=repository / "web/dist")
     parser.add_argument("--port", type=int, default=9310)
     parser.add_argument("--no-open", action="store_true")
+    parser.add_argument("--from-plugin", action="store_true", help="插件启动遵守存储维护停写门禁")
     parser.add_argument("--output", type=Path, help="将一次性登录入口写入仅所有者可读的文件")
     args = parser.parse_args()
     if not 1024 <= args.port <= 65535:
@@ -39,6 +40,12 @@ def main():
     from .storage_location import root_for
 
     root = root_for("core", repository / ".runtime/core", args.root)
+    if (
+        args.from_plugin
+        and args.command == "start"
+        and any((parent / ".storage-paused").exists() for parent in (root, *root.parents))
+    ):
+        raise SystemExit("存储迁移维护中，暂时不能从插件启动服务")
     root.mkdir(mode=0o700, parents=True, exist_ok=True)
     origin = f"http://127.0.0.1:{args.port}"
     registration = root / "service.json"
@@ -101,16 +108,38 @@ def main():
         if not current:
             print("Core 未启动")
             return
-        if ready.get("instance") != current.get("instance"):
+        pid = current.get("pid")
+        if not isinstance(pid, int) or pid <= 0:
+            raise SystemExit("启动登记的 PID 无效，未停止任何进程")
+
+        def process_state():
+            try:
+                return subprocess.check_output(
+                    ["ps", "-p", str(pid), "-o", "stat=", "-o", "command="], text=True
+                ).strip()
+            except subprocess.CalledProcessError:
+                return ""
+
+        line = process_state()
+        if not line or line.startswith("Z"):
+            if ready:
+                raise SystemExit("监听进程与启动登记不一致，未停止任何进程")
+            registration.unlink(missing_ok=True)
+            print("Core 已停止")
+            return
+        if f"dsh_core_worker.cli serve --root {root} --web-root " not in line:
+            raise SystemExit("PID 不属于此 Core 存储目录，未停止任何进程")
+        if ready and ready.get("instance") != current.get("instance"):
             raise SystemExit("启动登记与监听服务不一致，未停止任何进程")
-        os.kill(current["pid"], signal.SIGTERM)
-        for _ in range(80):
-            if not probe():
+        os.kill(pid, signal.SIGTERM)
+        for _ in range(450):
+            line = process_state()
+            if (not line or line.startswith("Z")) and not probe():
                 registration.unlink(missing_ok=True)
-                print("Core 已停止")
+                print("Core 已正常停止")
                 return
             time.sleep(0.1)
-        raise SystemExit("服务仍在退出，请稍后检查状态")
+        raise SystemExit("服务仍在正常退出，请稍后检查状态；未强制中断进程")
     if not ready:
         with socket.socket() as check:
             check.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
