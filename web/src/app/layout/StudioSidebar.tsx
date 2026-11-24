@@ -187,7 +187,6 @@ function StudioChrome({
     "model-test",
     "model-service",
     "model-call-logs",
-    "tasks",
   ];
   const infrastructureActive = infrastructurePages.includes(page);
 
@@ -217,13 +216,6 @@ function StudioChrome({
           } satisfies SecondaryItem,
         ]
       : []),
-    {
-      id: "tasks",
-      label: "运行记录",
-      icon: <LogsIcon />,
-      active: page === "tasks",
-      onSelect: () => navigate("tasks"),
-    },
   ];
 
   const sections: PrimarySection[] = [

@@ -1,0 +1,30 @@
+.agent-test-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+}
+.agent-test-panel textarea {
+  box-sizing: border-box;
+  min-height: 100px;
+  padding: 12px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--surface);
+  color: var(--text);
+  font: inherit;
+  resize: vertical;
+}
+.agent-test-panel p {
+  margin: 0;
+  color: var(--muted);
+}
+.agent-test-result {
+  margin-top: 16px;
+  padding: 20px;
+  min-width: 0;
+}
+.agent-test-result pre {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}

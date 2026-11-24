@@ -2,7 +2,6 @@ export type StudioPage =
   | "home"
   | "applications"
   | "files"
-  | "tasks"
   | "settings"
   | "integrations"
   | "model-test"

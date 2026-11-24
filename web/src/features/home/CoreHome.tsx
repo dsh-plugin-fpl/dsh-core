@@ -5,7 +5,6 @@ import { useApplications } from "@features/applications/catalog";
 import { HomeHeroPet } from "./HomeHeroPet";
 import { CompactPanelTabs } from "@shared/ui/CompactPanelTabs";
 import { FlaskConical, History, Folder, Network } from "lucide-react";
-import { TaskList } from "@features/tasks/TasksPage";
 import "./home.css";
 export function Home({ navigate }: { navigate: (p: string) => void }) {
   const applications = useApplications();
@@ -107,17 +106,7 @@ export function Home({ navigate }: { navigate: (p: string) => void }) {
             </span>
           </button>
         </section>
-        <section className="home-panel core-home-tasks core-home-task-footer">
-          <header className="home-section-heading">
-            <h2>最近运行</h2>
-            <button
-              className="home-text-link"
-              onClick={() => navigate("/tasks")}
-            >
-              运行记录
-            </button>
-          </header>
-          <TaskList compact />
+        <section className="home-panel core-home-resources">
           <div className="core-home-links">
             <button
               className="home-resource-link"
@@ -131,7 +120,9 @@ export function Home({ navigate }: { navigate: (p: string) => void }) {
             </button>
             <button
               className="home-resource-link"
-              onClick={() => navigate("/integrations?kind=external-connections")}
+              onClick={() =>
+                navigate("/integrations?kind=external-connections")
+              }
             >
               <Network />
               <span>

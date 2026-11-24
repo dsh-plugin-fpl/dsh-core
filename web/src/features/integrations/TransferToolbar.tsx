@@ -180,7 +180,6 @@ function TransferDialog({
       );
       setPlan(result);
       await cache.invalidateQueries({ queryKey: ["integrations"] });
-      await cache.invalidateQueries({ queryKey: ["core-tasks"] });
     } catch (e) {
       setError((e as Error).message);
     } finally {

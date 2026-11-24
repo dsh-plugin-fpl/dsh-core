@@ -220,7 +220,7 @@ export function ModelTestPage({
     if (items && initialConversationId && !initialConversationChecked.current) {
       initialConversationChecked.current = true;
       if (!items.some((item) => item.id === initialConversationId)) {
-        setError("来源对话已删除或不可用，运行记录中的输出仍可查看。");
+        setError("来源对话已删除或不可用，请选择其他对话。");
         setActiveId(null);
       }
     }

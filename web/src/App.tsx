@@ -33,7 +33,6 @@ const CodeAgentsPage = lazy(() =>
 );
 import type { StudioPage } from "@app/routes";
 import { Home } from "@features/home/CoreHome";
-import { Tasks } from "@features/tasks/TasksPage";
 import { Files } from "@features/resources/ResourcesPage";
 import { ApplicationsPage } from "@features/applications/ApplicationsPage";
 import type { IntegrationKind } from "@features/integrations/IntegrationCenterPage";
@@ -50,7 +49,6 @@ const paths: Record<StudioPage, string> = {
   home: "/",
   applications: "/apps",
   files: "/files",
-  tasks: "/tasks",
   settings: "/integrations?kind=external-connections",
   integrations: "/integrations",
   "model-service": "/model-service",
@@ -169,8 +167,6 @@ export function App() {
           />
         ) : page === "files" ? (
           <Files />
-        ) : page === "tasks" ? (
-          <Tasks />
         ) : (
           <Home navigate={navigate} />
         )}
