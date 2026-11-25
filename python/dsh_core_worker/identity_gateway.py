@@ -205,6 +205,19 @@ def create_unified_app(root, factory, web_root=None, origin="http://127.0.0.1:93
             *(runtime.invoke("task.cancel", {"id": identity}) for identity in jobs)
         )
 
+    @app.post("/v1/session/local")
+    async def local_session(request: Request):
+        # Never switch an existing authenticated account implicitly.
+        existing = accounts.session(request.cookies.get("core_session", ""))
+        identity = existing["account_id"] if existing else accounts.initial["id"]
+        if existing and not secrets.compare_digest(existing["csrf"], request.headers.get("x-core-csrf", "")):
+            raise CoreError("请求验证失效，请刷新", "forbidden")
+        token, csrf = accounts.issue(identity)
+        response = JSONResponse({"csrf": csrf, "owner": accounts.account(identity)})
+        response.set_cookie("core_session", token, httponly=True, samesite="strict", max_age=86400)
+        response.set_cookie("core_csrf", csrf, samesite="strict", max_age=86400)
+        return response
+
     @app.post("/v1/identity/login")
     async def login(request: Request, payload: Login):
         body = payload.model_dump()
@@ -457,7 +470,7 @@ def create_unified_app(root, factory, web_root=None, origin="http://127.0.0.1:93
             {
                 path: value
                 for path, value in identity["paths"].items()
-                if path.startswith(("/v1/identity/", "/v1/storage", "/v1/setup/"))
+                if path == "/v1/session/local" or path.startswith(("/v1/identity/", "/v1/storage", "/v1/setup/"))
             }
         )
         core.setdefault("components", {}).setdefault("schemas", {}).update(
@@ -476,7 +489,16 @@ def create_unified_app(root, factory, web_root=None, origin="http://127.0.0.1:93
             return RedirectResponse(
                 "/v1/identity/authorize?" + urlencode(dict(request.query_params)), 303
             )
-        return HTMLResponse(LOGIN_HTML)
+        if not session and request.query_params.get("application_id"):
+            from urllib.parse import urlencode
+            from .identity_login import local_authorization_html
+
+            return HTMLResponse(local_authorization_html(
+                "/v1/identity/authorize?" + urlencode(dict(request.query_params))
+            ))
+        if request.query_params.get("core") != "1":
+            return RedirectResponse("/", 303)
+        return HTMLResponse(LOGIN_HTML.replace('<p>登录后使用你的应用与私人资源。</p>', '<p>日常使用无需密码。<a href="/">以本机所有者进入</a>；此表单用于已有 Core 账号。</p>'))
 
     @app.api_route(
         "/{path:path}",

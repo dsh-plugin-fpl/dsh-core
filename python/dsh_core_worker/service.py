@@ -78,6 +78,11 @@ def create_tenant_app(root, web_root=None, origin="http://127.0.0.1:9310", *, ac
 
             app.state.integration_transfers = Transfers(app.state.integrations, bridges, access)
             app.state.integration_validation_recovery = app.state.integrations.jobs
+            from .creative.connection import Website
+            from .creative.installations import Installations
+
+            app.state.fpl_website = Website(access)
+            app.state.creative_installations = Installations(app.state.fpl_website, app.state.integrations)
             yield
         finally:
             for bridge in list(bridges.online.values()):
@@ -427,6 +432,9 @@ def create_tenant_app(root, web_root=None, origin="http://127.0.0.1:9310", *, ac
 
     from .web_routes import register_routes
 
+    from .creative.http import router as creative_router
+
+    app.include_router(creative_router)
     register_routes(app, content_response)
 
     @app.get("/settings", include_in_schema=False)

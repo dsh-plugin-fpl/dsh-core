@@ -62,6 +62,17 @@ export function AccountsPage() {
       <p>
         已登录为 {me.display_name} · {me.username}
       </p>
+      <button
+        disabled={busy}
+        onClick={() =>
+          void perform(async () => {
+            await requestApi("/v1/identity/logout", { method: "POST" });
+            location.assign("/login?core=1");
+          })
+        }
+      >
+        使用其他 Core 账号
+      </button>
       <p role="alert">{error}</p>
       <p role="status">{notice}</p>
       <h2>已授权的应用</h2>
@@ -130,7 +141,8 @@ export function AccountsPage() {
                         { password },
                       );
                       form.reset();
-                      if (account.id === me.id) location.assign("/login");
+                      if (account.id === me.id)
+                        location.assign("/login?core=1");
                       else setNotice("密码已重置，原会话已撤销。");
                     });
                   }}

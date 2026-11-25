@@ -64,7 +64,9 @@ export async function requestApi(
         ? await fetch(request, { signal })
         : await fetch(request);
   observeApplicationBuild(response);
-  if (response.status === 401) notifyAuthRequired();
+  if (response.headers.get("X-FPL-Auth-Required") === "1")
+    window.dispatchEvent(new Event("fpl:auth-required"));
+  if (response.status === 401 && !["/v1/identity/me", "/v1/session"].includes(path)) notifyAuthRequired();
   if (!response.ok) {
     const problem = await responseProblem(response);
     if (

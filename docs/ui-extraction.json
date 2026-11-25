@@ -235,5 +235,21 @@
       "web/src/features/files/styles/file-library.css": "cc50f7e143d734a3b4a68f6890859f4b94d8da4aba2c5926c523d02f43eca031"
     },
     "target": "web/src/features/resources; Core-owned API adaptation, no runtime FPL import"
+  },
+  "creative_workshop_source": {
+    "source_commit": "7a869f6a45135e6f4a1cd238dd4d8728572a36c8",
+    "files": {
+      "features/creative-workshop/creative-workshop.css": "4555bbd2b73fc2934d4a0d0f6b83ca4cecd6099d773c740c7fc333e9c80fc9b7",
+      "features/creative-workshop/CreativeDetail.tsx": "6faa0fb7899a715454528092b08c0738e2d84a17f072d271fc2342e73ffd4f49",
+      "features/creative-workshop/api.ts": "ee64ef1e781e31d107e79dfc61ae6bfdfed3d0eda4d1e1c8244ba6b499707e44",
+      "features/creative-workshop/shared.ts": "8ea831386d24947a886d612390beeb5d7b1bcafd29592e45e930b5171dc73712",
+      "features/creative-workshop/Cover.tsx": "15b23aa2c267d5a1806c2fdff9e12fd52ad58c02386b78d45d58cab899916db3",
+      "features/creative-workshop/CreativeEditor.tsx": "186314fd4353d496d4ce5a07847281fe8c858645bdabba3b0c9d826dc5be0953",
+      "features/creative-workshop/CreativeWorkshopPage.tsx": "186a2ac7d65ee6d1a94ebb5fad160e105b5cfdfabd39fd839de98f42269f5186",
+      "shared/ui/ImagePreview.tsx": "b3ee8b10f8cba31b77561b5c7b7cbc29a334c550a140ac6eca1c5197e7e05426",
+      "shared/ui/useUnsavedNavigation.tsx": "48cb912b5d1cd872a3197dd28f0190f236d1248039bb71a08bda0906da304998",
+      "shared/ui/responsive-image.css": "f391dd4c9c45ba3db071e7804804625871cefde04e90e4c42462cc22f90b43e0"
+    },
+    "adaptation": "Website-backed catalog and publication; local Core installation receipts and disabled copies. No runtime source dependency."
   }
 }

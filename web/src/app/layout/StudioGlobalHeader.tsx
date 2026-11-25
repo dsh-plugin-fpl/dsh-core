@@ -1,5 +1,5 @@
+import { useWebsite } from "@features/creative-workshop/WebsiteAccount";
 import { useCoreAccount } from "@platform/auth/AccountAccess";
-import { requestApi } from "@platform/api/client";
 import { ThemeToggle } from "@shared/ui/ThemeToggle";
 import { useQuery } from "@tanstack/react-query";
 import { fetchBridges, isDshConnection } from "@features/connections/api";
@@ -7,6 +7,7 @@ import { HardDrive, Network, UserRound } from "lucide-react";
 import "./studio-global-header.css";
 export function StudioGlobalHeader(_: { assistant?: unknown }) {
   const profile = useCoreAccount();
+  const website = useWebsite();
   const q = useQuery({
     queryKey: ["bridges"],
     queryFn: fetchBridges,
@@ -41,16 +42,11 @@ export function StudioGlobalHeader(_: { assistant?: unknown }) {
           <UserRound size={16} />
           {profile.display_name}
         </a>
-        <button
-          className="studio-header-chip"
-          onClick={() =>
-            void requestApi("/v1/identity/logout", { method: "POST" }).then(
-              () => location.assign("/login"),
-            )
-          }
-        >
-          退出
-        </button>
+        <a className="studio-header-chip" href="/fpl-account">
+          {website.data?.account
+            ? `FPL · ${website.data.account.display_name || website.data.account.username}`
+            : "登录 FPL"}
+        </a>
       </div>
     </header>
   );

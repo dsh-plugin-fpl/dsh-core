@@ -1,3 +1,4 @@
+import { ConnectedWorkshop } from "@features/creative-workshop/ConnectedWorkshop";
 import { StoragePage } from "@features/storage/StoragePage";
 import { AccountsPage } from "@features/accounts/AccountsPage";
 import { SetupAuthorizationPage } from "@features/accounts/SetupAuthorizationPage";
@@ -48,6 +49,7 @@ import "@app/layout/studio-shell.css";
 
 const paths: Record<StudioPage, string> = {
   home: "/",
+  "creative-workshop": "/creative-workshop",
   applications: "/apps",
   files: "/files",
   settings: "/integrations?kind=external-connections",
@@ -109,6 +111,14 @@ export function App() {
           <StoragePage />
         ) : path.split("?")[0] === "/account" ? (
           <AccountsPage />
+        ) : ["/creative-workshop", "/fpl-account"].includes(
+            path.split("?")[0],
+          ) ? (
+          <ConnectedWorkshop
+            path={path}
+            navigate={navigate}
+            registerNavigationGuard={registerIntegrationGuard}
+          />
         ) : page === "home" ? (
           <Home navigate={navigate} />
         ) : page === "model-service" ? (

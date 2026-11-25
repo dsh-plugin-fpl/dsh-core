@@ -2993,6 +2993,656 @@
         ]
       }
     },
+    "/v1/fpl-connection": {
+      "get": {
+        "tags": [
+          "fpl-creative-workshop"
+        ],
+        "summary": "Status",
+        "operationId": "status_v1_fpl_connection_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/fpl-connection/login": {
+      "post": {
+        "tags": [
+          "fpl-creative-workshop"
+        ],
+        "summary": "Login",
+        "operationId": "login_v1_fpl_connection_login_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Login"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/fpl-connection/logout": {
+      "post": {
+        "tags": [
+          "fpl-creative-workshop"
+        ],
+        "summary": "Logout",
+        "operationId": "logout_v1_fpl_connection_logout_post",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/fpl-connection/change-password": {
+      "post": {
+        "tags": [
+          "fpl-creative-workshop"
+        ],
+        "summary": "Change Password",
+        "operationId": "change_password_v1_fpl_connection_change_password_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ChangePassword"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/creative-workshop/operations/{operation_id}": {
+      "get": {
+        "tags": [
+          "fpl-creative-workshop"
+        ],
+        "summary": "Operation",
+        "operationId": "operation_v1_creative_workshop_operations__operation_id__get",
+        "parameters": [
+          {
+            "name": "operation_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Operation Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/creative-workshop/items": {
+      "get": {
+        "tags": [
+          "fpl-creative-workshop"
+        ],
+        "summary": "Items",
+        "operationId": "items_v1_creative_workshop_items_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "fpl-creative-workshop"
+        ],
+        "summary": "Create",
+        "operationId": "create_v1_creative_workshop_items_post",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/creative-workshop/items/from-integration": {
+      "post": {
+        "tags": [
+          "fpl-creative-workshop"
+        ],
+        "summary": "From Integration",
+        "operationId": "from_integration_v1_creative_workshop_items_from_integration_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "additionalProperties": true,
+                "type": "object",
+                "title": "Body"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/creative-workshop/items/{item_id}": {
+      "get": {
+        "tags": [
+          "fpl-creative-workshop"
+        ],
+        "summary": "Item",
+        "operationId": "item_v1_creative_workshop_items__item_id__get",
+        "parameters": [
+          {
+            "name": "item_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Item Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "fpl-creative-workshop"
+        ],
+        "summary": "Update",
+        "operationId": "update_v1_creative_workshop_items__item_id__patch",
+        "parameters": [
+          {
+            "name": "item_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Item Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/creative-workshop/items/{item_id}/{action}": {
+      "post": {
+        "tags": [
+          "fpl-creative-workshop"
+        ],
+        "summary": "Action",
+        "operationId": "action_v1_creative_workshop_items__item_id___action__post",
+        "parameters": [
+          {
+            "name": "item_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Item Id"
+            }
+          },
+          {
+            "name": "action",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Action"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/creative-workshop/items/{item_id}/cover": {
+      "get": {
+        "tags": [
+          "fpl-creative-workshop"
+        ],
+        "summary": "Cover",
+        "operationId": "cover_v1_creative_workshop_items__item_id__cover_get",
+        "parameters": [
+          {
+            "name": "item_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Item Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/creative-workshop/releases/{release_id}": {
+      "get": {
+        "tags": [
+          "fpl-creative-workshop"
+        ],
+        "summary": "Release",
+        "operationId": "release_v1_creative_workshop_releases__release_id__get",
+        "parameters": [
+          {
+            "name": "release_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Release Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/creative-workshop/releases/{release_id}/cover": {
+      "get": {
+        "tags": [
+          "fpl-creative-workshop"
+        ],
+        "summary": "Release Cover",
+        "operationId": "release_cover_v1_creative_workshop_releases__release_id__cover_get",
+        "parameters": [
+          {
+            "name": "release_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Release Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/creative-workshop/installations/preview": {
+      "post": {
+        "tags": [
+          "fpl-creative-workshop"
+        ],
+        "summary": "Preview",
+        "operationId": "preview_v1_creative_workshop_installations_preview_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Preview"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/creative-workshop/installations": {
+      "post": {
+        "tags": [
+          "fpl-creative-workshop"
+        ],
+        "summary": "Install",
+        "operationId": "install_v1_creative_workshop_installations_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Apply"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/creative-workshop/installations/{installation_id}": {
+      "get": {
+        "tags": [
+          "fpl-creative-workshop"
+        ],
+        "summary": "Receipt",
+        "operationId": "receipt_v1_creative_workshop_installations__installation_id__get",
+        "parameters": [
+          {
+            "name": "installation_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Installation Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/creative-workshop/installations/{installation_id}/stdio": {
+      "post": {
+        "tags": [
+          "fpl-creative-workshop"
+        ],
+        "summary": "Stdio",
+        "operationId": "stdio_v1_creative_workshop_installations__installation_id__stdio_post",
+        "parameters": [
+          {
+            "name": "installation_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Installation Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": true,
+                "title": "Body"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/v1/model-providers": {
       "get": {
         "operationId": "list_providers_v1_model_providers_get",
@@ -6098,6 +6748,22 @@
         ]
       }
     },
+    "/v1/session/local": {
+      "post": {
+        "summary": "Local Session",
+        "operationId": "local_session_v1_session_local_post",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        }
+      }
+    },
     "/v1/identity/login": {
       "post": {
         "summary": "Login",
@@ -7269,6 +7935,34 @@
         ],
         "title": "ApplicationOut"
       },
+      "Apply": {
+        "properties": {
+          "release_id": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9_-]{1,100}$",
+            "title": "Release Id"
+          },
+          "names": {
+            "additionalProperties": {
+              "type": "string"
+            },
+            "type": "object",
+            "maxProperties": 30,
+            "title": "Names"
+          },
+          "preview_id": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9_-]{1,100}$",
+            "title": "Preview Id"
+          }
+        },
+        "type": "object",
+        "required": [
+          "release_id",
+          "preview_id"
+        ],
+        "title": "Apply"
+      },
       "ApplyIn": {
         "properties": {
           "choices": {
@@ -7472,6 +8166,28 @@
           "application_id"
         ],
         "title": "BridgeOut"
+      },
+      "ChangePassword": {
+        "properties": {
+          "current_password": {
+            "type": "string",
+            "maxLength": 256,
+            "minLength": 1,
+            "title": "Current Password"
+          },
+          "new_password": {
+            "type": "string",
+            "maxLength": 256,
+            "minLength": 1,
+            "title": "New Password"
+          }
+        },
+        "type": "object",
+        "required": [
+          "current_password",
+          "new_password"
+        ],
+        "title": "ChangePassword"
       },
       "Choice": {
         "properties": {
@@ -8523,6 +9239,29 @@
         ],
         "title": "LibraryPage"
       },
+      "Login": {
+        "properties": {
+          "username": {
+            "type": "string",
+            "maxLength": 64,
+            "minLength": 3,
+            "title": "Username"
+          },
+          "password": {
+            "type": "string",
+            "maxLength": 256,
+            "minLength": 10,
+            "title": "Password"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "username",
+          "password"
+        ],
+        "title": "Login"
+      },
       "McpCallIn": {
         "properties": {
           "request_id": {
@@ -9045,6 +9784,28 @@
           "name"
         ],
         "title": "PairIn"
+      },
+      "Preview": {
+        "properties": {
+          "release_id": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9_-]{1,100}$",
+            "title": "Release Id"
+          },
+          "names": {
+            "additionalProperties": {
+              "type": "string"
+            },
+            "type": "object",
+            "maxProperties": 30,
+            "title": "Names"
+          }
+        },
+        "type": "object",
+        "required": [
+          "release_id"
+        ],
+        "title": "Preview"
       },
       "PreviewIn": {
         "properties": {
@@ -15644,29 +16405,6 @@
           "permissions"
         ],
         "title": "IdentityMe"
-      },
-      "Login": {
-        "properties": {
-          "username": {
-            "type": "string",
-            "maxLength": 64,
-            "minLength": 3,
-            "title": "Username"
-          },
-          "password": {
-            "type": "string",
-            "maxLength": 256,
-            "minLength": 10,
-            "title": "Password"
-          }
-        },
-        "additionalProperties": false,
-        "type": "object",
-        "required": [
-          "username",
-          "password"
-        ],
-        "title": "Login"
       },
       "Password": {
         "properties": {

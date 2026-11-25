@@ -4,7 +4,7 @@ Core 独立拥有配置、任务、会话、资源、凭据和本地执行。HTT
 
 ## 本机访问
 
-Core 默认监听 `127.0.0.1:9310`。启动器通过 120 秒、单次使用的票据换取 HttpOnly、SameSite=Strict 的本机会话；票据使用 URL fragment 传递，页面立即清除。写请求同时检查 Origin、Host 和 `X-Core-CSRF`。会话不在服务重启后恢复，可通过 `pnpm dashboard` 重新打开。
+Core 默认监听 `127.0.0.1:9310`。浏览器默认通过 `POST /v1/session/local` 建立本机所有者会话，必须通过 Host 和 Origin 验证；有有效会话时保留其账号并验证 CSRF。启动器通过 120 秒、单次使用的票据换取 HttpOnly、SameSite=Strict 的本机会话；票据使用 URL fragment 传递，页面立即清除。写请求同时检查 Origin、Host 和 `X-Core-CSRF`。会话不在服务重启后恢复，可通过 `pnpm dashboard` 重新打开。
 
 DSH 使用独立配对凭据连接 `/v1/bridge`，凭据保存于 DSH Credentials，不进入 URL 或日志。配对可在看板撤销，撤销立即断开连接。供应商密钥由 Core 加密，密文与模型目录在同一 SQLite 事务中提交；解密密钥保存于 `.runtime/core/access/secret.key`。
 
@@ -115,3 +115,13 @@ ctx.dshCore.manageLocalService({id,endpoint,installation,serviceDirectory?}) 提
 - `GET /v1/file-library/folder-export?folder_id=...`：导出当前文件夹及其子目录，不指定则导出文件库。ZIP 在账号运行目录内生成短生命周期临时文件，逐原件校验摘要后传输，关闭响应时释放。
 
 导入预检拒绝绝对路径、上级路径、重复/冲突路径、符号链接和加密归档。单次含隐式父目录最多 5000 项，ZIP 压缩输入和解压后的文件合计均最多 256 MiB。逐文件提交允许保留部分成功；发生中断时保留回执并提示核对或继续，不自动重复导入。以上所有操作复用账号会话、Origin 和 CSRF 验证；管理员也不能操作其他账号的条目，不改变既有迁移账本或 schema。
+
+## FPL 网站连接与公开能力副本
+
+`GET /v1/fpl-connection` 返回网站地址、公开账号资料与网站权限；`POST /login|logout|change-password` 使用该前缀管理独立网站会话。网站密码不持久化，Cookie/CSRF 只在 Core 后端加密保存，按本地账号隔离。远程认证错误返回 424 与 `X-FPL-Auth-Required`，不会使本机 Core 退出。网络错误返回 502；不会自动重放写请求。
+
+`/v1/creative-workshop/items`、`/releases/{id}` 及封面、上传、发布、撤回路由适配原站的固定公开业务接口；没有任意 URL 转发入口。`POST /items/from-integration` 从当前本机集成创建远程草稿，使用允许公开字段，排除凭据与本机命令。
+
+`POST /installations/preview` 输入 release_id 和可选 names，取得预览 id、依赖、目标名称、冲突与安装状态；`POST /installations` 带 preview_id、release_id 和 names，确认时使用已保存的预览名称并重新核验来源版本。预览绑定网站账号，有效期一小时。回执通过 `GET /installations/{id}` 读取；`POST /installations/{id}/stdio` 配置本机命令。副本默认停用，方案同一事务登记，附件失败补偿；重复请求读取既有回执。
+
+版本下载协议由原站 `/v1/creative-workshop/releases/{id}/package` 提供并拥有：schema_version=1、根 release_id、parts 中的公开 release、archive_base64 与 archive_sha256。Skill 归档经有界 ZIP 校验，名称调整同时更新 SKILL.md。新连接文件 schema_version=1 沿用 Access 加密私有文件协议，安装回执复用已登记 integration_transfer_receipts 表，无既有账本改写或数据迁移。

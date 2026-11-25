@@ -13,7 +13,7 @@ pnpm build
 pnpm start
 ```
 
-默认地址为 `http://127.0.0.1:9310`。启动入口打开带一次性票据的本机页面，票据交换后从地址栏移除；刷新页面沿用会话。
+默认地址为 `http://127.0.0.1:9310`。直接打开即可免密使用本机所有者。启动器的一次性票据入口继续兼容；刷新页面沿用有效会话。
 
 ```sh
 pnpm start:with-dsh   # 启动 Core、打开看板并唤起 DSH
@@ -85,7 +85,7 @@ DSH 连接层单独使用 `pnpm build:connector` 和 `pnpm pack --pack-destinati
 
 ## Core 0.4 统一账号
 
-看板名称为「未来道具研究所」，技术包与应用 ID 保持兼容。打开右上角账号进入 `/account`，管理员可创建/禁用账号、设置密码和撤销应用授权。初始本机账号沿用原 Core 状态；新账号拥有独立配置、资源和任务。首次可以用 `pnpm dashboard --no-open --output .runtime/core-launch.json` 生成仅本机可读的一次性入口，然后在账号页设置密码。不要发送该文件或提交到 Git。
+看板名称为「未来道具研究所」，技术包与应用 ID 保持兼容。打开右上角账号进入 `/account`，管理员可创建/禁用账号、设置密码和撤销应用授权。初始本机账号沿用原 Core 状态；新账号拥有独立配置、资源和任务。日常使用无需设置 Core 密码；已有 Core 账号仍可通过 `/login?core=1` 登录。首次可以用 `pnpm dashboard --no-open --output .runtime/core-launch.json` 生成仅本机可读的一次性入口，然后在账号页设置密码。不要发送该文件或提交到 Git。
 
 工坊在自己的仓库运行 `pnpm setup`，再用其文档的 `connect-core --launch-file` 入口登记统一身份；9360–9365 对应视觉、剪辑、演示、思绪、Galgame、录音标注。应用直接登录和独立桥接也会出现在 Core 目录中。DSH 插件默认通过所属启动器管理服务，工坊插件要求 Core 0.5.0，老的 DSH Core 连接器与原任务、资源协议仍兼容。
 
@@ -106,3 +106,13 @@ DSH 连接层单独使用 `pnpm build:connector` 和 `pnpm pack --pack-destinati
 每个 npm 候选包自带自己的 Python 服务与已编译界面；不依赖开发仓库或安装机路径。代码和环境默认保存在 `~/Library/Application Support/DSH-FPL-Runtime/.runtime`，业务数据仍由各自独立服务管理。已有 `serviceDirectory`、外部常驻服务和手动配对入口继续有效。
 
 详见 [安装、修复与兼容约定](docs/managed-setup.md)。`pnpm pack:plugin` 会重建并打包 `.runtime/packages/` 中的候选 tarball；不会发布。候选源码保留现有版本号，正式发布前须统一确定新版本和最小 Core 依赖，并重新验收对应包摘要。
+
+## FPL 网站与创意工坊
+
+默认以本机所有者进入，右上角“登录 FPL”连接原网站账号，默认网站 `http://127.0.0.1:3000`，可修改为自己的部署地址。网站账号不切换或迁移本机数据。网站不可达或退出后，本机项目、模型与集成仍可使用。
+
+左侧“首页”和“应用”之间的“创意工坊”提供工具 API、MCP、Skill 和方案包的发现、草稿、发布与撤回。网站必须提供公开版本 package 接口；旧站缺少该接口时需升级。下载前检查固定版本、依赖与目标名称，再确认安装到本机集成中心。所有副本默认停用；stdio MCP 需要填写本机命令再显式验证与启用。发布者更新或撤回不会自动修改本机副本。
+
+“从本机集成创建网站草稿”只导出公开字段及经校验的 Skill 附件。网站会话由 Core 加密保存，不保存网站密码；切换网站或账号先退出。真实网站发布会影响该网站上的作品，自动验收使用隔离合成账号。
+
+联动浏览器验收：`FPL_SOURCE_REPOSITORY=/path/to/Future-Props-Lab CORE_TEST_BROWSER_CHANNEL=chrome pnpm --dir web test:e2e`。不设置来源仓库时跳过真实原站旅程，仍验收本机免密与布局。

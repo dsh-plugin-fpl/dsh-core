@@ -228,6 +228,14 @@ function StudioChrome({
       page: "home",
     },
     {
+      id: "creative-workshop",
+      label: "创意工坊",
+      shortLabel: "创意",
+      icon: <CreativeIcon />,
+      active: page === "creative-workshop",
+      page: "creative-workshop",
+    },
+    {
       id: "applications",
       label: "应用",
       shortLabel: "应用",
@@ -243,6 +251,7 @@ function StudioChrome({
       active: page === "files",
       page: "files",
     },
+
     {
       id: "integrations",
       label: "集成中心",

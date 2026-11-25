@@ -5,7 +5,7 @@ import {
   CoreOwnerAccess,
   type CoreProfile,
 } from "@platform/auth/AccountAccess";
-import { requestApi, fetchApiJson } from "@platform/api/client";
+import { requestApi, fetchApiJson, ApiError } from "@platform/api/client";
 import { App } from "./App";
 import "@shared/ui/theme.css";
 import "@app/styles.css";
@@ -24,7 +24,7 @@ function Boot() {
   useEffect(() => {
     const fail = () => {
       setReady(false);
-      setError("本机会话已失效，请从启动入口重新打开看板。");
+      setError("本机会话已失效，请刷新页面重新连接本机。");
     };
     window.addEventListener("core:auth-required", fail);
     const start = async () => {
@@ -37,7 +37,12 @@ function Boot() {
           body: JSON.stringify({ ticket }),
         });
       }
-      await fetchApiJson("/v1/session");
+      try {
+        await fetchApiJson("/v1/identity/me");
+      } catch (cause) {
+        if (!(cause instanceof ApiError) || cause.status !== 401) throw cause;
+        await requestApi("/v1/session/local", { method: "POST" });
+      }
       setIdentity(await fetchApiJson("/v1/identity/me"));
       setReady(true);
     };
@@ -59,9 +64,9 @@ function Boot() {
       <p>{error || "正在连接本机服务…"}</p>
       {error && (
         <p>
-          <a className="btn primary" href="/login">
-            使用 Core 账号登录
-          </a>
+          <button className="btn primary" onClick={() => location.reload()}>
+            重新连接本机
+          </button>
         </p>
       )}
     </main>
