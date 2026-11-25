@@ -1,1 +1,32 @@
-<!doctype html><html lang="zh-CN"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/><title>未来道具研究所</title><link rel="icon" type="image/webp" sizes="256x256" href="/brand/icon.webp"/><script>try{var t=localStorage.getItem('future_props_theme');document.documentElement.dataset.theme=t==='light'||t==='dark'?t:matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'}catch{}</script></head><body><div id="root"></div><script type="module" src="/src/main.tsx"></script></body></html>
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+    <title>未来道具研究所</title>
+    <link
+      rel="icon"
+      type="image/webp"
+      sizes="256x256"
+      href="/brand/icon.webp"
+    />
+    <script>
+      try {
+        var t = localStorage.getItem("future_props_theme");
+        document.documentElement.dataset.theme =
+          t === "light" || t === "dark"
+            ? t
+            : matchMedia("(prefers-color-scheme: dark)").matches
+              ? "dark"
+              : "light";
+      } catch {}
+    </script>
+    <link rel="stylesheet" href="/src/shared/ui/loading-scene.css" />
+    <link rel="stylesheet" href="/src/shared/ui/loading-state.css" />
+    <link rel="stylesheet" href="/src/app/boot-loading.css" />
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/app/bootstrap.ts"></script>
+  </body>
+</html>

@@ -1,0 +1,9 @@
+{
+  "source": "Future-Props-Lab/web",
+  "source_commit": "438106845042e5dda850a54c4aa38a9ff4a5742a",
+  "files": {
+    "index.html": "81abb92c7049a9002f4dc34388dd4ee3e4d32c0f78c99a5bda199fd03dc4ebf0",
+    "src/app/bootLoading.ts": "ec6decc254c28686495be64aa85f129926526dad0c85ecc5899ae396374a80f6"
+  },
+  "adaptation": "Reuse HTML scene, boot reveal CSS, and unchanged animation controller; application title and bootstrap import belong to this provider. Brand art remains in the ignored local pack."
+}

@@ -1,0 +1,17 @@
+.fpl-boot-loading {
+  font: 14px system-ui;
+}
+.fpl-boot-loading > span {
+  animation: fpl-boot-reveal 0.15s step-end;
+}
+html[data-theme="dark"] .fpl-boot-loading {
+  color: #c0b8ab;
+}
+@keyframes fpl-boot-reveal {
+  from {
+    visibility: hidden;
+  }
+  to {
+    visibility: visible;
+  }
+}

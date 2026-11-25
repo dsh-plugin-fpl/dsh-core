@@ -122,3 +122,5 @@ DSH 连接层单独使用 `pnpm build:connector` 和 `pnpm pack --pack-destinati
 `pnpm build:local` 使用 `.runtime/assets/brand/loading/` 中完整的 12 个原 FPL 加载素材，显示红莉栖跑步与八件悬浮道具。素材缺失时构建停止；安装原品牌包后再构建。整页连接、打开工坊使用 page 加载状态，页面内部跳转使用 region；延迟显示、后台暂停和减少动态效果沿用原版组件。
 
 素材只用于本机，来源与 SHA256 记录在 `.runtime/assets/brand/loading-source.json`。运行与构建不依赖原 FPL 目录；通用分发继续使用 `pnpm build`，不包含个人角色素材。
+
+浏览器刷新也使用原 FPL 的 HTML 首屏加载动画：在 React 与工坊代码下载前即可展示，加载完成后自然交给应用；快速刷新不人为延长等待。
