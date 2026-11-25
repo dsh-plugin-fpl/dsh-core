@@ -3,6 +3,7 @@ import { StoragePage } from "@features/storage/StoragePage";
 import { AccountsPage } from "@features/accounts/AccountsPage";
 import { SetupAuthorizationPage } from "@features/accounts/SetupAuthorizationPage";
 import { useCoreAccount } from "@platform/auth/AccountAccess";
+import { LoadingState } from "@shared/ui/LoadingState";
 import {
   useEffect,
   useState,
@@ -104,7 +105,9 @@ export function App() {
       navigate={(p) => navigate(paths[p])}
       assistant={null}
     >
-      <Suspense fallback={<p className="page-loading">正在打开页面…</p>}>
+      <Suspense
+        fallback={<LoadingState label="正在打开页面…" variant="region" />}
+      >
         {path.split("?")[0] === "/setup/authorize" ? (
           <SetupAuthorizationPage />
         ) : path.split("?")[0] === "/storage" ? (

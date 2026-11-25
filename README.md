@@ -116,3 +116,9 @@ DSH 连接层单独使用 `pnpm build:connector` 和 `pnpm pack --pack-destinati
 “从本机集成创建网站草稿”只导出公开字段及经校验的 Skill 附件。网站会话由 Core 加密保存，不保存网站密码；切换网站或账号先退出。真实网站发布会影响该网站上的作品，自动验收使用隔离合成账号。
 
 联动浏览器验收：`FPL_SOURCE_REPOSITORY=/path/to/Future-Props-Lab CORE_TEST_BROWSER_CHANNEL=chrome pnpm --dir web test:e2e`。不设置来源仓库时跳过真实原站旅程，仍验收本机免密与布局。
+
+## 本机原版加载动画
+
+`pnpm build:local` 使用 `.runtime/assets/brand/loading/` 中完整的 12 个原 FPL 加载素材，显示红莉栖跑步与八件悬浮道具。素材缺失时构建停止；安装原品牌包后再构建。整页连接、打开工坊使用 page 加载状态，页面内部跳转使用 region；延迟显示、后台暂停和减少动态效果沿用原版组件。
+
+素材只用于本机，来源与 SHA256 记录在 `.runtime/assets/brand/loading-source.json`。运行与构建不依赖原 FPL 目录；通用分发继续使用 `pnpm build`，不包含个人角色素材。

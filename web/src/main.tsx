@@ -7,6 +7,7 @@ import {
 } from "@platform/auth/AccountAccess";
 import { requestApi, fetchApiJson, ApiError } from "@platform/api/client";
 import { App } from "./App";
+import { LoadingState } from "@shared/ui/LoadingState";
 import "@shared/ui/theme.css";
 import "@app/styles.css";
 import "./core.css";
@@ -61,7 +62,11 @@ function Boot() {
   ) : (
     <main className="core-unlock">
       <h1>未来道具研究所</h1>
-      <p>{error || "正在连接本机服务…"}</p>
+      {error ? (
+        <p>{error}</p>
+      ) : (
+        <LoadingState label="正在连接本机服务…" variant="page" />
+      )}
       {error && (
         <p>
           <button className="btn primary" onClick={() => location.reload()}>
