@@ -39,7 +39,7 @@ pnpm stop
 
 模型协议与本地模型范围见 [能力盘点](docs/scope.md)。本地 MLX / Metal 模型需要 Apple Silicon、macOS 15+；FFmpeg 使用本机可执行文件。RelayVSR 单次最多 300 帧、1080p 输入。
 
-角色素材沿用本机交付包，放在 `.runtime/assets/brand/`，构建时物化到被忽略的 `web/public/brand/`。来源和使用范围见 [界面迁移记录](docs/ui-extraction.json)。插件图标与看板标签页统一使用品牌包的 `icon.webp`（项目 logo 的 256px 版本）；连接层构建将其复制到 `lib/icon.webp`，通过 manifest 和 `./icon` 导出，打包时随 `lib/` 分发。公开源码不携带个人角色资源。VAD 模型和 WASM 由锁定的 npm 依赖准备。
+角色素材沿用本机交付包，放在 `.runtime/assets/brand/`，构建时物化到被忽略的 `web/public/brand/`。来源和使用范围见 [界面迁移记录](docs/ui-extraction.json)。插件图标与看板标签页统一使用品牌包的 `icon.webp`（项目 logo 的 256px 版本）；连接层构建将其复制到 `lib/icon.webp`，通过 manifest 和 `./icon` 导出，打包时随 `lib/` 分发。公开源码不携带个人角色资源。 已安装本机品牌资源时，使用 `pnpm build:local` 构建本机运行页面；它保留原 logo 和首页红莉栖图片/动画，并在资源不完整时停止。`pnpm build` 仍生成通用分发界面。VAD 模型和 WASM 由锁定的 npm 依赖准备。
 
 ## 连接 DeepSeek Harness
 

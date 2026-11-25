@@ -76,7 +76,8 @@
     "test:connector": "node --test tests/*.test.mjs",
     "release:service": "pnpm build:dashboard && node scripts/release-service.mjs",
     "test:harness": "node scripts/verify-harness.mjs",
-    "prepack": "node scripts/prepack.mjs"
+    "prepack": "node scripts/prepack.mjs",
+    "build:local": "node scripts/build-local.mjs"
   },
   "peerDependencies": {
     "@deepseek-ai/cordis": "~4.1.0",
