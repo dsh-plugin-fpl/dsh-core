@@ -49,7 +49,7 @@ export async function requestApi(
   init: TransferRequestInit = {},
 ): Promise<Response> {
   const { signal, onProgress, ...requestInit } = init;
-  const request = coreRequest(addApplicationBuild(
+  const request = await coreRequest(addApplicationBuild(
     applySessionHeaders(
       new Request(apiUrl(path), { ...requestInit, credentials: "include" }),
     ),

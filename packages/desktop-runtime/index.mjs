@@ -1,5 +1,5 @@
 /** Shared desktop lifecycle. Products supply their own executable, arguments and state. */
-import { app, BrowserWindow, dialog, session, shell } from 'electron';
+import { app, BrowserWindow, dialog, nativeImage, session, shell } from 'electron';
 import { spawn } from 'node:child_process';
 import { randomBytes } from 'node:crypto';
 import { mkdir, open } from 'node:fs/promises';
@@ -27,6 +27,9 @@ export async function runDesktop(config) {
   app.setName(config.title);
   app.setPath('userData', process.env.FPL_DESKTOP_STATE_ROOT || join(app.getPath('appData'), 'FPL', config.applicationId));
   await app.whenReady();
+  const icon = config.icon ? nativeImage.createFromPath(config.icon) : undefined;
+  if (icon?.isEmpty()) throw new Error('无法读取应用图标：' + config.icon);
+  if (icon && process.platform === 'darwin') app.dock.setIcon(icon);
   const root = process.env.FPL_DESKTOP_STATE_ROOT || app.getPath('userData');
   await mkdir(root, {recursive: true, mode: 0o700});
   const launch = randomBytes(32).toString('hex');
@@ -106,7 +109,7 @@ export async function runDesktop(config) {
     });
     if (!response.ok) throw new Error('无法建立本机会话，端口可能由另一实例占用。');
     const openWindow = async () => {
-      window = new BrowserWindow({title: config.title, width: 1440, height: 960,
+      window = new BrowserWindow({title: config.title, icon, width: 1440, height: 960,
         minWidth: 760, minHeight: 540, show: false,
         webPreferences: {session: desktopSession, nodeIntegration: false, contextIsolation: true, sandbox: true}});
       window.webContents.on('will-navigate', (event, url) => {

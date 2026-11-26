@@ -51,7 +51,7 @@ export async function postSse<TEvent>({
 }: PostSseOptions<TEvent>) {
   const base = String(import.meta.env.VITE_API_BASE || "").replace(/\/$/, "");
   const csrf = getCsrfToken();
-  const response = await fetch(coreRequest(new Request(new URL(`${base}${path}`, window.location.origin), {
+  const response = await fetch(await coreRequest(new Request(new URL(`${base}${path}`, window.location.origin), {
     method: "POST",
     headers: {
       "Content-Type": "application/json",

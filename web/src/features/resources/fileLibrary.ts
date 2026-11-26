@@ -108,6 +108,7 @@ export async function uploadFile(file: File, folderId: string | null) {
       `文件已上传到根目录，归入文件夹失败：${(error as Error).message}`,
     );
   }
+  return resource;
 }
 export async function previewText(item: LibraryEntry, signal: AbortSignal) {
   const response = await requestApi(contentUrl(item), {

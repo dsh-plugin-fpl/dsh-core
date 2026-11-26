@@ -110,6 +110,7 @@ export function Home({ navigate }: { navigate: (p: string) => void }) {
         </section>
         <section className="home-panel core-home-resources">
           <div className="core-home-links">
+            {!coreProduct() && <>
             <button
               className="home-resource-link"
               onClick={() => navigate("/files")}
@@ -120,6 +121,7 @@ export function Home({ navigate }: { navigate: (p: string) => void }) {
                 <small>上传参考素材、查看生成结果</small>
               </span>
             </button>
+            </>}
             <button
               className="home-resource-link"
               onClick={() =>

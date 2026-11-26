@@ -38,6 +38,7 @@ const CodeAgentsPage = lazy(() =>
 );
 import type { StudioPage } from "@app/routes";
 import { Home } from "@features/home/CoreHome";
+import { ProjectFilesPage } from "@features/resources/ProjectFilesPage";
 import { Files } from "@features/resources/ResourcesPage";
 import { ApplicationsPage } from "@features/applications/ApplicationsPage";
 import type { IntegrationKind } from "@features/integrations/IntegrationCenterPage";
@@ -117,6 +118,8 @@ export function App() {
       >
         {path.split("?")[0] === "/setup/authorize" ? (
           <SetupAuthorizationPage />
+        ) : coreProduct() && ["/files", "/legacy-files", "/project-files"].includes(path.split("?")[0]) ? (
+          <ProjectFilesPage legacy={path.split("?")[0] !== "/project-files"} />
         ) : path.split("?")[0] === "/storage" ? (
           coreProduct() ? <ProductStorage /> : <StoragePage />
         ) : path.split("?")[0] === "/account" ? (

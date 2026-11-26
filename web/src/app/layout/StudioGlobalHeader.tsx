@@ -27,10 +27,10 @@ export function StudioGlobalHeader(_: { assistant?: unknown }) {
         </div>
       </div>
       <div className="studio-header-actions">
-        {profile.legacy && profile.role === "admin" && (
+        {(coreProduct() || (profile.legacy && profile.role === "admin")) && (
           <a className="studio-header-chip" href={coreUrl("/storage")}>
             <HardDrive size={16} />
-            存储
+            {coreProduct() ? "设置" : "存储"}
           </a>
         )}
         <a

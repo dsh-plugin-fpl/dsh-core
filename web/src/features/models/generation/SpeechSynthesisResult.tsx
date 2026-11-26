@@ -1,3 +1,5 @@
+import { coreProduct, coreUrl } from "@platform/embedded";
+import { productApi } from "@features/resources/ProjectFilesPage";
 import { LoadingScene } from "@shared/ui/LoadingScene";
 import { LoadingState } from "@shared/ui/LoadingState";
 import { useEffect, useRef, useState } from "react";
@@ -43,7 +45,23 @@ export function SpeechSynthesisResult({
   const [position, setPosition] = useState(0);
   const [savePending, setSavePending] = useState(false);
   const [saved, setSaved] = useState(false);
+  const [project, setProject] = useState("");
+  const [projects, setProjects] = useState<
+    { id: string; title?: string; name?: string }[]
+  >([]);
+  useEffect(() => {
+    if (coreProduct())
+      void productApi<{
+        items: { id: string; title?: string; name?: string }[];
+      }>("file-projects")
+        .then((x) => setProjects(x.items))
+        .catch((e) => setError(String(e)));
+  }, []);
   const [error, setError] = useState("");
+  useEffect(() => {
+    setSaved(false);
+    setError("");
+  }, [task.id]);
   const mounted = useRef(true);
   useEffect(() => {
     mounted.current = true;
@@ -63,7 +81,14 @@ export function SpeechSynthesisResult({
     setSavePending(true);
     setError("");
     try {
-      await saveSpeechTask(task.id);
+      if (coreProduct() && !project) throw new Error("请选择目标项目");
+      const resource = await saveSpeechTask(task.id);
+      if (coreProduct())
+        await productApi("project-files", {
+          project_id: project,
+          source: "core",
+          source_id: resource.id,
+        });
       if (mounted.current) setSaved(true);
     } catch (cause) {
       if (mounted.current) setError(apiErrorMessage(cause, "保存失败"));
@@ -201,24 +226,56 @@ export function SpeechSynthesisResult({
                 下载 WAV
               </a>
             )}
+            {coreProduct() && (
+              <label>
+                保存到项目{" "}
+                <select
+                  aria-label="保存到项目"
+                  value={project}
+                  disabled={savePending || saved}
+                  onChange={(e) => setProject(e.target.value)}
+                >
+                  <option value="">选择项目</option>
+                  {projects.map((p) => (
+                    <option key={p.id} value={p.id}>
+                      {p.title || p.name || p.id}
+                    </option>
+                  ))}
+                </select>
+                {!projects.length && (
+                  <a href={coreProduct()!.projectsUrl}>创建项目</a>
+                )}
+              </label>
+            )}
             <button
               className="btn"
               type="button"
-              disabled={!canWrite || savePending || saved}
+              disabled={
+                !canWrite ||
+                savePending ||
+                saved ||
+                (!!coreProduct() && !project)
+              }
               onClick={() => void save()}
             >
               <FolderPlus size={16} aria-hidden />
               {savePending ? (
                 <LoadingState variant="inline" label="正在保存…" />
               ) : saved ? (
-                "已保存到文件库"
+                coreProduct() ? (
+                  "已保存到项目"
+                ) : (
+                  "已保存到文件库"
+                )
+              ) : coreProduct() ? (
+                "保存到项目"
               ) : (
                 "保存到文件库"
               )}
             </button>
           </div>
           {!canWrite && (
-            <p className="speech-help">保存到文件库需要内容写入权限。</p>
+            <p className="speech-help">保存文件需要内容写入权限。</p>
           )}
         </>
       )}
@@ -237,7 +294,17 @@ export function SpeechSynthesisResult({
       )}
       {saved && (
         <p className="speech-feedback is-success" role="status">
-          已保存到文件库
+          {coreProduct() ? (
+            <a
+              href={coreUrl(
+                "/project-files?project=" + encodeURIComponent(project),
+              )}
+            >
+              已保存到项目 · 查看文件
+            </a>
+          ) : (
+            "已保存到文件库"
+          )}
         </p>
       )}
     </article>

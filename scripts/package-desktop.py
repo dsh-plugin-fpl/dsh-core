@@ -92,6 +92,7 @@ import {fileURLToPath} from 'node:url';
 import {resolve} from 'node:path';
 const resources = fileURLToPath(new URL('../', import.meta.url));
 void runDesktop({...CONFIG,
+ icon: resolve(resources, 'product-assets/icon.png'),
  python: resolve(resources, 'python/bin/python3'), cwd: resources,
  args: ['-m', MODULE, 'desktop', '--web-root', resolve(resources, 'web')],
  env: {PYTHONNOUSERSITE: '1', PYTHONPATH: '', FPL_APP_RESOURCES: resolve(resources, 'product-assets'),
