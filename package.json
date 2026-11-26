@@ -129,10 +129,10 @@
   ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/dsh-plugin-fpl/dsh-core.git"
+    "url": "https://github.com/future-props-lab/fpl-core.git"
   },
   "bugs": {
-    "url": "https://github.com/dsh-plugin-fpl/dsh-core/issues"
+    "url": "https://github.com/future-props-lab/fpl-core/issues"
   },
   "keywords": [
     "dsh-plugin",

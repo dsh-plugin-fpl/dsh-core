@@ -2,4 +2,4 @@
 
 Shared models, coding agents, local models, tasks and resources for FPL apps.
 
-Installation and full documentation: [GitHub · dsh-plugin-fpl/dsh-core](https://github.com/dsh-plugin-fpl/dsh-core).
+Installation and full documentation: [GitHub · future-props-lab/fpl-core](https://github.com/future-props-lab/fpl-core).
