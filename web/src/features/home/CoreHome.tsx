@@ -1,4 +1,5 @@
 import { useState } from "react";
+import {coreProduct} from '@platform/embedded';
 import { HomeInfrastructure } from "./HomeInfrastructure";
 import { HomeApplicationFolders } from "./HomeApplicationFolders";
 import { useApplications } from "@features/applications/catalog";
@@ -9,12 +10,13 @@ import "./home.css";
 export function Home({ navigate }: { navigate: (p: string) => void }) {
   const applications = useApplications();
   const [mode, setMode] = useState("chat");
+  const product = coreProduct();
   return (
     <section className="page home-page">
       <header className="home-header">
         <div className="home-header-copy">
           <span className="home-eyebrow">你的灵感，随时开场</span>
-          <h1>今天想从哪里开始？</h1>
+          <h1>{product?.name || '今天想从哪里开始？'}</h1>
           <p>从一个好想法，到下一件作品。</p>
         </div>
         <HomeHeroPet />
@@ -25,22 +27,22 @@ export function Home({ navigate }: { navigate: (p: string) => void }) {
           aria-labelledby="home-app-title"
         >
           <header className="home-section-heading">
-            <h2 id="home-app-title">AI 应用</h2>
+            <h2 id="home-app-title">{product ? '项目' : 'AI 应用'}</h2>
             <span className="home-count">
-              {applications.data?.length || 0} 个应用
+              {product ? product.name : `${applications.data?.length || 0} 个应用`}
             </span>
             <button
               className="home-text-link"
               onClick={() => navigate("/apps")}
             >
-              全部应用
+              {product ? '查看项目' : '全部应用'}
             </button>
           </header>
-          <HomeApplicationFolders
+          {product ? <a className="home-resource-link" href={product.projectsUrl}><Folder /><span><strong>{product.name}</strong><small>打开项目列表，继续创作或新建项目</small></span></a> : <HomeApplicationFolders
             applications={applications.data || []}
             onNavigate={navigate}
-          />
-          {!applications.data?.length && (
+          />}
+          {!product && !applications.data?.length && (
             <p className="core-apps-hint">
               在 DSH 中安装应用插件，连接后会显示在这里。
               <button

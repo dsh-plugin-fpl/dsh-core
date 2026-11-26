@@ -1,5 +1,7 @@
+import { corePath, coreUrl, coreProduct } from "@platform/embedded";
 import { ConnectedWorkshop } from "@features/creative-workshop/ConnectedWorkshop";
 import { StoragePage } from "@features/storage/StoragePage";
+import {ProductStorage} from '@features/storage/ProductStorage';
 import { AccountsPage } from "@features/accounts/AccountsPage";
 import { SetupAuthorizationPage } from "@features/accounts/SetupAuthorizationPage";
 import { useCoreAccount } from "@platform/auth/AccountAccess";
@@ -62,9 +64,9 @@ const paths: Record<StudioPage, string> = {
 };
 export function App() {
   const account = useCoreAccount();
-  const [path, setPath] = useState(location.pathname + location.search);
+  const [path, setPath] = useState(corePath());
   useEffect(() => {
-    const sync = () => setPath(location.pathname + location.search);
+    const sync = () => setPath(corePath());
     window.addEventListener("popstate", sync);
     return () => window.removeEventListener("popstate", sync);
   }, []);
@@ -79,7 +81,12 @@ export function App() {
     if (target === "/settings")
       target = "/integrations?kind=external-connections";
     const proceed = () => {
-      history.pushState(null, "", target);
+      const product = coreProduct();
+      if (product && (target === '/apps' || target.startsWith('/apps/'))) {
+        window.location.assign(product.projectsUrl);
+        return;
+      }
+      history.pushState(null, "", coreUrl(target));
       setPath(target);
     };
     if (integrationGuard.current?.(proceed)) return;
@@ -111,7 +118,7 @@ export function App() {
         {path.split("?")[0] === "/setup/authorize" ? (
           <SetupAuthorizationPage />
         ) : path.split("?")[0] === "/storage" ? (
-          <StoragePage />
+          coreProduct() ? <ProductStorage /> : <StoragePage />
         ) : path.split("?")[0] === "/account" ? (
           <AccountsPage />
         ) : ["/creative-workshop", "/fpl-account"].includes(
@@ -143,7 +150,7 @@ export function App() {
           <ModelTestPage
             key={path}
             onInitialModelHandled={() =>
-              history.replaceState(null, "", "/model-test")
+              history.replaceState(null, "", coreUrl("/model-test"))
             }
             initialConversationId={new URLSearchParams(path.split("?")[1]).get(
               "conversation",

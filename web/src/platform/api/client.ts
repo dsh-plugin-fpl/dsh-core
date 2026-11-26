@@ -1,3 +1,4 @@
+import { coreRequest } from "@platform/embedded";
 import {
   addApplicationBuild,
   observeApplicationBuild,
@@ -48,11 +49,11 @@ export async function requestApi(
   init: TransferRequestInit = {},
 ): Promise<Response> {
   const { signal, onProgress, ...requestInit } = init;
-  const request = addApplicationBuild(
+  const request = coreRequest(addApplicationBuild(
     applySessionHeaders(
       new Request(apiUrl(path), { ...requestInit, credentials: "include" }),
     ),
-  );
+  ));
   const response =
     requestInit.body instanceof FormData && onProgress
       ? await uploadRequest(
@@ -136,7 +137,7 @@ export async function fetchApiDownload(
 }
 api.use({
   async onRequest({ request }) {
-    return addApplicationBuild(applySessionHeaders(request));
+    return coreRequest(addApplicationBuild(applySessionHeaders(request)));
   },
   async onResponse({ response, schemaPath }) {
     observeApplicationBuild(response);

@@ -1,3 +1,4 @@
+import {coreUrl, coreProduct} from "@platform/embedded";
 import { useWebsite } from "@features/creative-workshop/WebsiteAccount";
 import { useCoreAccount } from "@platform/auth/AccountAccess";
 import { ThemeToggle } from "@shared/ui/ThemeToggle";
@@ -19,6 +20,7 @@ export function StudioGlobalHeader(_: { assistant?: unknown }) {
   return (
     <header className="studio-panel studio-global-header">
       <div className="studio-header-start">
+        {coreProduct() && <a className="studio-header-chip" href={coreProduct()!.projectsUrl}>{coreProduct()!.name}</a>}
         <div className="studio-header-theme">
           <span>外观</span>
           <ThemeToggle />
@@ -26,23 +28,23 @@ export function StudioGlobalHeader(_: { assistant?: unknown }) {
       </div>
       <div className="studio-header-actions">
         {profile.legacy && profile.role === "admin" && (
-          <a className="studio-header-chip" href="/storage">
+          <a className="studio-header-chip" href={coreUrl("/storage")}>
             <HardDrive size={16} />
             存储
           </a>
         )}
         <a
-          href="/integrations?kind=external-connections"
+          href={coreUrl("/integrations?kind=external-connections")}
           className="studio-header-chip"
         >
           <Network size={16} />
           <span>{connected ? "DSH 已连接" : "连接 DSH"}</span>
         </a>
-        <a className="studio-header-chip" href="/account">
+        <a className="studio-header-chip" href={coreUrl("/account")}>
           <UserRound size={16} />
           {profile.display_name}
         </a>
-        <a className="studio-header-chip" href="/fpl-account">
+        <a className="studio-header-chip" href={coreUrl("/fpl-account")}>
           {website.data?.account
             ? `FPL · ${website.data.account.display_name || website.data.account.username}`
             : "登录 FPL"}

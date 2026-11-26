@@ -51,7 +51,7 @@ export async function postSse<TEvent>({
 }: PostSseOptions<TEvent>) {
   const base = String(import.meta.env.VITE_API_BASE || "").replace(/\/$/, "");
   const csrf = getCsrfToken();
-  const response = await fetch(`${base}${path}`, {
+  const response = await fetch(coreRequest(new Request(new URL(`${base}${path}`, window.location.origin), {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -61,7 +61,7 @@ export async function postSse<TEvent>({
     credentials: "include",
     body: JSON.stringify(body),
     signal,
-  });
+  })));
   if (response.status === 401) notifyAuthRequired();
   if (!response.ok) {
     const problem = (await response.json().catch(() => ({}))) as ProblemDetail;
@@ -92,3 +92,4 @@ export async function postSse<TEvent>({
   }
   if (buffer.trim()) parseFrame(buffer, onEvent);
 }
+import {coreRequest} from '@platform/embedded';

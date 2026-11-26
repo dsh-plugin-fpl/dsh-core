@@ -174,7 +174,7 @@ function FileButton({
 }
 
 function mediaPath(skill: Skill, version: string, path: string) {
-  return `/v1/integrations/skills/${encodeURIComponent(skill.id)}/versions/${encodeURIComponent(version)}/files/media?path=${encodeURIComponent(path)}`;
+  return coreApiUrl(`/v1/integrations/skills/${encodeURIComponent(skill.id)}/versions/${encodeURIComponent(version)}/files/media?path=${encodeURIComponent(path)}`);
 }
 
 export function SkillVersionBrowser({
@@ -303,3 +303,4 @@ export function SkillVersionBrowser({
     </div>
   );
 }
+import {coreApiUrl} from '@platform/embedded';

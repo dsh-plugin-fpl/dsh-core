@@ -31,6 +31,7 @@ tree(root / "python" / config["module"], "python/" + config["module"])
 for name in ["pyproject.toml", "uv.lock"]:
     add(root / ("python" if core else "") / name, ("python/" if core else "") + name)
 if core:
+    tree(root / "python/fpl_core", "python/fpl_core")
     add(root / "scripts/core.mjs", "scripts/core.mjs")
 else:
     tree(root / "contracts", "contracts")

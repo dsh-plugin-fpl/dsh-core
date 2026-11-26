@@ -89,7 +89,7 @@ export function AgentTestResult({ taskId }: { taskId: string }) {
           {task.result?.resources?.map((r) => (
             <a
               className="btn"
-              href={`/v1/resources/${r.id}/content?download=true`}
+              href={coreApiUrl(`/v1/resources/${r.id}/content?download=true`)}
               key={r.id}
             >
               下载 {r.name}
@@ -100,3 +100,4 @@ export function AgentTestResult({ taskId }: { taskId: string }) {
     </section>
   );
 }
+import {coreApiUrl} from '@platform/embedded';

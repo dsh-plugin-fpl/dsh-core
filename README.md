@@ -2,6 +2,8 @@
 
 独立运行的模型、编程智能体、本地模型、任务和资源服务。看板复用现有 FPL 的页面、主题与组件；DeepSeek Harness 通过可选连接层接入。
 
+产品内嵌公共包和桌面迁移见 [产品内嵌 Core](docs/embedded.md)。独立服务入口继续用于迁移期间兼容。
+
 ## 启动看板
 
 需要 Node.js 22+、pnpm、uv。Python 依赖安装到本仓库 `.runtime/worker-venv/`。

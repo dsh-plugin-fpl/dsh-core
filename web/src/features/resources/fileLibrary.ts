@@ -25,7 +25,7 @@ export const sortOptions = [
   { value: "size", label: "按大小" },
 ];
 export function contentUrl(item: LibraryEntry, download = false) {
-  return `/v1/file-library/entries/${encodeURIComponent(item.id)}/content${download ? "?download=true" : ""}`;
+  return coreApiUrl(`/v1/file-library/entries/${encodeURIComponent(item.id)}/content${download ? "?download=true" : ""}`);
 }
 export function itemPath(item: LibraryItem) {
   return `/v1/file-library/${item.type === "folder" ? "folders" : "entries"}/${encodeURIComponent(item.value.id)}`;
@@ -140,3 +140,4 @@ export async function previewText(item: LibraryEntry, signal: AbortSignal) {
     truncated: item.byte_size > size,
   };
 }
+import {coreApiUrl} from '@platform/embedded';

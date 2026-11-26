@@ -289,6 +289,22 @@ class Accounts:
             raise CoreError("应用配对无效", "unauthorized")
         return {k: row[k] for k in ("id", "origin", "callback")}
 
+    def relocate_client(self, identity, token, origin):
+        """Trusted embedded launcher only; retain grants and reject stale credentials."""
+        from urllib.parse import urlsplit
+
+        parsed = urlsplit(origin)
+        if parsed.scheme != 'http' or parsed.hostname != '127.0.0.1' or not parsed.port or origin != f'http://127.0.0.1:{parsed.port}':
+            raise CoreError('应用回调地址无效', 'validation')
+        with self.connection() as db:
+            db.execute('BEGIN IMMEDIATE')
+            row = db.execute('SELECT * FROM app_client WHERE id=?', (identity,)).fetchone()
+            if not row or not hmac.compare_digest(row['digest'], digest(token)):
+                raise CoreError('应用配对无效', 'unauthorized')
+            if row['origin'] != origin:
+                db.execute('UPDATE app_client SET origin=? WHERE id=?', (origin, identity))
+                db.execute('DELETE FROM app_login WHERE application_id=?', (identity,))
+
     def code(self, account_id, application_id):
         self.account(account_id)
         client = self.client(application_id)

@@ -1,4 +1,5 @@
 import "./studio-shell.css";
+import {coreProduct} from '@platform/embedded';
 import { useEffect, useState, type ReactNode } from "react";
 import { Bot, MonitorCog, Link2 } from "lucide-react";
 import {
@@ -237,8 +238,8 @@ function StudioChrome({
     },
     {
       id: "applications",
-      label: "应用",
-      shortLabel: "应用",
+      label: coreProduct() ? "项目" : "应用",
+      shortLabel: coreProduct() ? "项目" : "应用",
       icon: <AppsIcon />,
       active: page === "applications",
       page: "applications",

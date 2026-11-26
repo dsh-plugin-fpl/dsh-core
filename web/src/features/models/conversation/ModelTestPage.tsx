@@ -1,4 +1,5 @@
 import { LoadingScene } from "@shared/ui/LoadingScene";
+import {requestApi} from '@platform/api/client';
 import { useTransferProgress } from "@platform/api/useTransferProgress";
 import { TransferFeedback } from "@shared/ui/TransferFeedback";
 import { useEffect, useMemo, useRef, useState } from "react";
@@ -475,7 +476,7 @@ export function ModelTestPage({
 
   const stopGeneration = () => {
     if (conversation)
-      void fetch(
+      void requestApi(
         `/v1/model-test/conversations/${encodeURIComponent(conversation.id)}/stop`,
         {
           method: "POST",

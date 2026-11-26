@@ -21,6 +21,7 @@ await cp(
     filter: (p) => !p.includes("__pycache__") && !p.endsWith(".pyc"),
   },
 );
+await cp(resolve(root, "python/fpl_core"), resolve(output, "python/fpl_core"), {recursive: true, filter: p => !p.includes("__pycache__")});
 for (const item of ["pyproject.toml", "uv.lock"])
   await cp(resolve(root, "python", item), resolve(output, "python", item));
 await cp(resolve(root, "web/dist"), resolve(output, "web/dist"), {
