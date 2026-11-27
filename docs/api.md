@@ -130,3 +130,22 @@ ctx.dshCore.manageLocalService({id,endpoint,installation,serviceDirectory?}) 提
 ## GitHub 资源库
 
 创意界面使用独立于网站账号的 Core 资源源与导入接口：`/v1/resource-sources`、`/v1/resource-library/imports`。内嵌产品经 `/v1/core` 适配，沿用产品的本地会话、权限与 CSRF 边界。接口及配方格式见 [GitHub 资源库协议](resource-library.md)。旧网站接口仅保留兼容，不再由创意页面调用。
+
+### 产品首页扩展（Core UI）
+
+`@fpl/core-ui` 导出 `CoreWorkspaceProps` 与 `CoreHomeProps`。产品可传入 React 组件：
+
+```tsx
+const ProductHome = lazy(() => import('./ProductHome'));
+createRoot(root).render(<CoreWorkspace home={ProductHome} />);
+```
+
+Core 在已认证的外框、查询 Provider 和页面 Suspense 内挂载首页，传入：
+
+- `navigateCore(path)`：使用 Core 相对路由（如 `/files`）；产品业务页面使用自身公开路由，不经过 Core 的项目列表重定向。
+- `account.id`、只读的 `account.permissions`：本次会话身份与权限。产品应桥接自己的账号上下文并按权限显示写入操作，服务端仍负责授权。
+- `mascot`：Core 管理的首页角色节点。每个定制首页放置一次，在自身作用域内安排 `.home-hero-pet` 的位置与尺寸；图片、动画、品牌资源路径、减少动态效果与失败回退继续由 Core 管理。
+
+未传入 `home` 时沿用当前产品首页或独立 Core 首页。首页布局、品牌拼贴与项目查询归产品仓库；Core 不导入产品私有业务组件。该扩展不改变 HTTP 契约。公共声明由 `pnpm test:consumer` 的首页消费者示例检查。
+
+可选的 `WorkshopHomeFrame` 提供标题、工具链接、文案、操作区、插画与角色叠放，以及任意最近内容插槽。它只负责展示；产品仍可完全自定义首页，不要求采用此布局。`className` 可调整本工坊的构图，例如录音标注使用分行列表，演示将角色安放在画架台面上。

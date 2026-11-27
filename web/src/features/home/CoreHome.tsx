@@ -1,5 +1,6 @@
+import { HomeExtension } from "./homeExtension";
 import {ProductHome} from './ProductHome';
-import { useState } from "react";
+import { useContext, useState } from "react";
 import {coreProduct} from '@platform/embedded';
 import { HomeInfrastructure } from "./HomeInfrastructure";
 import { HomeApplicationFolders } from "./HomeApplicationFolders";
@@ -142,4 +143,11 @@ function StandaloneHome({ navigate }: { navigate: (p: string) => void }) {
   );
 }
 
-export function Home(props:{navigate:(path:string)=>void}) { return coreProduct() ? <ProductHome {...props}/> : <StandaloneHome {...props}/>; }
+export function Home(props:{navigate:(path:string)=>void}) {
+  const extension = useContext(HomeExtension);
+  if (extension) {
+    const ProductHomepage = extension.home;
+    return <ProductHomepage navigateCore={props.navigate} account={extension.account} mascot={<HomeHeroPet />} />;
+  }
+  return coreProduct() ? <ProductHome {...props}/> : <StandaloneHome {...props}/>;
+}
