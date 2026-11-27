@@ -1,5 +1,5 @@
 import {useEffect, useLayoutEffect, useRef, useState} from 'react';
-import {ArrowLeft, ArrowUpRight, Box, Check, Download, FolderGit2, GitBranch, Github, Layers, LayoutTemplate, Package, RefreshCw, Search, Settings2, Sparkles, Workflow, X, type LucideIcon} from 'lucide-react';
+import {ArrowLeft, ArrowUpRight, Box, Check, Download, FolderGit2, GitBranch, Layers, LayoutTemplate, Package, RefreshCw, Search, Settings2, Sparkles, Workflow, X, type LucideIcon} from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import {CustomSelect} from '@shared/ui/CustomSelect';
 import {fetchApiJson} from '@platform/api/client';
