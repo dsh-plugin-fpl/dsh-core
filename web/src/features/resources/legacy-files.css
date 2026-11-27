@@ -1,20 +1,20 @@
-.project-files-page {
+.legacy-files-page {
   display: flex;
   flex-direction: column;
   gap: 18px;
   color: var(--text);
 }
-.project-files-page > :is(h1, p) {
+.legacy-files-page > :is(h1, p) {
   margin: 0;
 }
-.project-files-page > label {
+.legacy-files-page > label {
   display: flex;
   flex-direction: column;
   gap: 8px;
   max-width: 36rem;
   width: 100%;
 }
-.project-files-page :is(select, input:not([type="checkbox"]), button) {
+.legacy-files-page :is(select, input:not([type="checkbox"]), button) {
   box-sizing: border-box;
   min-height: 38px;
   padding: 8px 12px;
@@ -25,26 +25,26 @@
   font: inherit;
   max-width: 100%;
 }
-.project-files-page > button {
+.legacy-files-page > button {
   align-self: flex-start;
 }
-.project-files-page button {
+.legacy-files-page button {
   cursor: pointer;
 }
-.project-files-page button:disabled {
+.legacy-files-page button:disabled {
   opacity: 0.5;
   cursor: default;
 }
-.project-files-page :is(button, a, input, select):focus-visible {
+.legacy-files-page :is(button, a, input, select):focus-visible {
   outline: 2px solid var(--accent);
   outline-offset: 3px;
 }
-.project-files-page ul {
+.legacy-files-page ul {
   list-style: none;
   padding: 0;
   margin: 0;
 }
-.project-files-page li {
+.legacy-files-page li {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
@@ -52,10 +52,10 @@
   padding: 14px 0;
   border-bottom: 1px solid color-mix(in srgb, currentColor 15%, transparent);
 }
-.project-file-name {
+.legacy-file-name {
   flex: 1 1 12rem;
   overflow-wrap: anywhere;
 }
-.project-files-page [role="alert"] {
+.legacy-files-page [role="alert"] {
   color: var(--danger, #b5412a);
 }

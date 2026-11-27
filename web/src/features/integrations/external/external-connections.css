@@ -400,3 +400,37 @@
   background: var(--surface-soft);
   color: var(--accent);
 }
+
+.connection-add-menu {
+  position: relative;
+  display: block !important;
+}
+.connection-add-menu summary {
+  list-style: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.connection-add-menu summary::-webkit-details-marker {
+  display: none;
+}
+.connection-add-menu > div {
+  position: absolute;
+  right: 0;
+  top: calc(100% + 8px);
+  z-index: 20;
+  min-width: 210px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 8px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--surface-raised);
+  box-shadow: 0 12px 30px #0003;
+}
+.connection-add-menu > div .btn {
+  justify-content: flex-start;
+  width: 100%;
+}

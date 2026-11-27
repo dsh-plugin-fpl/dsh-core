@@ -1,5 +1,5 @@
 /** Product-provided platform configuration; standalone defaults are preserved. */
-export type CorePlatform = {apiPrefix: string; routePrefix: string; csrfCookie: string; brandAsset?: string; product?: {name: string; projectsUrl: string}};
+export type CorePlatform = {apiPrefix: string; routePrefix: string; csrfCookie: string; brandAsset?: string; assetPrefix?: string; localBrand?: boolean; product?: {name: string; projectsUrl: string}};
 let configuration: CorePlatform | undefined;
 export function configureCorePlatform(value: CorePlatform) { configuration = value; }
 export function corePath() {
@@ -37,3 +37,6 @@ export function coreCsrfToken() {
   const name = configuration?.csrfCookie;
   return name ? decodeURIComponent(document.cookie.split("; ").find(x=>x.startsWith(name+"="))?.slice(name.length+1) || "") : "";
 }
+
+export function coreAssetPrefix() { return configuration?.assetPrefix || ""; }
+export function coreLocalBrand() { return configuration?.localBrand; }

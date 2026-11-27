@@ -1,9 +1,10 @@
+import { programAsset } from "@platform/programAsset";
 import { ResponsiveImage } from "@shared/ui/ResponsiveImage";
 /** Feishu client brand mark; source: flathub/cn.feishu.Feishu. */
 export function FeishuMark({ size = 40 }: { size?: number }) {
   return (
     <ResponsiveImage
-      src="/providers/feishu-logo.svg"
+      src={programAsset("/providers/feishu-logo.svg")}
       width={size}
       height={size}
       alt=""

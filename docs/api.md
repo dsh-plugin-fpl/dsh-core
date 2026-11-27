@@ -116,7 +116,7 @@ ctx.dshCore.manageLocalService({id,endpoint,installation,serviceDirectory?}) 提
 
 导入预检拒绝绝对路径、上级路径、重复/冲突路径、符号链接和加密归档。单次含隐式父目录最多 5000 项，ZIP 压缩输入和解压后的文件合计均最多 256 MiB。逐文件提交允许保留部分成功；发生中断时保留回执并提示核对或继续，不自动重复导入。以上所有操作复用账号会话、Origin 和 CSRF 验证；管理员也不能操作其他账号的条目，不改变既有迁移账本或 schema。
 
-## FPL 网站连接与公开能力副本
+## 旧 FPL 网站连接与公开能力副本（兼容接口）
 
 `GET /v1/fpl-connection` 返回网站地址、公开账号资料与网站权限；`POST /login|logout|change-password` 使用该前缀管理独立网站会话。网站密码不持久化，Cookie/CSRF 只在 Core 后端加密保存，按本地账号隔离。远程认证错误返回 424 与 `X-FPL-Auth-Required`，不会使本机 Core 退出。网络错误返回 502；不会自动重放写请求。
 
@@ -125,3 +125,8 @@ ctx.dshCore.manageLocalService({id,endpoint,installation,serviceDirectory?}) 提
 `POST /installations/preview` 输入 release_id 和可选 names，取得预览 id、依赖、目标名称、冲突与安装状态；`POST /installations` 带 preview_id、release_id 和 names，确认时使用已保存的预览名称并重新核验来源版本。预览绑定网站账号，有效期一小时。回执通过 `GET /installations/{id}` 读取；`POST /installations/{id}/stdio` 配置本机命令。副本默认停用，方案同一事务登记，附件失败补偿；重复请求读取既有回执。
 
 版本下载协议由原站 `/v1/creative-workshop/releases/{id}/package` 提供并拥有：schema_version=1、根 release_id、parts 中的公开 release、archive_base64 与 archive_sha256。Skill 归档经有界 ZIP 校验，名称调整同时更新 SKILL.md。新连接文件 schema_version=1 沿用 Access 加密私有文件协议，安装回执复用已登记 integration_transfer_receipts 表，无既有账本改写或数据迁移。
+
+
+## GitHub 资源库
+
+创意界面使用独立于网站账号的 Core 资源源与导入接口：`/v1/resource-sources`、`/v1/resource-library/imports`。内嵌产品经 `/v1/core` 适配，沿用产品的本地会话、权限与 CSRF 边界。接口及配方格式见 [GitHub 资源库协议](resource-library.md)。旧网站接口仅保留兼容，不再由创意页面调用。

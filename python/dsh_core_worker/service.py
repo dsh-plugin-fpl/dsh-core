@@ -83,6 +83,9 @@ def create_tenant_app(root, web_root=None, origin="http://127.0.0.1:9310", *, ac
 
             app.state.fpl_website = Website(access)
             app.state.creative_installations = Installations(app.state.fpl_website, app.state.integrations)
+            from .resource_library.library import ResourceLibrary
+
+            app.state.resource_library = ResourceLibrary(app.state.integrations)
             yield
         finally:
             for bridge in list(bridges.online.values()):
@@ -435,6 +438,9 @@ def create_tenant_app(root, web_root=None, origin="http://127.0.0.1:9310", *, ac
     from .creative.http import router as creative_router
 
     app.include_router(creative_router)
+    from .resource_library.http import router as resource_library_router
+
+    app.include_router(resource_library_router)
     register_routes(app, content_response)
 
     @app.get("/settings", include_in_schema=False)

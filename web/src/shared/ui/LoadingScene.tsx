@@ -1,9 +1,9 @@
 import { useEffect, useRef, useState } from "react";
-import { programAsset, localBrandEnabled } from "@platform/programAsset";
+import { programAsset, brandMotionEnabled } from "@platform/programAsset";
 import { LoadingCharacter } from "./LoadingCharacter";
 import "./loading-scene.css";
 
-const ART = programAsset("/brand/loading/");
+const ART = () => programAsset("/brand/loading/");
 const PROPS = [
   "phonewave",
   "pocket-watch",
@@ -45,7 +45,35 @@ export function LoadingScene({
     return () => observer.disconnect();
   }, []);
   const props = variant === "inline" ? [] : PROPS;
-  if (!localBrandEnabled) return <span ref={root} className={`fpl-loading-scene fpl-loading-scene--${variant}`} aria-hidden="true"><svg viewBox="0 0 100 100" width="100%" height="100%"><circle cx="50" cy="50" r="32" fill="none" stroke="currentColor" strokeWidth="2" opacity=".2" /><circle cx="50" cy="50" r="18" fill="none" stroke="currentColor" strokeWidth="3" strokeDasharray="60 54" /></svg></span>;
+  if (!brandMotionEnabled())
+    return (
+      <span
+        ref={root}
+        className={`fpl-loading-scene fpl-loading-scene--${variant}`}
+        aria-hidden="true"
+      >
+        <svg viewBox="0 0 100 100" width="100%" height="100%">
+          <circle
+            cx="50"
+            cy="50"
+            r="32"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            opacity=".2"
+          />
+          <circle
+            cx="50"
+            cy="50"
+            r="18"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="3"
+            strokeDasharray="60 54"
+          />
+        </svg>
+      </span>
+    );
   return (
     <span
       ref={root}
@@ -62,32 +90,32 @@ export function LoadingScene({
       <svg className="fpl-loading-dial" viewBox="0 0 320 320" fill="none">
         <use
           className="fpl-dial-base"
-          href={`${ART}loading-dial.svg#${variant === "inline" ? "compact" : "base"}`}
+          href={`${ART()}loading-dial.svg#${variant === "inline" ? "compact" : "base"}`}
         />
         <g className="fpl-dial-sweep">
-          <use href={`${ART}loading-dial.svg#sweep`} />
+          <use href={`${ART()}loading-dial.svg#sweep`} />
         </g>
         {variant !== "inline" ? (
           <>
             <g className="fpl-dial-tracers">
-              <use href={`${ART}loading-dial.svg#tracers`} />
+              <use href={`${ART()}loading-dial.svg#tracers`} />
             </g>
             <g className="fpl-dial-comet">
-              <use href={`${ART}loading-dial.svg#comet`} />
+              <use href={`${ART()}loading-dial.svg#comet`} />
             </g>
             <g className="fpl-dial-energy">
-              <use href={`${ART}loading-dial.svg#energy`} />
+              <use href={`${ART()}loading-dial.svg#energy`} />
             </g>
             <g className="fpl-dial-particles">
-              <use href={`${ART}loading-dial.svg#particles`} />
+              <use href={`${ART()}loading-dial.svg#particles`} />
             </g>
             <use
               className="fpl-dial-scan"
-              href={`${ART}loading-dial.svg#scan`}
+              href={`${ART()}loading-dial.svg#scan`}
             />
             <use
               className="fpl-dial-speed"
-              href={`${ART}loading-dial.svg#speed`}
+              href={`${ART()}loading-dial.svg#speed`}
             />
           </>
         ) : null}
@@ -98,7 +126,7 @@ export function LoadingScene({
       {props.map((name) => (
         <span className={`fpl-scene-prop fpl-scene-prop--${name}`} key={name}>
           <img
-            src={`${ART}${name}.webp`}
+            src={`${ART()}${name}.webp`}
             alt=""
             width={256}
             height={256}

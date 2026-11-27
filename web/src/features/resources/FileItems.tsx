@@ -184,6 +184,7 @@ export function FileItems({
   openFolder,
   preview,
   edit,
+  renderActions,
 }: {
   folders: LibraryFolder[];
   files: LibraryEntry[];
@@ -191,6 +192,7 @@ export function FileItems({
   openFolder: (id: string) => void;
   preview: (file: LibraryEntry) => void;
   edit: (editor: Editor) => void;
+  renderActions?: (file: LibraryEntry) => ReactNode;
 }) {
   return (
     <div className={`file-items ${view}`}>
@@ -259,11 +261,11 @@ export function FileItems({
                 {updatedLabel(file.updated_at)}
               </time>
             </div>
-            <ItemActions
+            {renderActions ? renderActions(file) : <ItemActions
               item={{ type: "file", value: file }}
               edit={edit}
               preview={() => preview(file)}
-            />
+            />}
           </article>
         ))}
       </div>

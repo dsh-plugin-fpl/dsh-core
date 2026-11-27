@@ -1,9 +1,9 @@
-import { programAsset, localBrandEnabled } from "@platform/programAsset";
+import { programAsset, brandMotionEnabled } from "@platform/programAsset";
 import { ResponsiveImage } from "@shared/ui/ResponsiveImage";
 import { useEffect, useRef, useState } from "react";
 
-const POSTER = programAsset("/brand/home/kurisu-idle.png");
-const ANIMATION = programAsset("/brand/home/kurisu-idle.webm");
+const POSTER = () => programAsset("/brand/home/kurisu-idle.png");
+const ANIMATION = () => programAsset("/brand/home/kurisu-idle.webm");
 
 export function HomeHeroPet() {
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -53,12 +53,12 @@ export function HomeHeroPet() {
       aria-hidden="true"
       data-playing={ready && !reduced && !failed}
     >
-      <ResponsiveImage src={POSTER} alt="" width="640" height="360" />
-      {localBrandEnabled && !reduced && !failed && (
+      <ResponsiveImage src={POSTER()} alt="" width="640" height="360" />
+      {brandMotionEnabled() && !reduced && !failed && (
         <video
           ref={videoRef}
-          src={ANIMATION}
-          poster={POSTER}
+          src={ANIMATION()}
+          poster={POSTER()}
           autoPlay={!document.hidden}
           muted
           loop

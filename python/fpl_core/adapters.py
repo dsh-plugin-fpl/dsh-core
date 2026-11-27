@@ -109,6 +109,7 @@ def prepare_product(root, port, *, application_id, identity_id, title, initializ
     host = CoreHost(CoreOptions(application_id, title, root / 'embedded-core',
         identity_id=identity_id, origin=f'http://127.0.0.1:{port}'))
     value = host.provision_product(credential=old.get('token'), relocate=bool(old))
-    value.update(mode='embedded', application_origin=value['origin'], legacy_owner_id=owner_id(root))
+    value.update(mode='embedded', application_origin=value['origin'],
+        legacy_owner_id=old.get('legacy_owner_id', owner_id(root)))
     atomic_private(identity, json.dumps(value).encode())
     return host

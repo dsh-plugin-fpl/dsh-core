@@ -3,6 +3,6 @@ import {resolve} from 'node:path';
 import base from './vite.config';
 export default mergeConfig(base, defineConfig({
   build: {outDir: '../packages/core-ui/dist', emptyOutDir: true,
-    lib: {entry: resolve(import.meta.dirname, 'src/embedded.tsx'), formats: ['es'], fileName: 'index'},
+    lib: {entry: {index: resolve(import.meta.dirname, 'src/embedded.tsx'), files: resolve(import.meta.dirname, 'src/features/resources/ProductFilePicker.tsx')}, formats: ['es'], fileName: (_format, entryName) => entryName + '.js'},
     rollupOptions: {external: ['react','react-dom','react/jsx-runtime','@tanstack/react-query']}}
 }));

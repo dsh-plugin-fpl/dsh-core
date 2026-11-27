@@ -19,6 +19,7 @@ parser.add_argument('--title', required=True)
 parser.add_argument('--path', required=True)
 parser.add_argument('--port', type=int, required=True)
 parser.add_argument('--dmg', action='store_true')
+parser.add_argument('--local-brand', action='store_true', help='Include the installed owner-supplied application mark in this local candidate')
 options = parser.parse_args()
 if platform.system() != 'Darwin' or platform.machine() != 'arm64':
     parser.error('首轮桌面构建只支持 macOS Apple Silicon')
@@ -79,6 +80,22 @@ if web_fingerprint(resources / 'web') != web_snapshot or web_fingerprint(web) !=
     raise SystemExit('桌面组装期间界面产物发生变化，请等待构建结束后使用新候选版本重试。')
 shutil.copytree(product / 'src', resources / 'product-assets',
     ignore=shutil.ignore_patterns('runtime', '*.mjs', '*.json', '*.md'))
+if options.local_brand:
+    mark = product / '.runtime/assets/brand' / (options.application_id.removeprefix('dsh-') + '-mark.png')
+    if not mark.is_file():
+        raise SystemExit('本机应用品牌图标缺失。')
+    shutil.copy2(mark, resources / 'product-assets/brand-icon.png')
+    shutil.copy2(mark, resources / 'product-assets/icon.png')
+    iconset = stage / 'workshop.iconset'
+    iconset.mkdir()
+    for size in [16,32,128,256,512]:
+        for scale in [1,2]:
+            suffix = '@2x' if scale == 2 else ''
+            run('/usr/bin/sips','-z',size*scale,size*scale,mark,'--out',iconset/f'icon_{size}x{size}{suffix}.png',stdout=subprocess.DEVNULL)
+    run('/usr/bin/iconutil','-c','icns',iconset,'-o',resources/'workshop.icns')
+    info['CFBundleIconFile']='workshop.icns'
+    with info_path.open('wb') as stream:
+        plistlib.dump(info, stream)
 application = resources / 'app'
 application.mkdir()
 shutil.copytree(core / 'packages/desktop-runtime', application / 'runtime',
@@ -86,7 +103,8 @@ shutil.copytree(core / 'packages/desktop-runtime', application / 'runtime',
 (application / 'package.json').write_text(json.dumps({'name': options.application_id,
     'version': version, 'type': 'module', 'main': 'main.mjs'}))
 config = {'title': options.title, 'applicationId': options.application_id,
-    'port': options.port, 'path': options.path}
+    'port': options.port, 'path': options.path,
+    'cacheVersion': hashlib.sha256(json.dumps(web_snapshot, sort_keys=True).encode()).hexdigest()}
 (application / 'main.mjs').write_text('''import {runDesktop} from './runtime/index.mjs';
 import {fileURLToPath} from 'node:url';
 import {resolve} from 'node:path';

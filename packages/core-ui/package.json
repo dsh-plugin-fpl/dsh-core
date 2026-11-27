@@ -7,11 +7,16 @@
       "types": "./index.d.ts",
       "import": "./dist/index.js"
     },
-    "./style.css": "./dist/index.css"
+    "./style.css": "./dist/index.css",
+    "./files": {
+      "types": "./files.d.ts",
+      "import": "./dist/files.js"
+    }
   },
   "files": [
     "dist",
-    "index.d.ts"
+    "index.d.ts",
+    "files.d.ts"
   ],
   "peerDependencies": {
     "react": "^19",

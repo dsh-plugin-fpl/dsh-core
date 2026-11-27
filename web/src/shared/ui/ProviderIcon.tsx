@@ -1,3 +1,4 @@
+import { programAsset } from "@platform/programAsset";
 import { ResponsiveImage } from "@shared/ui/ResponsiveImage";
 export function ProviderIcon({
   kind,
@@ -21,7 +22,9 @@ export function ProviderIcon({
     return (
       <ResponsiveImage
         className="provider-brand-icon"
-        src={`/providers/${kind === "local_qwen_tts" ? "qwen" : "deepseek"}-logo.svg`}
+        src={programAsset(
+          `/providers/${kind === "local_qwen_tts" ? "qwen" : "deepseek"}-logo.svg`,
+        )}
         width={size}
         height={size}
         alt=""

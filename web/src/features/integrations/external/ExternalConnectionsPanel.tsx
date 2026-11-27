@@ -201,26 +201,36 @@ export function ExternalConnectionsPanel({
       <div className="external-connections-heading">
         <div>
           <h2>外部连接</h2>
-          <p>
-            管理 DSH
-            配对和飞书等外部服务。工坊入口与运行状态请在「应用」中查看。
-          </p>
+          <p>管理 DSH 配对和飞书等外部服务。每个连接单独配置、检查和停用。</p>
         </div>
-        <div className="external-connections-add">
-          <button className="btn" onClick={dsh.open}>
-            <AgentLogo id="dsh" size={17} />
-            连接 DSH
-          </button>
-          <button
-            className="btn primary"
-            onClick={() => {
-              setError("");
-              setForm({ current: null });
-            }}
-          >
-            <Plus size={16} /> 添加飞书连接
-          </button>
-        </div>
+        <details className="external-connections-add connection-add-menu">
+          <summary className="btn primary">
+            <Plus size={16} /> 添加连接
+          </summary>
+          <div role="group" aria-label="添加连接类型">
+            <button
+              className="btn"
+              onClick={(event) => {
+                event.currentTarget.closest("details")!.open = false;
+                setError("");
+                setForm({ current: null });
+              }}
+            >
+              <FeishuMark />
+              添加飞书连接
+            </button>
+            <button
+              className="btn"
+              onClick={(event) => {
+                event.currentTarget.closest("details")!.open = false;
+                dsh.open();
+              }}
+            >
+              <AgentLogo id="dsh" size={17} />
+              添加 DSH
+            </button>
+          </div>
+        </details>
       </div>
       {!!total && (
         <div className="external-connections-toolbar">

@@ -1,5 +1,5 @@
 import { coreProduct, coreUrl } from "@platform/embedded";
-import { productApi } from "@features/resources/ProjectFilesPage";
+import { productApi } from "@features/resources/productFiles";
 import { LoadingScene } from "@shared/ui/LoadingScene";
 import { LoadingState } from "@shared/ui/LoadingState";
 import { useEffect, useRef, useState } from "react";
@@ -297,7 +297,7 @@ export function SpeechSynthesisResult({
           {coreProduct() ? (
             <a
               href={coreUrl(
-                "/project-files?project=" + encodeURIComponent(project),
+                "/files?project=" + encodeURIComponent(project),
               )}
             >
               已保存到项目 · 查看文件

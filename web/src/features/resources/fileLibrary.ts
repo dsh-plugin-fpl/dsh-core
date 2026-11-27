@@ -1,7 +1,7 @@
 import { fetchApiJson, requestApi } from "@platform/api/client";
 import type { components } from "@generated/api";
 export type LibraryFolder = components["schemas"]["LibraryFolder"];
-export type LibraryEntry = components["schemas"]["LibraryEntry"];
+export type LibraryEntry = components["schemas"]["LibraryEntry"] & { content_url?: string };
 export type LibraryPage = components["schemas"]["LibraryPage"];
 export type LibraryItem =
   | { type: "folder"; value: LibraryFolder }
@@ -25,6 +25,7 @@ export const sortOptions = [
   { value: "size", label: "按大小" },
 ];
 export function contentUrl(item: LibraryEntry, download = false) {
+  if (item.content_url) return item.content_url;
   return coreApiUrl(`/v1/file-library/entries/${encodeURIComponent(item.id)}/content${download ? "?download=true" : ""}`);
 }
 export function itemPath(item: LibraryItem) {

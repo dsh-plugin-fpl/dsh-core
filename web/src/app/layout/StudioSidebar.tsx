@@ -244,14 +244,14 @@ function StudioChrome({
       active: page === "applications",
       page: "applications",
     },
-    ...(!coreProduct() ? [{
+    ...([{
       id: "files",
-      label: "文件管理",
+      label: coreProduct() ? "文件库" : "文件管理",
       shortLabel: "文件",
       icon: <FilesIcon />,
       active: page === "files",
       page: "files" as const,
-    }] : []),
+    }]),
 
     {
       id: "integrations",

@@ -1,14 +1,12 @@
 import {coreUrl, coreProduct} from "@platform/embedded";
-import { useWebsite } from "@features/creative-workshop/WebsiteAccount";
 import { useCoreAccount } from "@platform/auth/AccountAccess";
 import { ThemeToggle } from "@shared/ui/ThemeToggle";
 import { useQuery } from "@tanstack/react-query";
 import { fetchBridges, isDshConnection } from "@features/connections/api";
 import { HardDrive, Network, UserRound } from "lucide-react";
 import "./studio-global-header.css";
-export function StudioGlobalHeader(_: { assistant?: unknown }) {
+function StandaloneGlobalHeader(_: { assistant?: unknown }) {
   const profile = useCoreAccount();
-  const website = useWebsite();
   const q = useQuery({
     queryKey: ["bridges"],
     queryFn: fetchBridges,
@@ -44,12 +42,11 @@ export function StudioGlobalHeader(_: { assistant?: unknown }) {
           <UserRound size={16} />
           {profile.display_name}
         </a>
-        <a className="studio-header-chip" href={coreUrl("/fpl-account")}>
-          {website.data?.account
-            ? `FPL · ${website.data.account.display_name || website.data.account.username}`
-            : "登录 FPL"}
-        </a>
       </div>
     </header>
   );
+}
+
+export function StudioGlobalHeader(props: {assistant?: unknown}) {
+  return coreProduct() ? <header className="studio-panel studio-global-header"><div className="studio-header-start"><ThemeToggle /></div></header> : <StandaloneGlobalHeader {...props}/>;
 }

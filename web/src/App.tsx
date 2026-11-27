@@ -38,7 +38,8 @@ const CodeAgentsPage = lazy(() =>
 );
 import type { StudioPage } from "@app/routes";
 import { Home } from "@features/home/CoreHome";
-import { ProjectFilesPage } from "@features/resources/ProjectFilesPage";
+import { LegacyFileCleanup } from "@features/resources/LegacyFileCleanup";
+import { ProductLibrary } from "@features/resources/ProductLibrary";
 import { Files } from "@features/resources/ResourcesPage";
 import { ApplicationsPage } from "@features/applications/ApplicationsPage";
 import type { IntegrationKind } from "@features/integrations/IntegrationCenterPage";
@@ -65,7 +66,15 @@ const paths: Record<StudioPage, string> = {
 };
 export function App() {
   const account = useCoreAccount();
-  const [path, setPath] = useState(corePath());
+  const [path, setPath] = useState(() => {
+    const current = corePath();
+    if (coreProduct() && current.split("?")[0] === "/project-files") {
+      const target = "/files" + location.search;
+      history.replaceState(null, "", coreUrl(target));
+      return target;
+    }
+    return current;
+  });
   useEffect(() => {
     const sync = () => setPath(corePath());
     window.addEventListener("popstate", sync);
@@ -118,8 +127,10 @@ export function App() {
       >
         {path.split("?")[0] === "/setup/authorize" ? (
           <SetupAuthorizationPage />
-        ) : coreProduct() && ["/files", "/legacy-files", "/project-files"].includes(path.split("?")[0]) ? (
-          <ProjectFilesPage legacy={path.split("?")[0] !== "/project-files"} />
+        ) : coreProduct() && path.split("?")[0] === "/legacy-files" ? (
+          <LegacyFileCleanup />
+        ) : coreProduct() && path.split("?")[0] === "/files" ? (
+          <ProductLibrary key={path} />
         ) : path.split("?")[0] === "/storage" ? (
           coreProduct() ? <ProductStorage /> : <StoragePage />
         ) : path.split("?")[0] === "/account" ? (

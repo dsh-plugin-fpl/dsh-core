@@ -1,3 +1,4 @@
+import {coreProduct} from "@platform/embedded";
 import { TransferToolbar } from "./TransferToolbar";
 import { ValidationRecoveryPanel } from "./ValidationRecoveryPanel";
 import { IntegrationInteractions } from "./IntegrationInteractions";
@@ -44,7 +45,7 @@ export function IntegrationCenterPage({
             <h1>集成中心</h1>
             <p>统一管理工具 API、MCP 服务、Skill 与外部连接</p>
           </div>
-          <TransferToolbar />
+          {!coreProduct() && <TransferToolbar />}
         </header>
         {canManage ? <ValidationRecoveryPanel /> : null}
         <div className="integration-tabs" role="tablist" aria-label="集成类型">

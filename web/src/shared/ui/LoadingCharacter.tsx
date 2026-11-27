@@ -1,17 +1,17 @@
 import { useEffect, useRef, useState } from "react";
 
-import { programAsset, localBrandEnabled } from "@platform/programAsset";
+import { programAsset, brandMotionEnabled } from "@platform/programAsset";
 
-const POSTER = programAsset("/brand/loading/kurisu-run.png");
-const WEBP_POSTER = programAsset("/brand/loading/kurisu-run.webp");
-const ANIMATION = programAsset("/brand/loading/kurisu-run.webm");
+const POSTER = () => programAsset("/brand/loading/kurisu-run.png");
+const WEBP_POSTER = () => programAsset("/brand/loading/kurisu-run.webp");
+const ANIMATION = () => programAsset("/brand/loading/kurisu-run.webm");
 const MOTION_PREFERENCE = "(prefers-reduced-motion: reduce)";
 
 function CharacterPoster() {
   return (
     <picture>
-      <source srcSet={WEBP_POSTER} type="image/webp" />
-      <img src={POSTER} alt="" width={150} height={192} />
+      <source srcSet={WEBP_POSTER()} type="image/webp" />
+      <img src={POSTER()} alt="" width={150} height={192} />
     </picture>
   );
 }
@@ -61,8 +61,8 @@ function AnimatedCharacter({
       <CharacterPoster />
       <video
         ref={videoRef}
-        src={ANIMATION}
-        poster={WEBP_POSTER}
+        src={ANIMATION()}
+        poster={WEBP_POSTER()}
         width={150}
         height={192}
         muted
@@ -98,7 +98,7 @@ export function LoadingCharacter({
     return () => preference.removeEventListener("change", changed);
   }, []);
 
-  if (!localBrandEnabled) return <span className="fpl-loading-character" aria-hidden="true"><img src={programAsset("/brand/icon.webp")} width={96} height={96} alt="" /></span>;
+  if (!brandMotionEnabled()) return <span className="fpl-loading-character" aria-hidden="true"><img src={programAsset("/brand/icon.webp")} width={96} height={96} alt="" /></span>;
   return active && !reduced && !failed ? (
     <AnimatedCharacter onFailure={setFailed} paused={paused} />
   ) : (

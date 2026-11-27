@@ -1,0 +1,31 @@
+.resource-library label { display: grid; gap: 7px; font-size: 14px; min-width: 0; }
+.resource-library input, .resource-library select, .resource-library textarea { box-sizing: border-box; max-width: 100%; padding: 10px 12px; border: 1px solid var(--cw-border); background: var(--surface); color: var(--text); border-radius: 10px; }
+.resource-library a { color: var(--cw-accent); overflow-wrap: anywhere; }
+.resource-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 280px), 1fr)); gap: 16px; }
+.resource-card { padding: 20px; min-height: 230px; text-align: left; color: var(--text); background: var(--surface); border: 1px solid var(--cw-border); border-radius: 16px; display: flex; flex-direction: column; gap: 12px; }
+.resource-card:hover { border-color: var(--cw-accent); }
+.resource-card strong { font-size: 18px; }
+.resource-card p { font-size: 14px; line-height: 1.6; height: 6.4em; margin: 0; overflow-wrap: anywhere; display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical; overflow: hidden; }
+.resource-card small { margin-top: auto; overflow-wrap: anywhere; }
+.resource-metadata { display: flex; flex-wrap: wrap; gap: 8px 16px; font-size: 12px; color: var(--text-muted); }
+.resource-muted, .resource-card small { color: var(--text-muted); font-size: 13px; }
+.resource-notice { padding: 14px 18px; border-radius: 12px; background: var(--cw-accent-soft); border: 1px solid var(--cw-border); line-height: 1.7; }
+.resource-sources form { max-width: 850px; display: grid; gap: 16px; margin: 24px 0; }
+.resource-source-options { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.resource-source-list { list-style: none; padding: 0; display: grid; gap: 12px; }
+.resource-source-list li { display: flex; gap: 16px; align-items: center; padding: 18px; border: 1px solid var(--cw-border); border-radius: 14px; background: var(--surface); }
+.resource-source-list li > div { flex: 1; min-width: 0; display: grid; gap: 8px; }
+.resource-detail { max-width: 1050px; margin: 20px auto; }
+.resource-detail h2 { margin-bottom: 10px; }
+.resource-markdown { line-height: 1.8; overflow-wrap: anywhere; padding: 20px 0; }
+.resource-markdown pre { overflow: auto; padding: 16px; background: var(--surface); border-radius: 12px; }
+.resource-markdown img { max-width: 100%; }
+.resource-markdown table { display: block; overflow: auto; }
+.resource-previews { display: flex; flex-wrap: wrap; gap: 16px; margin: 20px 0; }
+.resource-previews figure { max-width: 100%; flex: 1 1 260px; margin: 0; }
+.resource-previews img, .resource-previews video { width: 100%; max-height: 400px; object-fit: contain; border-radius: 12px; }
+.resource-install { padding: 20px; border: 1px solid var(--cw-border); border-radius: 16px; background: var(--surface); }
+.resource-install-part { display: grid; gap: 12px; margin: 18px 0; }
+.resource-install details label { margin: 12px 0; }
+.resource-library .creative-toolbar { margin: 20px 0; }
+@media (max-width: 760px) { .resource-library .creative-header { align-items: flex-start; flex-direction: column; } .resource-source-options { grid-template-columns: 1fr; } .resource-source-list li { flex-wrap: wrap; } .resource-source-list li > div { flex-basis: 100%; } }

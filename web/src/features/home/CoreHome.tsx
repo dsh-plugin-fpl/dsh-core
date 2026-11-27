@@ -1,3 +1,4 @@
+import {ProductHome} from './ProductHome';
 import { useState } from "react";
 import {coreProduct} from '@platform/embedded';
 import { HomeInfrastructure } from "./HomeInfrastructure";
@@ -7,7 +8,7 @@ import { HomeHeroPet } from "./HomeHeroPet";
 import { CompactPanelTabs } from "@shared/ui/CompactPanelTabs";
 import { FlaskConical, History, Folder, Network } from "lucide-react";
 import "./home.css";
-export function Home({ navigate }: { navigate: (p: string) => void }) {
+function StandaloneHome({ navigate }: { navigate: (p: string) => void }) {
   const applications = useApplications();
   const [mode, setMode] = useState("chat");
   const product = coreProduct();
@@ -140,3 +141,5 @@ export function Home({ navigate }: { navigate: (p: string) => void }) {
     </section>
   );
 }
+
+export function Home(props:{navigate:(path:string)=>void}) { return coreProduct() ? <ProductHome {...props}/> : <StandaloneHome {...props}/>; }
