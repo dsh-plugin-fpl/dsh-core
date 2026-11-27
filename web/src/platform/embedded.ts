@@ -1,5 +1,6 @@
+import type { FileBrowserAdapter } from "../features/resources/fileBrowserTypes";
 /** Product-provided platform configuration; standalone defaults are preserved. */
-export type CorePlatform = {apiPrefix: string; routePrefix: string; csrfCookie: string; brandAsset?: string; assetPrefix?: string; localBrand?: boolean; product?: {name: string; projectsUrl: string}};
+export type CorePlatform = {apiPrefix: string; routePrefix: string; csrfCookie: string; brandAsset?: string; assetPrefix?: string; localBrand?: boolean; product?: {name: string; projectsUrl: string; fileBrowser?: FileBrowserAdapter}};
 let configuration: CorePlatform | undefined;
 export function configureCorePlatform(value: CorePlatform) { configuration = value; }
 export function corePath() {
@@ -8,14 +9,17 @@ export function corePath() {
 export function coreUrl(path: string) { return (configuration?.routePrefix ?? '') + path; }
 export function coreBrandAsset() { return configuration?.brandAsset; }
 export function coreProduct() { return configuration?.product; }
+function productFilePath(path: string) {
+  return !!configuration?.product && (path.startsWith('/v1/app/') || path.startsWith('/v1/files/'));
+}
 export function coreApiUrl(path: string) {
-  return configuration && path.startsWith('/v1/') && !path.startsWith(configuration.apiPrefix + '/')
+  return configuration && path.startsWith('/v1/') && !productFilePath(path) && !path.startsWith(configuration.apiPrefix + '/')
     ? configuration.apiPrefix + path.slice(3) : path;
 }
 export async function coreRequest(request: Request) {
   if (!configuration) return request;
   const url = new URL(request.url);
-  if (url.origin === location.origin && url.pathname.startsWith('/v1/') && !url.pathname.startsWith(configuration.apiPrefix + '/')) {
+  if (url.origin === location.origin && url.pathname.startsWith('/v1/') && !productFilePath(url.pathname) && !url.pathname.startsWith(configuration.apiPrefix + '/')) {
     url.pathname = configuration.apiPrefix + url.pathname.slice(3);
     // Forward a replayable body. Passing Request as init converts its body to a
     // streaming upload, which Chromium refuses over the product's HTTP/1 loopback.

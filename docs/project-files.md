@@ -28,3 +28,17 @@
 - `tests/integration/project_files.py` 使用六个工坊各自的运行环境核对真实项目/旧文件接口，包含未登录与不存在项目的拒绝路径。
 - 视觉工坊 `node tests/project-files-browser.mjs` 使用临时账号与真实 Chrome，覆盖旧链接、归档、项目编辑器入口、附件上传及移除引用，截图在本仓库 `.local/project-files-proof/`。可设置 `FPL_FILE_TEST_WEB_ROOT` 指向隔离构建的 Web 目录。
 - 六工坊前端在临时源代码副本中安装冻结依赖并构建，避免并行安装流程改动共享 `node_modules`。
+
+## 旧版文件管理与原生素材适配
+
+`/core/files` 使用旧版紧凑文件浏览器：路径、数量与主要操作为第一行，搜索、类型、排序和视图切换为第二行。文件夹、预览、目录导入导出与单项操作在同一页面完成。默认卡片视图、最近更新排序；视图按产品记忆。
+
+产品通过 `CorePlatform.product.fileBrowser` 提供 `FileBrowserAdapter`。公共实现和类型从 `@fpl/core-ui/files` 导出，包括 `createFileBrowserAdapter`、`SharedFileBrowser`、`ProductFilePicker`、`browserFile` 与 `readBrowserFile`。适配器使用产品的请求客户端及项目文件回调，负责其原生公开接口；公共 UI 不猜测项目类型、不访问业务数据库。
+
+`ProductFilePicker` 保留旧请求客户端、项目、接受类型及 `onChoose(file, signal)` 用法；提供适配器时显示缩略图、目录和文件库／本项目／其他项目来源。`onSelect(items, signal)` 优先于文件回调，可直接复用原生素材或调用产品导入接口；仅需要跨存储导入时读取原件。`multiple` 开启多选。各来源的资源 ID、文件夹、原始版本和时间保留；无版本或不支持的操作不显示写入按钮。
+
+文件库同时显示当前工坊公共素材与已存在的 Core 文件。项目范围额外读取原生素材及旧附件回执；仅移除附件引用时原件保留。视觉读取项目文件与引用；剪辑读取素材和时间线组织目录；Galgame 读取资产与虚拟路径；演示读取文稿引用；思绪按知识库分页读取文档引用；录音标注读取原始录音。原生浏览权限由所属业务接口验证。
+
+回归入口：`node --test tests/file-browser.test.mjs`。联合工作区 `node scripts/verify-file-browser.mjs <工坊目录>` 以隔离账号启动真实服务与 Chrome，检查非空文件页、目录写入、预览、旧链接、附件解除和编辑器选用；由 TestWithProof 的 `file-browser.rebuild` 记录截图、操作与 trace，不对真实数据运行自动迁移。
+
+根目录同时展示工坊文件和已有附件时，更多操作分别导出各来源；进入文件夹后导出当前目录。Core 归档和文件夹导入按相同批次复用服务端回执，取消或响应中断后可以继续，不自动重提未知结果。嵌入编辑器的浏览器使用紧凑布局，文件管理页保持完整工具栏。

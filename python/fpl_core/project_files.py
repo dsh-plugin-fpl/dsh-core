@@ -176,7 +176,7 @@ def install_project_files(app, host, access, catalog, transport, application_id)
         if product == "presentation-workshop":
             while len(result["items"]) < result.get("total", len(result["items"])):
                 page = await business(
-                    request, "GET", base, params={"offset": len(result["items"]), "limit": 200}
+                    request, "GET", base, params={"offset": len(result["items"]), "limit": 100}
                 )
                 if not page["items"]:
                     break
@@ -250,7 +250,25 @@ def install_project_files(app, host, access, catalog, transport, application_id)
 
                 info = FileLibrary(resources).entry(body.source_id)
             except CoreError as error:
-                raise HTTPException(409, error.code) from None
+                # A durable project copy can be hidden from the ordinary library.
+                # Reuse it only through an existing account-owned, readable project
+                # receipt; knowing a resource ID alone does not authorize reuse.
+                saved = next(
+                    (
+                        item
+                        for item in ProjectFiles(resources.store).items(owner)
+                        if item.get("resource_id", item["source_id"]) == body.source_id
+                    ),
+                    None,
+                )
+                if saved is None:
+                    raise HTTPException(409, error.code) from None
+                await business(request, "GET", base + "/" + saved["project_id"])
+                try:
+                    resources.path(body.source_id)
+                except CoreError as unavailable:
+                    raise HTTPException(409, unavailable.code) from None
+                info = {**saved, "id": body.source_id}
             value = {
                 **info,
                 "name": info["name"],
